@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -10,15 +11,15 @@
     </parent>
 
     <groupId>com.vaadin</groupId>
-    <artifactId>vaadin-spring-parent</artifactId>
+    <artifactId>vaadin-guice-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>vaadin-spring-parent</name>
+    <name>vaadin-guice-parent</name>
     <description>
-        Parent module for Spring integration for Vaadin applications.
+        Parent module for guice integration for Vaadin applications.
     </description>
-    <url>https://github.com/vaadin/spring</url>
+    <url>https://github.com/vaadin/guice</url>
 
     <organization>
         <name>Vaadin Ltd</name>
@@ -33,9 +34,9 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/vaadin/spring</url>
-        <connection>scm:git:git@github.com:vaadin/spring.git</connection>
-        <developerConnection>scm:git:git@github.com:vaadin/spring.git</developerConnection>
+        <url>https://github.com/vaadin/guice</url>
+        <connection>scm:git:git@github.com:vaadin/guice.git</connection>
+        <developerConnection>scm:git:git@github.com:vaadin/guice.git</developerConnection>
     </scm>
 
     <developers>
@@ -44,6 +45,10 @@
             <name>AMahdy AbdElAziz</name>
             <organization>Vaadin</organization>
             <email>amahdy7@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Bernd Hopp</name>
+            <email>bernd@vaadin.com</email>
         </developer>
         <developer>
             <name>Chris Phillipson</name>
@@ -85,11 +90,10 @@
         <project.build.source>1.6</project.build.source>
         
         <!-- These are typically overridden with BOMs -->
+        <guice.version>4.0</guice.version>
         <vaadin.version>7.4.4</vaadin.version>
-        <spring.version>4.1.6.RELEASE</spring.version>
-        <spring.boot.version>1.2.2.RELEASE</spring.boot.version>
-        
         <slf4j.version>1.7.7</slf4j.version>
+        <reflections.version>0.9.8</reflections.version>
 
         <!-- Additional manifest fields -->
         <Vaadin-License-Title>Apache License 2.0</Vaadin-License-Title>
@@ -107,6 +111,7 @@
                     <source>${project.build.source}</source>
                 </configuration>
             </plugin>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -128,6 +133,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -144,6 +150,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -156,7 +163,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
         <pluginManagement>
             <plugins>
@@ -196,9 +203,7 @@
     </build>
 
     <modules>
-        <module>vaadin-spring</module>
-        <module>vaadin-spring-boot</module>
-        <module>vaadin-spring-boot-starter</module>
+        <module>vaadin-guice</module>
     </modules>
 
 </project>

@@ -1,11 +1,11 @@
-Vaadin Spring
+Vaadin guice
 ======================
 
-Vaadin Spring is the official Spring integration for Vaadin Framework version 7.
+Vaadin guice is the official guice integration for Vaadin Framework version 7.
 
 Building the project
 ----
-Execute `mvn clean install` in the root directory to build vaadin-spring and vaadin-spring-boot.
+Execute `mvn clean install` in the root directory to build vaadin-guice and vaadin-guice-boot.
 
 Issue tracking
 ----
