@@ -122,6 +122,13 @@ public class GuiceViewProvider implements ViewProvider, SessionDestroyListener, 
 
     @Override
     public String getViewName(String viewAndParameters) {
+
+        for (String viewName : viewNames) {
+            if(viewAndParameters.startsWith(viewName)){
+                return viewName;
+            }
+        }
+
         return viewAndParameters;
     }
 
