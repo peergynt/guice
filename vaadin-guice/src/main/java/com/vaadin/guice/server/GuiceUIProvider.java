@@ -23,7 +23,6 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
 import com.vaadin.util.CurrentInstance;
 
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,8 +48,8 @@ class GuiceUIProvider extends UIProvider {
     private final Map<String, Class<? extends UI>> pathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<String, Class<? extends UI>> wildcardPathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
 
-    public GuiceUIProvider(Reflections reflections) {
-        detectUIs(reflections);
+    public GuiceUIProvider(Set<Class<?>> uiClasses) {
+        detectUIs(uiClasses);
 
         if (pathToUIMap.isEmpty()) {
             logger.warn("Found no Vaadin UIs in the application context");
@@ -58,10 +57,8 @@ class GuiceUIProvider extends UIProvider {
     }
 
     @SuppressWarnings("unchecked")
-    protected void detectUIs(Reflections reflections) {
+    protected void detectUIs(Set<Class<?>> uiClasses) {
         logger.info("Checking the application context for Vaadin UIs");
-
-        Set<Class<?>> uiClasses = reflections.getTypesAnnotatedWith(GuiceUI.class);
 
         for (Class<?> uiClass : uiClasses) {
             checkArgument(UI.class.isAssignableFrom(uiClass), "class %s has GuiceUI annotation but is not of type com.vaadin.ui.UI.", uiClass);

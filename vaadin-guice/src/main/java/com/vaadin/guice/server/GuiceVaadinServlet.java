@@ -15,11 +15,14 @@
  */
 package com.vaadin.guice.server;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Module;
 
 import com.vaadin.guice.annotation.Configuration;
+import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.guice.annotation.ViewScope;
@@ -39,9 +42,13 @@ import org.reflections.Reflections;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.String.format;
 
 /**
  * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin
@@ -67,8 +74,8 @@ import javax.servlet.http.HttpServletRequest;
 public class GuiceVaadinServlet extends VaadinServlet {
 
     private static final long serialVersionUID = 5371983676318947478L;
-    private final com.vaadin.guice.server.UIScope uiScope = new com.vaadin.guice.server.UIScope();
-    private final com.vaadin.guice.server.ViewScope viewScope = new com.vaadin.guice.server.ViewScope();
+    private final SessionBasedScoper uiScoper = new SessionBasedScoper();
+    private final TransactionBasedScoper viewScoper = new TransactionBasedScoper();
     private final GuiceViewProvider viewProvider;
     private final GuiceUIProvider uiProvider;
 
@@ -83,15 +90,24 @@ public class GuiceVaadinServlet extends VaadinServlet {
 
         Reflections reflections = new Reflections(annotation.basePackage());
 
-        viewProvider = new GuiceViewProvider(reflections);
-        uiProvider = new GuiceUIProvider(reflections);
+        Set<Class<?>> uis = reflections.getTypesAnnotatedWith(GuiceUI.class);
+
+        checkArgument(!uis.isEmpty(), "no @GuiceUI annotated UI's found in %s", annotation.basePackage());
+
+        Set<Class<?>> uiScopedElements = reflections.getTypesAnnotatedWith(UIScope.class);
+        Set<Class<?>> views = reflections.getTypesAnnotatedWith(GuiceView.class);
+
+        checkNoUIViewScopeIntersection(uiScopedElements, views);
+
+        viewProvider = new GuiceViewProvider(views, viewScoper);
+        uiProvider = new GuiceUIProvider(uis);
 
         Module scopeModule = new AbstractModule() {
             @Override
             protected void configure() {
-                bindScope(UIScope.class, uiScope);
-                bindScope(GuiceView.class, viewScope);
-                bindScope(ViewScope.class, viewScope);
+                bindScope(UIScope.class, uiScoper);
+                bindScope(GuiceView.class, viewScoper);
+                bindScope(ViewScope.class, viewScoper);
                 bind(UIProvider.class).toInstance(uiProvider);
                 bind(ViewProvider.class).toInstance(viewProvider);
             }
@@ -112,6 +128,19 @@ public class GuiceVaadinServlet extends VaadinServlet {
         }
 
         InjectorHolder.setInjector(Guice.createInjector(modules));
+    }
+
+    private void checkNoUIViewScopeIntersection(Set<Class<?>> uiScopedElements, Set<Class<?>> views) {
+        Sets.SetView<Class<?>> viewsWithUIScope = Sets.intersection(views, uiScopedElements);
+
+        if (!viewsWithUIScope.isEmpty()) {
+            throw new IllegalArgumentException(
+                    format(
+                            "@UIScope and @GuiceView are mutually exclusive because they expect different guice-scopes, please remove @UIScope from %s",
+                            Joiner.on(",").join(viewsWithUIScope)
+                    )
+            );
+        }
     }
 
     @Override
@@ -143,10 +172,8 @@ public class GuiceVaadinServlet extends VaadinServlet {
             }
         });
 
-        getService().addSessionDestroyListener(uiScope);
-        getService().addSessionInitListener(uiScope);
-        getService().addSessionDestroyListener(viewScope);
-        getService().addSessionInitListener(viewScope);
+        getService().addSessionDestroyListener(uiScoper);
+        getService().addSessionInitListener(uiScoper);
         getService().addSessionDestroyListener(viewProvider);
         getService().addSessionInitListener(viewProvider);
     }

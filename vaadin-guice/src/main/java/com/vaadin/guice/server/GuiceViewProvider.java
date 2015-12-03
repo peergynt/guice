@@ -145,11 +145,11 @@ public class GuiceViewProvider implements ViewProvider, SessionDestroyListener, 
             checkArgument(viewClass != null, "no view for name %s registered", viewName);
 
             try {
-                viewScoper.startScope();
+                viewScoper.startTransaction();
                 view = InjectorHolder.getInjector().getInstance(viewClass);
                 views.put(viewName, view);
             } finally {
-                viewScoper.endScope();
+                viewScoper.endTransaction();
             }
         }
 

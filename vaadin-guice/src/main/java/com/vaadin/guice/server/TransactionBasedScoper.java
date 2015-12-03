@@ -19,19 +19,29 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 
-import com.vaadin.server.ServiceException;
-import com.vaadin.server.SessionDestroyEvent;
-import com.vaadin.server.SessionDestroyListener;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
-import com.vaadin.server.VaadinSession;
-
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-abstract class AbstractScope implements Scope, SessionDestroyListener, SessionInitListener {
+import static com.google.common.base.Preconditions.checkState;
 
-    private final Map<VaadinSession, Map<Key, Object>> sessionToScopedObjectsMap = new ConcurrentHashMap<VaadinSession, Map<Key, Object>>();
+class TransactionBasedScoper implements Scope {
+
+    private final ThreadLocal<Map<Key, Object>> caches = new ThreadLocal<Map<Key, Object>>();
+
+    public void startTransaction() {
+        Map<Key, Object> cache = caches.get();
+
+        if (cache == null) {
+            cache = new HashMap<Key, Object>();
+            caches.set(cache);
+        } else {
+            checkState(cache.isEmpty());
+        }
+    }
+
+    public void endTransaction() {
+        caches.get().clear();
+    }
 
     @Override
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
@@ -39,27 +49,17 @@ abstract class AbstractScope implements Scope, SessionDestroyListener, SessionIn
             @Override
             @SuppressWarnings("unchecked")
             public T get() {
-                Map<Key, Object> map = sessionToScopedObjectsMap.get(VaadinSession.getCurrent());
+                Map<Key, Object> cache = caches.get();
 
-                T t = (T) map.get(key);
+                T t = (T) cache.get(key);
 
                 if (t == null) {
                     t = unscoped.get();
-                    map.put(key, t);
+                    cache.put(key, t);
                 }
 
                 return t;
             }
         };
-    }
-
-    @Override
-    public void sessionDestroy(SessionDestroyEvent event) {
-        sessionToScopedObjectsMap.remove(event.getSession());
-    }
-
-    @Override
-    public void sessionInit(SessionInitEvent event) throws ServiceException {
-        sessionToScopedObjectsMap.put(event.getSession(), new ConcurrentHashMap<Key, Object>());
     }
 }
