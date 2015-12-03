@@ -28,8 +28,6 @@ import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.VaadinSession;
 
-import org.reflections.Reflections;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
-
 
 /**
  * A Vaadin {@link ViewProvider} that fetches the views from the guice application context. The
@@ -70,20 +67,20 @@ public class GuiceViewProvider implements ViewProvider, SessionDestroyListener, 
     private final Map<String, Class<? extends View>> viewNamesToViewClassesMap;
     private final Map<VaadinSession, Map<String, View>> viewsBySessionMap;
     private final Set<String> viewNames;
+    private final TransactionBasedScoper viewScoper;
 
-    public GuiceViewProvider(Reflections reflections) {
+    public GuiceViewProvider(Set<Class<?>> viewClasses, TransactionBasedScoper viewScoper) {
+        this.viewScoper = viewScoper;
 
-        viewNamesToViewClassesMap = scanForViews(reflections);
+        viewNamesToViewClassesMap = scanForViews(viewClasses);
         viewNames = viewNamesToViewClassesMap.keySet();
 
         viewsBySessionMap = new ConcurrentHashMap<VaadinSession, Map<String, View>>();
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Class<? extends View>> scanForViews(Reflections reflections) {
+    private Map<String, Class<? extends View>> scanForViews(Set<Class<?>> viewClasses) {
         ImmutableMap.Builder<String, Class<? extends View>> viewMapBuilder = ImmutableMap.builder();
-
-        Set<Class<?>> viewClasses = reflections.getTypesAnnotatedWith(GuiceView.class);
 
         for (Class viewClass : viewClasses) {
             checkArgument(
@@ -147,8 +144,13 @@ public class GuiceViewProvider implements ViewProvider, SessionDestroyListener, 
 
             checkArgument(viewClass != null, "no view for name %s registered", viewName);
 
-            view = InjectorHolder.getInjector().getInstance(viewClass);
-            views.put(viewName, view);
+            try {
+                viewScoper.startScope();
+                view = InjectorHolder.getInjector().getInstance(viewClass);
+                views.put(viewName, view);
+            } finally {
+                viewScoper.endScope();
+            }
         }
 
         return view;
