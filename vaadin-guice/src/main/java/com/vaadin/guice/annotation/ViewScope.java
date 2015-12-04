@@ -16,7 +16,6 @@
 package com.vaadin.guice.annotation;
 
 import com.google.inject.ScopeAnnotation;
-import com.google.inject.servlet.SessionScoped;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -34,6 +33,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @ScopeAnnotation
-@SessionScoped
 public @interface ViewScope {
 }
