@@ -47,7 +47,6 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
 
 /**
@@ -91,8 +90,6 @@ public class GuiceVaadinServlet extends VaadinServlet {
         Reflections reflections = new Reflections(annotation.basePackage());
 
         Set<Class<?>> uis = reflections.getTypesAnnotatedWith(GuiceUI.class);
-
-        checkArgument(!uis.isEmpty(), "no @GuiceUI annotated UI's found in %s", annotation.basePackage());
 
         Set<Class<?>> uiScopedElements = reflections.getTypesAnnotatedWith(UIScope.class);
         Set<Class<?>> views = reflections.getTypesAnnotatedWith(GuiceView.class);
