@@ -22,8 +22,8 @@ import com.vaadin.server.VaadinServletService;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Custom Vaadin servlet request to handle getPathInfo() when the servlet is
- * used via ServletForwardingController which does not set it.
+ * Custom Vaadin servlet request to handle getPathInfo() when the servlet is used via
+ * ServletForwardingController which does not set it.
  */
 public class GuiceVaadinServletRequest extends VaadinServletRequest {
 
@@ -33,13 +33,10 @@ public class GuiceVaadinServletRequest extends VaadinServletRequest {
     /**
      * Construct a guice servlet request
      *
-     * @param request
-     * @param vaadinService
-     * @param clearServletPath
-     *            true to use empty string as the servlet path (needed when
-     *            using ServletForwardingController for bootstrap page
-     *            requests), false to use the normal servlet path - for more
-     *            information on this hack, see {@link GuiceVaadinServlet}
+     * @param clearServletPath true to use empty string as the servlet path (needed when using
+     *                         ServletForwardingController for bootstrap page requests), false to
+     *                         use the normal servlet path - for more information on this hack, see
+     *                         {@link GuiceVaadinServlet}
      */
     public GuiceVaadinServletRequest(HttpServletRequest request,
                                      VaadinServletService vaadinService, boolean clearServletPath) {

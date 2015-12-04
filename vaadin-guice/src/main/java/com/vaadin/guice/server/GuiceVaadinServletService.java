@@ -25,23 +25,18 @@ import com.vaadin.server.communication.ServletBootstrapHandler;
 import java.util.List;
 
 /**
- * Servlet service class that allows customization of the service URL
- * (client-server communication base URL).
+ * Servlet service class that allows customization of the service URL (client-server communication
+ * base URL).
  */
 public class GuiceVaadinServletService extends VaadinServletService {
 
     private String serviceUrl;
 
     /**
-     * Create a servlet service instance that allows the use of a custom service
-     * URL.
+     * Create a servlet service instance that allows the use of a custom service URL.
      *
-     * @param servlet
-     * @param deploymentConfiguration
-     * @param serviceUrl
-     *            custom service URL to use (relative to context path, starting
-     *            with a slash) or null for default
-     * @throws ServiceException
+     * @param serviceUrl custom service URL to use (relative to context path, starting with a slash)
+     *                   or null for default
      */
     public GuiceVaadinServletService(VaadinServlet servlet,
                                      DeploymentConfiguration deploymentConfiguration, String serviceUrl)

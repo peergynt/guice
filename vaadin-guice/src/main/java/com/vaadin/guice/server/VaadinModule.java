@@ -47,13 +47,12 @@ class VaadinModule extends AbstractModule implements SessionInitListener {
 
         viewScoper = new TransactionBasedScoper();
         uiScoper = new SessionBasedScoper();
-
         viewProvider = new GuiceViewProvider(views, viewScoper);
         uiProvider = new GuiceUIProvider(uis);
 
-        for (Class<? extends Module> aClass : configuration.modules()) {
+        for (Class<? extends Module> moduleClass : configuration.modules()) {
             try {
-                install(aClass.newInstance());
+                install(moduleClass.newInstance());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

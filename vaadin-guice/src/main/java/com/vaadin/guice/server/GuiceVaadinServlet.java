@@ -28,22 +28,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin
- * servlet} that adds a {@link GuiceUIProvider} to every new Vaadin session and
- * allows the use of a custom service URL on the bootstrap page.
- * <p>
- * If you need a custom Vaadin servlet, you can either extend this servlet
- * directly, or extend another subclass of {@link VaadinServlet} and just add
- * the UI provider.
- * <p>
+ * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin servlet} that adds a
+ * {@link GuiceUIProvider} to every new Vaadin session and allows the use of a custom service URL on
+ * the bootstrap page. <p> If you need a custom Vaadin servlet, you can either extend this servlet
+ * directly, or extend another subclass of {@link VaadinServlet} and just add the UI provider. <p>
  * This servlet also implements a hack to get around the behavior of guice
- * ServletForwardingController/ServletWrappingController. Those controllers
- * return null as the pathInfo of requests forwarded to the Vaadin servlet, and
- * use the mapping as the servlet path whereas with Vaadin the mapping typically
- * corresponds to a UI, not a virtual servlet. Thus, there is an option to clear
- * the servlet path in requests and compute pathInfo accordingly. This is used
- * by Vaadin guice Boot to make it easier to use Vaadin and guice MVC
- * applications together in the same global "namespace".
+ * ServletForwardingController/ServletWrappingController. Those controllers return null as the
+ * pathInfo of requests forwarded to the Vaadin servlet, and use the mapping as the servlet path
+ * whereas with Vaadin the mapping typically corresponds to a UI, not a virtual servlet. Thus, there
+ * is an option to clear the servlet path in requests and compute pathInfo accordingly. This is used
+ * by Vaadin guice Boot to make it easier to use Vaadin and guice MVC applications together in the
+ * same global "namespace".
  *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Josh Long (josh@joshlong.com)
@@ -72,13 +67,12 @@ public class GuiceVaadinServlet extends VaadinServlet {
     }
 
     /**
-     * Return the path of the service URL (URL for all client-server
-     * communication) relative to the context path. A value of null means that
-     * the default service path of Vaadin should be used. The path should start
-     * with a slash.
+     * Return the path of the service URL (URL for all client-server communication) relative to the
+     * context path. A value of null means that the default service path of Vaadin should be used.
+     * The path should start with a slash.
      *
-     * @return service URL path relative to context path (starting with slash)
-     *         or null to use the default
+     * @return service URL path relative to context path (starting with slash) or null to use the
+     * default
      */
     public String getServiceUrlPath() {
         return serviceUrlPath;

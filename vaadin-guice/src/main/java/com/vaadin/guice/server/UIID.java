@@ -24,8 +24,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Uniquely identifies a UI instance for a given window/tab inside a session.
- * This is basically a wrapper for {@link com.vaadin.ui.UI#getUIId()}.
+ * Uniquely identifies a UI instance for a given window/tab inside a session. This is basically a
+ * wrapper for {@link com.vaadin.ui.UI#getUIId()}.
  *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Josh Long (josh@joshlong.com)

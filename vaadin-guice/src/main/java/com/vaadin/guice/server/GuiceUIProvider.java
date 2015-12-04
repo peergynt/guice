@@ -33,9 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * Vaadin {@link com.vaadin.server.UIProvider} that looks up UI classes from the
- * Guice application context. The UI classes must be annotated with
- * {@link GuiceUI}.
+ * Vaadin {@link com.vaadin.server.UIProvider} that looks up UI classes from the Guice application
+ * context. The UI classes must be annotated with {@link GuiceUI}.
  *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Henri Sara (hesara@vaadin.com)
@@ -69,12 +68,12 @@ class GuiceUIProvider extends UIProvider {
 
             Class<? extends UI> existingUiForPath = getUIByPath(path);
             if (existingUiForPath != null) {
-                    throw new IllegalStateException(String.format(
-                            "[%s] is already mapped to the path [%s]",
-                            existingUiForPath.getCanonicalName(), path));
-                }
-                logger.debug("Mapping Vaadin UI [{}] to path [{}]",
-                        uiClass.getCanonicalName(), path);
+                throw new IllegalStateException(String.format(
+                        "[%s] is already mapped to the path [%s]",
+                        existingUiForPath.getCanonicalName(), path));
+            }
+            logger.debug("Mapping Vaadin UI [{}] to path [{}]",
+                    uiClass.getCanonicalName(), path);
             mapPathToUI(path, (Class<? extends UI>) uiClass);
         }
     }

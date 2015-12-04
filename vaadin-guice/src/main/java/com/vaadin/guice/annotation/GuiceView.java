@@ -22,18 +22,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to be placed on {@link com.vaadin.navigator.View}-classes that
- * should be handled by the {@link GuiceViewProvider}.
- * <p>
- * This annotation is also a stereotype annotation, so guice will automatically
- * detect the annotated classes. By default, this annotation also puts the view
- * into the {@link com.vaadin.guice.annotation.ViewScope view scope}. You can
- * override this by using another scope annotation, such as
- * {@link UIScope the UI scope}, on your view
- * class. <b>However, the singleton scope will not work!</b>
- * <p>
- * This is an example of a view that is mapped to an empty view name and is
- * available for all UI subclasses in the application:
+ * Annotation to be placed on {@link com.vaadin.navigator.View}-classes that should be handled by
+ * the {@link GuiceViewProvider}. <p> This annotation is also a stereotype annotation, so guice will
+ * automatically detect the annotated classes. By default, this annotation also puts the view into
+ * the {@link com.vaadin.guice.annotation.ViewScope view scope}. You can override this by using
+ * another scope annotation, such as {@link UIScope the UI scope}, on your view class. <b>However,
+ * the singleton scope will not work!</b> <p> This is an example of a view that is mapped to an
+ * empty view name and is available for all UI subclasses in the application:
  *
  * <pre>
  * &#064;GuiceView(name = &quot;&quot;)
@@ -42,8 +37,7 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  *
- * This is an example of a view that is only available to a specified UI
- * subclass:
+ * This is an example of a view that is only available to a specified UI subclass:
  *
  * <pre>
  * &#064;GuiceView(name = &quot;myView&quot;, ui = MyUI.class)
@@ -55,27 +49,25 @@ import java.lang.annotation.Target;
  * @author Petter Holmström (petter@vaadin.com)
  * @author Henri Sara (hesara@vaadin.com)
  */
-@Target({ java.lang.annotation.ElementType.TYPE })
+@Target({java.lang.annotation.ElementType.TYPE})
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Documented
 public @interface GuiceView {
 
     /**
-     * USE_CONVENTIONS is treated as a special case that will cause the
-     * automatic View mapping to occur.
+     * USE_CONVENTIONS is treated as a special case that will cause the automatic View mapping to
+     * occur.
      */
     String USE_CONVENTIONS = "USE CONVENTIONS";
 
     /**
-     * The name of the view. This is the name that is to be passed to the
-     * {@link com.vaadin.navigator.Navigator} when navigating to the view. There
-     * can be multiple views with the same name as long as they belong to
-     * separate UI subclasses.
+     * The name of the view. This is the name that is to be passed to the {@link
+     * com.vaadin.navigator.Navigator} when navigating to the view. There can be multiple views with
+     * the same name as long as they belong to separate UI subclasses.
      *
-     * If the default value {@link #USE_CONVENTIONS} is used, the name of the
-     * view is derived from the class name so that e.g. UserDetailView becomes
-     * "user-detail". Although auto-generated view names are supported, using
-     * explicit naming of views is strongly recommended.
+     * If the default value {@link #USE_CONVENTIONS} is used, the name of the view is derived from
+     * the class name so that e.g. UserDetailView becomes "user-detail". Although auto-generated
+     * view names are supported, using explicit naming of views is strongly recommended.
      */
     String name() default USE_CONVENTIONS;
 }

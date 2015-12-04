@@ -19,18 +19,15 @@ import com.vaadin.guice.server.GuiceViewProvider;
 import com.vaadin.ui.UI;
 
 /**
- * Interface to be implemented by guice beans that will be consulted before the
- * {@link GuiceViewProvider} creates a view
- * instance. If any of the view access controls deny access, the view provider
- * will act like no such view ever existed, or show an
- * {@link GuiceViewProvider#setAccessDeniedViewClass(Class)
- * access denied view}.
+ * Interface to be implemented by guice beans that will be consulted before the {@link
+ * GuiceViewProvider} creates a view instance. If any of the view access controls deny access, the
+ * view provider will act like no such view ever existed, or show an {@link
+ * GuiceViewProvider#setAccessDeniedViewClass(Class) access denied view}.
  *
- * Access control beans implementing this interface are called before a view
- * instance is created but can access the annotations on the view bean class
- * through the application context. Unless contextual information from the view
- * instance is needed, this interface should be used instead of a
- * {@link ViewInstanceAccessControl}.
+ * Access control beans implementing this interface are called before a view instance is created but
+ * can access the annotations on the view bean class through the application context. Unless
+ * contextual information from the view instance is needed, this interface should be used instead of
+ * a {@link ViewInstanceAccessControl}.
  *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Henri Sara (hesara@vaadin.com)
@@ -40,10 +37,8 @@ public interface ViewAccessControl {
     /**
      * Checks if the current user has access to the specified view and UI.
      *
-     * @param ui
-     *            the UI, never {@code null}.
-     * @param beanName
-     *            the bean name of the view, never {@code null}.
+     * @param ui       the UI, never {@code null}.
+     * @param beanName the bean name of the view, never {@code null}.
      * @return true if access is granted, false if access is denied.
      */
     boolean isAccessGranted(UI ui, String beanName);
