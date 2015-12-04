@@ -15,39 +15,17 @@
  */
 package com.vaadin.guice.server;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import com.google.inject.Module;
 
 import com.vaadin.guice.annotation.Configuration;
-import com.vaadin.guice.annotation.GuiceUI;
-import com.vaadin.guice.annotation.GuiceView;
-import com.vaadin.guice.annotation.UIScope;
-import com.vaadin.guice.annotation.ViewScope;
-import com.vaadin.navigator.ViewProvider;
-import com.vaadin.server.DefaultUIProvider;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ServiceException;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
-import com.vaadin.server.UIProvider;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.server.VaadinServletService;
-import com.vaadin.server.VaadinSession;
-
-import org.reflections.Reflections;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-
-import static java.lang.String.format;
 
 /**
  * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin
@@ -73,11 +51,7 @@ import static java.lang.String.format;
 public class GuiceVaadinServlet extends VaadinServlet {
 
     private static final long serialVersionUID = 5371983676318947478L;
-    private final SessionBasedScoper uiScoper = new SessionBasedScoper();
-    private final TransactionBasedScoper viewScoper = new TransactionBasedScoper();
-    private final GuiceViewProvider viewProvider;
-    private final GuiceUIProvider uiProvider;
-
+    private final VaadinModule vaadinModule;
     private String serviceUrlPath = null;
 
     public GuiceVaadinServlet() {
@@ -87,92 +61,14 @@ public class GuiceVaadinServlet extends VaadinServlet {
             throw new IllegalStateException("GuiceVaadinServlet cannot be used without 'Configuration' annotation");
         }
 
-        Reflections reflections = new Reflections(annotation.basePackage());
+        vaadinModule = new VaadinModule(annotation);
 
-        Set<Class<?>> uis = reflections.getTypesAnnotatedWith(GuiceUI.class);
-
-        Set<Class<?>> uiScopedElements = reflections.getTypesAnnotatedWith(UIScope.class);
-        Set<Class<?>> views = reflections.getTypesAnnotatedWith(GuiceView.class);
-
-        checkNoUIViewScopeIntersection(uiScopedElements, views);
-
-        viewProvider = new GuiceViewProvider(views, viewScoper);
-        uiProvider = new GuiceUIProvider(uis);
-
-        Module scopeModule = new AbstractModule() {
-            @Override
-            protected void configure() {
-                bindScope(UIScope.class, uiScoper);
-                bindScope(GuiceView.class, viewScoper);
-                bindScope(ViewScope.class, viewScoper);
-                bind(UIProvider.class).toInstance(uiProvider);
-                bind(ViewProvider.class).toInstance(viewProvider);
-            }
-        };
-
-        List<Module> modules = new ArrayList<Module>();
-
-        modules.add(scopeModule);
-
-        for (Class<? extends Module> aClass : annotation.modules()) {
-            try {
-                modules.add(aClass.newInstance());
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        InjectorHolder.setInjector(Guice.createInjector(modules));
-    }
-
-    private void checkNoUIViewScopeIntersection(Set<Class<?>> uiScopedElements, Set<Class<?>> views) {
-        Sets.SetView<Class<?>> viewsWithUIScope = Sets.intersection(views, uiScopedElements);
-
-        if (!viewsWithUIScope.isEmpty()) {
-            throw new IllegalArgumentException(
-                    format(
-                            "@UIScope and @GuiceView are mutually exclusive because they expect different guice-scopes, please remove @UIScope from %s",
-                            Joiner.on(",").join(viewsWithUIScope)
-                    )
-            );
-        }
+        InjectorHolder.setInjector(Guice.createInjector(vaadinModule));
     }
 
     @Override
     protected void servletInitialized() throws ServletException {
-        getService().addSessionInitListener(new SessionInitListener() {
-
-            private static final long serialVersionUID = -6307820453486668084L;
-
-            @Override
-            public void sessionInit(SessionInitEvent sessionInitEvent)
-                    throws ServiceException {
-                // remove DefaultUIProvider instances to avoid mapping
-                // extraneous UIs if e.g. a servlet is declared as a nested
-                // class in a UI class
-                VaadinSession session = sessionInitEvent.getSession();
-                List<UIProvider> uiProviders = new ArrayList<UIProvider>(
-                        session.getUIProviders());
-                for (UIProvider provider : uiProviders) {
-                    // use canonical names as these may have been loaded with
-                    // different classloaders
-                    if (DefaultUIProvider.class.getCanonicalName().equals(
-                            provider.getClass().getCanonicalName())) {
-                        session.removeUIProvider(provider);
-                    }
-                }
-
-                // add guice UI provider
-                session.addUIProvider(uiProvider);
-            }
-        });
-
-        getService().addSessionDestroyListener(uiScoper);
-        getService().addSessionInitListener(uiScoper);
-        getService().addSessionDestroyListener(viewProvider);
-        getService().addSessionInitListener(viewProvider);
+        vaadinModule.vaadinInitialized();
     }
 
     /**
@@ -208,5 +104,4 @@ public class GuiceVaadinServlet extends VaadinServlet {
             return new VaadinServletRequest(request, getService());
         }
     }
-
 }
