@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 public @interface Configuration {
     Class<? extends Module>[] modules();
 
-    String basePackage();
+    String[] basePackage();
 }

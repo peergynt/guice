@@ -19,6 +19,8 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 
+import com.vaadin.guice.annotation.UIScope;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +47,14 @@ class TransactionBasedScoper implements Scope {
 
     @Override
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
+
+        boolean hasUiScope = key.getTypeLiteral().getRawType().getAnnotation(UIScope.class) != null;
+
+        //UIScope overrides ViewScope
+        if (hasUiScope) {
+            return unscoped;
+        }
+
         return new Provider<T>() {
             @Override
             @SuppressWarnings("unchecked")

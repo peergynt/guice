@@ -145,9 +145,6 @@ class GuiceUIProvider extends UIProvider {
         CurrentInstance.set(key, identifier);
 
         try {
-            logger.debug(
-                    "Creating a new UI bean of class [{}] with identifier [{}]",
-                    event.getUIClass().getCanonicalName(), identifier);
             return InjectorHolder.getInjector().getInstance(event.getUIClass());
         } finally {
             CurrentInstance.set(key, null);

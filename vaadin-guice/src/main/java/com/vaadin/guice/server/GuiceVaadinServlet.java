@@ -16,54 +16,63 @@
 package com.vaadin.guice.server;
 
 import com.google.inject.Guice;
+import com.google.inject.Module;
 
 import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ServiceException;
+import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.server.VaadinServletService;
+import com.vaadin.server.VaadinSession;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin servlet} that adds a
- * {@link GuiceUIProvider} to every new Vaadin session and allows the use of a custom service URL on
- * the bootstrap page. <p> If you need a custom Vaadin servlet, you can either extend this servlet
- * directly, or extend another subclass of {@link VaadinServlet} and just add the UI provider. <p>
- * This servlet also implements a hack to get around the behavior of guice
- * ServletForwardingController/ServletWrappingController. Those controllers return null as the
- * pathInfo of requests forwarded to the Vaadin servlet, and use the mapping as the servlet path
- * whereas with Vaadin the mapping typically corresponds to a UI, not a virtual servlet. Thus, there
- * is an option to clear the servlet path in requests and compute pathInfo accordingly. This is used
- * by Vaadin guice Boot to make it easier to use Vaadin and guice MVC applications together in the
- * same global "namespace".
- *
  * @author Petter Holmström (petter@vaadin.com)
+ * @author Bernd Hopp (bernd@vaadin.com)
  * @author Josh Long (josh@joshlong.com)
  */
 public class GuiceVaadinServlet extends VaadinServlet {
 
-    private static final long serialVersionUID = 5371983676318947478L;
     private final VaadinModule vaadinModule;
     private String serviceUrlPath = null;
 
-    public GuiceVaadinServlet() {
+    public GuiceVaadinServlet() throws IllegalAccessException, InstantiationException {
         Configuration annotation = getClass().getAnnotation(Configuration.class);
 
         if (annotation == null) {
             throw new IllegalStateException("GuiceVaadinServlet cannot be used without 'Configuration' annotation");
         }
 
-        vaadinModule = new VaadinModule(annotation);
+        List<Module> modules = new ArrayList<Module>(annotation.modules().length + 1);
 
-        InjectorHolder.setInjector(Guice.createInjector(vaadinModule));
+        for (Class<? extends Module> moduleClass : annotation.modules()) {
+            modules.add(moduleClass.newInstance());
+        }
+
+        SessionProvider sessionProvider = new SessionProvider() {
+            @Override
+            public VaadinSession getCurrentSession() {
+                return VaadinSession.getCurrent();
+            }
+        };
+
+        this.vaadinModule = new VaadinModule(sessionProvider, annotation.basePackage());
+
+        modules.add(vaadinModule);
+
+        InjectorHolder.setInjector(Guice.createInjector(modules));
     }
 
     @Override
     protected void servletInitialized() throws ServletException {
-        vaadinModule.vaadinInitialized();
+        vaadinModule.vaadinInitialized(VaadinService.getCurrent());
     }
 
     /**

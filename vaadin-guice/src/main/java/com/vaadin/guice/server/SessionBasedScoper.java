@@ -32,6 +32,11 @@ import java.util.concurrent.ConcurrentHashMap;
 class SessionBasedScoper implements Scope, SessionDestroyListener, SessionInitListener {
 
     private final Map<VaadinSession, Map<Key, Object>> sessionToScopedObjectsMap = new ConcurrentHashMap<VaadinSession, Map<Key, Object>>();
+    private final SessionProvider sessionProvider;
+
+    SessionBasedScoper(SessionProvider sessionProvider) {
+        this.sessionProvider = sessionProvider;
+    }
 
     @Override
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
@@ -39,7 +44,7 @@ class SessionBasedScoper implements Scope, SessionDestroyListener, SessionInitLi
             @Override
             @SuppressWarnings("unchecked")
             public T get() {
-                Map<Key, Object> map = sessionToScopedObjectsMap.get(VaadinSession.getCurrent());
+                Map<Key, Object> map = sessionToScopedObjectsMap.get(sessionProvider.getCurrentSession());
 
                 T t = (T) map.get(key);
 

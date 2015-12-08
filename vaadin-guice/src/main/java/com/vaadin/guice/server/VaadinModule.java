@@ -1,10 +1,7 @@
 package com.vaadin.guice.server;
 
-import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 
-import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.UIScope;
@@ -24,48 +21,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static com.google.common.base.Joiner.on;
-import static java.lang.String.format;
-
 class VaadinModule extends AbstractModule implements SessionInitListener {
 
-    private static final String SCOPE_INTERSECTION_ERROR_MESSAGE = "@UIScope and @GuiceView are mutually exclusive because they expect different guice-scopes, please remove @UIScope from %s";
     private final GuiceViewProvider viewProvider;
     private final GuiceUIProvider uiProvider;
     private final SessionBasedScoper uiScoper;
     private final TransactionBasedScoper viewScoper;
 
-    public VaadinModule(Configuration configuration) {
-        Reflections reflections = new Reflections(configuration.basePackage());
+    public VaadinModule(SessionProvider sessionProvider, String... basePackages) {
+        Reflections reflections = new Reflections(basePackages);
 
         Set<Class<?>> uis = reflections.getTypesAnnotatedWith(GuiceUI.class);
-
-        Set<Class<?>> uiScopedElements = reflections.getTypesAnnotatedWith(UIScope.class);
         Set<Class<?>> views = reflections.getTypesAnnotatedWith(GuiceView.class);
 
-        checkNoUIViewScopeIntersection(uiScopedElements, views);
-
         viewScoper = new TransactionBasedScoper();
-        uiScoper = new SessionBasedScoper();
+        uiScoper = new SessionBasedScoper(sessionProvider);
         viewProvider = new GuiceViewProvider(views, viewScoper);
         uiProvider = new GuiceUIProvider(uis);
-
-        for (Class<? extends Module> moduleClass : configuration.modules()) {
-            try {
-                install(moduleClass.newInstance());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void checkNoUIViewScopeIntersection(Set<Class<?>> uiScopedElements, Set<Class<?>> views) {
-        Sets.SetView<Class<?>> viewsWithUIScope = Sets.intersection(views, uiScopedElements);
-
-        if (!viewsWithUIScope.isEmpty()) {
-            final String errorMessage = format(SCOPE_INTERSECTION_ERROR_MESSAGE, on(",").join(viewsWithUIScope));
-            throw new IllegalArgumentException(errorMessage);
-        }
     }
 
     @Override
@@ -77,9 +49,7 @@ class VaadinModule extends AbstractModule implements SessionInitListener {
         bind(ViewProvider.class).toInstance(viewProvider);
     }
 
-    public void vaadinInitialized() {
-        VaadinService service = VaadinService.getCurrent();
-
+    public void vaadinInitialized(VaadinService service) {
         service.addSessionInitListener(new SessionInitListener() {
             @Override
             public void sessionInit(SessionInitEvent sessionInitEvent)
