@@ -7,6 +7,36 @@ Building the project
 ----
 Execute `mvn clean install` in the root directory to build vaadin-guice and vaadin-guice-boot.
 
+Porting from vaadin-spring
+----
+
+first, you need to install it:
+```bash
+cd YOUR_SOURCE_FOLDER
+git clone https://github.com/berndhopp/guice.git
+cd guice
+mvn install
+then, open bugrap in your IDE, replace
+```
+
+```
+'spring' -> 'guice'
+'Spring' -> 'Guice'
+'import org.springframework.beans.factory.annotation.Autowired;' -> import com.google.inject.Inject;''
+'@Autowired' -> '@Inject'
+'@SpringComponent' -> ''
+'import org.springframework.stereotype.Component;' -> ''
+```
+
+Your SpringVaadinServlet needs to be adjusted manually, GuiceVaadinServlet expects a @Configuration annotation like this:
+
+```Java
+@Configuration(modules = {MyModule.class}, basePackage = "com.mycompany")
+@WebServlet(urlPatterns = "/*", name = "MyServlet", asyncSupported = true)
+public static class MyServlet extends GuiceVaadinServlet {
+}
+```
+
 Issue tracking
 ----
 Issues for the project are tracked in the Vaadin Trac at http://dev.vaadin.com
