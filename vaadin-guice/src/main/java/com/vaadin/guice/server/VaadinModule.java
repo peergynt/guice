@@ -75,6 +75,7 @@ class VaadinModule extends AbstractModule implements SessionInitListener {
         service.addSessionInitListener(uiScoper);
         service.addSessionDestroyListener(viewProvider);
         service.addSessionInitListener(viewProvider);
+        service.addSessionInitListener(this);
     }
 
     @Override

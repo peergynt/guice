@@ -43,7 +43,7 @@ public class GuiceVaadinServlet extends VaadinServlet {
     private final VaadinModule vaadinModule;
     private String serviceUrlPath = null;
 
-    public GuiceVaadinServlet() throws IllegalAccessException, InstantiationException {
+    public GuiceVaadinServlet() {
         Configuration annotation = getClass().getAnnotation(Configuration.class);
 
         if (annotation == null) {
@@ -53,7 +53,11 @@ public class GuiceVaadinServlet extends VaadinServlet {
         List<Module> modules = new ArrayList<Module>(annotation.modules().length + 1);
 
         for (Class<? extends Module> moduleClass : annotation.modules()) {
-            modules.add(moduleClass.newInstance());
+            try {
+                modules.add(moduleClass.newInstance());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         SessionProvider sessionProvider = new SessionProvider() {

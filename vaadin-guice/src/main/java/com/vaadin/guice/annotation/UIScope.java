@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
  *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Josh Long (josh@joshlong.com)
+ * @author Bernd Hopp (bernd@vaadin.com)
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

@@ -150,5 +150,4 @@ class GuiceUIProvider extends UIProvider {
             CurrentInstance.set(key, null);
         }
     }
-
 }
