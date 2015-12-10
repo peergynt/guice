@@ -37,15 +37,15 @@ import static org.mockito.Mockito.when;
 public class ScopeTest {
 
     private SessionProvider sessionProvider;
-    private VaadinModule vaadinModule;
     private SessionBasedScoper uiScoper;
     private TransactionBasedScoper transactionBasedScoper;
+    private GuiceUIProvider uiProvider;
     private Injector injector;
 
     @Before
     public void setup() throws NoSuchFieldException, IllegalAccessException {
         sessionProvider = mock(SessionProvider.class);
-        vaadinModule = new VaadinModule(sessionProvider, "com.vaadin.guice.server.testClasses");
+        VaadinModule vaadinModule = new VaadinModule(sessionProvider, "com.vaadin.guice.server.testClasses");
         injector = Guice.createInjector(vaadinModule);
         final Field uiScoperField = VaadinModule.class.getDeclaredField("uiScoper");
         uiScoperField.setAccessible(true);
@@ -53,6 +53,11 @@ public class ScopeTest {
         final Field viewScoperField = VaadinModule.class.getDeclaredField("viewScoper");
         viewScoperField.setAccessible(true);
         transactionBasedScoper = (TransactionBasedScoper) viewScoperField.get(vaadinModule);
+
+
+        final Field uiProviderField = VaadinModule.class.getDeclaredField("uiProvider");
+        uiProviderField.setAccessible(true);
+        uiProvider = (GuiceUIProvider) uiProviderField.get(vaadinModule);
     }
 
     @Test //default prototype behaviour should not be affected
@@ -193,7 +198,6 @@ public class ScopeTest {
         when(sessionInitEvent.getSession()).thenReturn(vaadinSession);
 
         uiScoper.sessionInit(sessionInitEvent);
-
-        vaadinModule.sessionInit(sessionInitEvent);
+        uiProvider.sessionInit(sessionInitEvent);
     }
 }

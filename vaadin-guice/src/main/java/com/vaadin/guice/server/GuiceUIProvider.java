@@ -16,6 +16,9 @@
 package com.vaadin.guice.server;
 
 import com.vaadin.guice.annotation.GuiceUI;
+import com.vaadin.server.ServiceException;
+import com.vaadin.server.SessionInitEvent;
+import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.UIClassSelectionEvent;
 import com.vaadin.server.UICreateEvent;
 import com.vaadin.server.UIProvider;
@@ -40,7 +43,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @author Henri Sara (hesara@vaadin.com)
  * @author Bernd Hopp (bernd@vaadin.com)
  */
-class GuiceUIProvider extends UIProvider {
+class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -149,5 +152,10 @@ class GuiceUIProvider extends UIProvider {
         } finally {
             CurrentInstance.set(key, null);
         }
+    }
+
+    @Override
+    public void sessionInit(SessionInitEvent event) throws ServiceException {
+        event.getSession().addUIProvider(this);
     }
 }

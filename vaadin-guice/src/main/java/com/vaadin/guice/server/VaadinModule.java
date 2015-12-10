@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-class VaadinModule extends AbstractModule implements SessionInitListener {
+class VaadinModule extends AbstractModule {
 
     private final GuiceViewProvider viewProvider;
     private final GuiceUIProvider uiProvider;
@@ -75,11 +75,6 @@ class VaadinModule extends AbstractModule implements SessionInitListener {
         service.addSessionInitListener(uiScoper);
         service.addSessionDestroyListener(viewProvider);
         service.addSessionInitListener(viewProvider);
-        service.addSessionInitListener(this);
-    }
-
-    @Override
-    public void sessionInit(SessionInitEvent event) throws ServiceException {
-        event.getSession().addUIProvider(uiProvider);
+        service.addSessionInitListener(uiProvider);
     }
 }
