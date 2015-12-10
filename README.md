@@ -29,6 +29,9 @@ then, open bugrap in your IDE, replace
 'import org.springframework.stereotype.Component;' -> ''
 ```
 
+If you have any classes that you want to be singleton, you need to annotate them with @com.google.inject.Singleton, since
+in contrast to spring, guice will default to a 'prototype' strategy ( that is why @SpringComponent can be removed without replacement ).
+
 Your SpringVaadinServlet needs to be adjusted manually, GuiceVaadinServlet expects a @Configuration annotation like this:
 
 ```Java
