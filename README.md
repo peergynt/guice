@@ -16,8 +16,9 @@ cd YOUR_SOURCE_FOLDER
 git clone https://github.com/berndhopp/guice.git
 cd guice
 mvn install
-then, open bugrap in your IDE, replace
 ```
+
+then, open bugrap in your IDE, replace
 
 ```
 'spring' -> 'guice'
