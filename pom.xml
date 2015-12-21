@@ -91,7 +91,7 @@
         
         <!-- These are typically overridden with BOMs -->
         <guice.version>4.0</guice.version>
-        <vaadin.version>7.4.4</vaadin.version>
+        <vaadin.version>7.5.1</vaadin.version>
         <slf4j.version>1.7.7</slf4j.version>
         <reflections.version>0.9.8</reflections.version>
 

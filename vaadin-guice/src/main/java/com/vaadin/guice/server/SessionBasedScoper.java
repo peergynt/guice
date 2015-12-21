@@ -26,13 +26,19 @@ import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.VaadinSession;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 class SessionBasedScoper implements Scope, SessionDestroyListener, SessionInitListener {
 
+    private static final int MAP_INIT_SIZE_MAX = 384;
+    private static final int MAP_POOL_MAX_SIZE = 12;
+    private final Stack<Map<Key, Object>> mapPool = new Stack<Map<Key, Object>>();
     private final Map<VaadinSession, Map<Key, Object>> sessionToScopedObjectsMap = new ConcurrentHashMap<VaadinSession, Map<Key, Object>>();
     private final SessionProvider sessionProvider;
+    private int mapSizeInit = 16;
 
     SessionBasedScoper(SessionProvider sessionProvider) {
         this.sessionProvider = sessionProvider;
@@ -58,13 +64,36 @@ class SessionBasedScoper implements Scope, SessionDestroyListener, SessionInitLi
         };
     }
 
+    private Map<Key, Object> getMap() {
+        synchronized (mapPool) {
+            return mapPool.isEmpty()
+                    ? new HashMap<Key, Object>(mapSizeInit)
+                    : mapPool.pop();
+        }
+    }
+
+    private void returnMap(Map<Key, Object> map) {
+        if (mapSizeInit < map.size()) {
+            mapSizeInit = Math.min(map.size(), MAP_INIT_SIZE_MAX);
+        }
+
+        if (map.size() <= MAP_INIT_SIZE_MAX) {
+            synchronized (mapPool) {
+                if (mapPool.size() < MAP_POOL_MAX_SIZE) {
+                    map.clear();
+                    mapPool.add(map);
+                }
+            }
+        }
+    }
+
     @Override
     public void sessionDestroy(SessionDestroyEvent event) {
-        sessionToScopedObjectsMap.remove(event.getSession());
+        returnMap(sessionToScopedObjectsMap.remove(event.getSession()));
     }
 
     @Override
     public void sessionInit(SessionInitEvent event) throws ServiceException {
-        sessionToScopedObjectsMap.put(event.getSession(), new ConcurrentHashMap<Key, Object>());
+        sessionToScopedObjectsMap.put(event.getSession(), getMap());
     }
 }

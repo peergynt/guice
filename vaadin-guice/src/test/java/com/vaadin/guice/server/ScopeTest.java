@@ -77,6 +77,8 @@ public class ScopeTest {
 
     @Test //default singleton behaviour should not be affected
     public void testSingleton() throws ServiceException, NoSuchFieldException, IllegalAccessException {
+        System.err.println("jarkz!");
+
         newSession();
         transactionBasedScoper.startTransaction();
         Target target1 = injector.getInstance(Target.class);
