@@ -28,33 +28,31 @@ import static com.google.common.base.Preconditions.checkState;
 
 class TransactionBasedScoper implements Scope {
 
+    private static final int MAX_SIZE = 512;
     private final ThreadLocal<Map<Key, Object>> caches = new ThreadLocal<Map<Key, Object>>();
 
     public void startTransaction() {
         Map<Key, Object> cache = caches.get();
 
         if (cache == null) {
-            cache = new HashMap<Key, Object>();
-            caches.set(cache);
+            caches.set(new HashMap<Key, Object>());
         } else {
             checkState(cache.isEmpty());
         }
     }
 
     public void endTransaction() {
-        caches.get().clear();
+        Map<Key, Object> cache = caches.get();
+
+        if(cache.size() > MAX_SIZE){
+            caches.remove();
+        } else {
+            cache.clear();
+        }
     }
 
     @Override
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
-
-        boolean hasUiScope = key.getTypeLiteral().getRawType().getAnnotation(UIScope.class) != null;
-
-        //UIScope overrides ViewScope
-        if (hasUiScope) {
-            return unscoped;
-        }
-
         return new Provider<T>() {
             @Override
             @SuppressWarnings("unchecked")

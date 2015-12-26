@@ -121,6 +121,10 @@ public class GuiceViewProvider implements ViewProvider, SessionDestroyListener, 
     public String getViewName(String viewAndParameters) {
 
         for (String viewName : viewNames) {
+            if(viewName.isEmpty()){
+                continue;//skip default view
+            }
+
             if (viewAndParameters.startsWith(viewName)) {
                 return viewName;
             }
