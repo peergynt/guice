@@ -42,6 +42,7 @@ class VaadinModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        bindScope(GuiceUI.class, uiScoper);
         bindScope(UIScope.class, uiScoper);
         bindScope(GuiceView.class, viewScoper);
         bindScope(ViewScope.class, viewScoper);
