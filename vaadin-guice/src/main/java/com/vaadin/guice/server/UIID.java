@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Petter Holmström (petter@vaadin.com)
  * @author Josh Long (josh@joshlong.com)
  */
-public class UIID implements Serializable {
+class UIID implements Serializable {
 
     private static final long serialVersionUID = -999655298640370601L;
 

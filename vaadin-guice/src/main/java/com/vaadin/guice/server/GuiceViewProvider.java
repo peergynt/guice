@@ -39,30 +39,14 @@ import static java.lang.Character.toLowerCase;
 /**
  * A Vaadin {@link ViewProvider} that fetches the views from the guice application context. The
  * views must implement the {@link View} interface and be annotated with the {@link GuiceView}
- * annotation. <p> Use like this:
- *
- * <pre>
- * &#064;GuiceUI
- * public class MyUI extends UI {
- *
- *     &#064;Autowired
- *     GuiceViewProvider viewProvider;
- *
- *     protected void init(VaadinRequest vaadinRequest) {
- *         Navigator navigator = new Navigator(this, this);
- *         navigator.addProvider(viewProvider);
- *         setNavigator(navigator);
- *         // ...
- *     }
- * }
- * </pre>
- *
+ * annotation. <p>
  * @author Petter Holmström (petter@vaadin.com)
  * @author Henri Sara (hesara@vaadin.com)
+ * @author Bernd Hopp (bernd@vaadin.com)
  * @see GuiceView
  */
 @Singleton
-public class GuiceViewProvider implements ViewProvider, SessionDestroyListener, SessionInitListener {
+class GuiceViewProvider implements ViewProvider, SessionDestroyListener, SessionInitListener {
 
     private final Map<String, Class<? extends View>> viewNamesToViewClassesMap;
     private final Map<VaadinSession, Map<String, View>> viewsBySessionMap;
