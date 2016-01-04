@@ -43,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 public class GuiceVaadinServlet extends VaadinServlet {
 
     private final VaadinModule vaadinModule;
-    private String serviceUrlPath = null;
 
     public GuiceVaadinServlet() {
         Configuration annotation = getClass().getAnnotation(Configuration.class);
@@ -81,25 +80,13 @@ public class GuiceVaadinServlet extends VaadinServlet {
         vaadinModule.vaadinInitialized(VaadinService.getCurrent());
     }
 
-    /**
-     * Return the path of the service URL (URL for all client-server communication) relative to the
-     * context path. A value of null means that the default service path of Vaadin should be used.
-     * The path should start with a slash.
-     *
-     * @return service URL path relative to context path (starting with slash) or null to use the
-     * default
-     */
-    public String getServiceUrlPath() {
-        return serviceUrlPath;
-    }
-
     @Override
     protected VaadinServletService createServletService(
             DeploymentConfiguration deploymentConfiguration)
             throws ServiceException {
         // this is needed when using a custom service URL
         GuiceVaadinServletService service = new GuiceVaadinServletService(
-                this, deploymentConfiguration, getServiceUrlPath());
+                this, deploymentConfiguration, null);
         service.init();
         return service;
     }
@@ -107,10 +94,6 @@ public class GuiceVaadinServlet extends VaadinServlet {
     @Override
     protected VaadinServletRequest createVaadinRequest(
             HttpServletRequest request) {
-        if (serviceUrlPath != null) {
-            return new GuiceVaadinServletRequest(request, getService(), true);
-        } else {
-            return new VaadinServletRequest(request, getService());
-        }
+           return new VaadinServletRequest(request, getService());
     }
 }

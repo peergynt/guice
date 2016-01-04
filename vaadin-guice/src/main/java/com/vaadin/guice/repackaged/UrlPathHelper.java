@@ -40,7 +40,6 @@ public class UrlPathHelper {
      * URI in the request forwarding chain.
      */
     private static final String WEBSPHERE_URI_ATTRIBUTE = "com.ibm.websphere.servlet.uri_non_decoded";
-    ;
 
     static volatile Boolean websphereComplianceFlag;
 

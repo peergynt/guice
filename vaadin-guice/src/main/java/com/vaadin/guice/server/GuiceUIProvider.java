@@ -53,8 +53,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
-
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Map<String, Class<? extends UI>> pathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<String, Class<? extends UI>> wildcardPathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<Class<? extends UI>, Field> uiToDefaultViewField = new ConcurrentHashMap<Class<? extends UI>, Field>();
@@ -68,7 +67,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     }
 
     @SuppressWarnings("unchecked")
-    protected void detectUIs(Set<Class<?>> uiClasses) {
+    private void detectUIs(Set<Class<?>> uiClasses) {
         logger.info("Checking the application context for Vaadin UIs");
 
         for (Class<?> uiClassRaw : uiClasses) {
@@ -165,7 +164,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
         return "";
     }
 
-    protected void mapPathToUI(String path, Class<? extends UI> uiClass) {
+    private void mapPathToUI(String path, Class<? extends UI> uiClass) {
         if (path.endsWith("/*")) {
             wildcardPathToUIMap.put(path.substring(0, path.length() - 2),
                     uiClass);
@@ -174,7 +173,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
         }
     }
 
-    protected Class<? extends UI> getUIByPath(String path) {
+    private Class<? extends UI> getUIByPath(String path) {
         return pathToUIMap.get(path);
     }
 

@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * Annotation to be placed on {@link com.vaadin.navigator.View}-classes that should be handled by
  * the {@link com.vaadin.navigator.ViewProvider}. <p> This annotation is also a stereotype annotation,
  * so guice will automatically detect the annotated classes. This annotation also puts the view into
- * the {@link cosomm.vaadin.guice.annotation.ViewScope view scope}. <b>Note that in contrast to
+ * the {@link com.vaadin.guice.annotation.ViewScope view scope}. <b>Note that in contrast to
  * the spring vaadin integration, this cannot be overwritten with other scope-annotations like
  * {@link UIScope}.</b>This is an example of a view that is mapped to an
  * empty view name and is available for all UI subclasses in the application:
