@@ -40,6 +40,7 @@ import static java.lang.Character.toLowerCase;
  * A Vaadin {@link ViewProvider} that fetches the views from the guice application context. The
  * views must implement the {@link View} interface and be annotated with the {@link GuiceView}
  * annotation. <p>
+ *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Henri Sara (hesara@vaadin.com)
  * @author Bernd Hopp (bernd@vaadin.com)
@@ -105,7 +106,7 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
     public String getViewName(String viewAndParameters) {
 
         for (String viewName : viewNames) {
-            if(viewName.isEmpty()){
+            if (viewName.isEmpty()) {
                 continue;//skip default view
             }
 

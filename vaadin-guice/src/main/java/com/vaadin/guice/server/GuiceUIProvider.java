@@ -100,7 +100,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
         Field defaultViewField = null;
 
         for (java.lang.reflect.Field field : uiClass.getDeclaredFields()) {
-            if(field.getAnnotation(DefaultView.class) == null){
+            if (field.getAnnotation(DefaultView.class) == null) {
                 continue;
             }
 
@@ -109,7 +109,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
             defaultViewField = field;
         }
 
-        if(defaultViewField == null){
+        if (defaultViewField == null) {
             return;
         }
 
@@ -188,12 +188,12 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
             Field defaultViewField = uiToDefaultViewField.get(event.getUIClass());
 
-            if(defaultViewField != null){
+            if (defaultViewField != null) {
 
                 Object defaultView;
 
                 try {
-                     defaultView = defaultViewField.get(instance);
+                    defaultView = defaultViewField.get(instance);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -202,7 +202,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
                 Navigator navigator;
 
-                if(defaultView instanceof ComponentContainer){
+                if (defaultView instanceof ComponentContainer) {
                     navigator = new Navigator(instance, (ComponentContainer) defaultView);
                 } else if (defaultView instanceof SingleComponentContainer) {
                     navigator = new Navigator(instance, (SingleComponentContainer) defaultView);

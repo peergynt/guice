@@ -42,7 +42,7 @@ class TransactionBasedScoper implements Scope {
     public void endTransaction() {
         Map<Key, Object> cache = caches.get();
 
-        if(cache.size() > MAX_SIZE){
+        if (cache.size() > MAX_SIZE) {
             caches.remove();
         } else {
             cache.clear();

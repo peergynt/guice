@@ -34,8 +34,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin
- * servlet} that adds a {@link GuiceUIProvider} to every new Vaadin session
+ * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin servlet} that adds a
+ * {@link GuiceUIProvider} to every new Vaadin session
+ *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Josh Long (josh@joshlong.com)
  * @author Bernd Hopp (bernd@vaadin.com)
@@ -94,6 +95,6 @@ public class GuiceVaadinServlet extends VaadinServlet {
     @Override
     protected VaadinServletRequest createVaadinRequest(
             HttpServletRequest request) {
-           return new VaadinServletRequest(request, getService());
+        return new VaadinServletRequest(request, getService());
     }
 }

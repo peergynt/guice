@@ -26,6 +26,7 @@ import java.lang.annotation.Target;
 /**
  * Stereotype annotation for guice's view-scope. Every field annotated with ViewScope is unique for
  * the scope of the View that it is ultimately contained or referenced in.
+ *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Josh Long (josh@joshlong.com)
  * @author Bernd Hopp (bernd@vaadin.com)
