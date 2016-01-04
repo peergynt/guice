@@ -15,8 +15,6 @@
  */
 package com.vaadin.guice.annotation;
 
-import com.google.inject.ScopeAnnotation;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -51,7 +49,6 @@ import java.lang.annotation.Target;
 @Target({java.lang.annotation.ElementType.TYPE})
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Documented
-@ScopeAnnotation
 public @interface GuiceUI {
 
     /**
