@@ -17,19 +17,17 @@ package com.vaadin.guice.annotation;
 
 import com.google.inject.ScopeAnnotation;
 
-import com.vaadin.guice.server.GuiceViewProvider;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
  * Annotation to be placed on {@link com.vaadin.navigator.View}-classes that should be handled by
- * the {@link GuiceViewProvider}. <p> This annotation is also a stereotype annotation, so guice will
- * automatically detect the annotated classes. By default, this annotation also puts the view into
- * the {@link com.vaadin.guice.annotation.ViewScope view scope}. You can override this by using
- * another scope annotation, such as {@link UIScope the UI scope}, on your view class. <b>However,
- * the singleton scope will not work!</b> <p> This is an example of a view that is mapped to an
+ * the {@link com.vaadin.navigator.ViewProvider}. <p> This annotation is also a stereotype annotation,
+ * so guice will automatically detect the annotated classes. This annotation also puts the view into
+ * the {@link cosomm.vaadin.guice.annotation.ViewScope view scope}. <b>Note that in contrast to
+ * the spring vaadin integration, this cannot be overwritten with other scope-annotations like
+ * {@link UIScope}.</b>This is an example of a view that is mapped to an
  * empty view name and is available for all UI subclasses in the application:
  *
  * <pre>
@@ -50,6 +48,7 @@ import java.lang.annotation.Target;
  *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Henri Sara (hesara@vaadin.com)
+ * @author Bernd Hopp (bernd@vaadin.com)
  */
 @Target({java.lang.annotation.ElementType.TYPE})
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
