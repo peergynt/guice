@@ -15,7 +15,6 @@
  */
 package com.vaadin.guice.server;
 
-import com.vaadin.guice.repackaged.UrlPathHelper;
 import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.server.VaadinServletService;
 

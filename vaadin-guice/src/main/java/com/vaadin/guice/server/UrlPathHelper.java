@@ -1,4 +1,4 @@
-package com.vaadin.guice.repackaged;
+package com.vaadin.guice.server;
 /*
  * Copyright 2002-2014 the original author or authors.
  *
@@ -23,6 +23,18 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
+
+
+
+
+
+//NOTE: repackaged spring class!!!
+
+
+
+
+
+
 /**
  * Helper class for URL path matching. Provides support for URL paths in RequestDispatcher includes
  * and support for consistent URL decoding.
@@ -32,7 +44,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Rossen Stoyanchev
  * @since 14.01.2004
  */
-public class UrlPathHelper {
+class UrlPathHelper {
 
     /**
      * Special WebSphere request attribute, indicating the original request URI. Preferable over the

@@ -1,4 +1,4 @@
-package com.vaadin.guice.repackaged;
+package com.vaadin.guice.server;
 
 /*
 * Copyright 2002-2015 the original author or authors.
@@ -15,6 +15,18 @@ package com.vaadin.guice.repackaged;
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+
+
+
+
+
+
+//NOTE: repackaged spring class!!!
+
+
+
+
+
 
 /**
  * Miscellaneous {@link String} utility methods.
@@ -35,7 +47,7 @@ package com.vaadin.guice.repackaged;
  * @author Sam Brannen
  * @since 16 April 2001
  */
-public abstract class StringUtils {
+abstract class StringUtils {
 
     private static final String FOLDER_SEPARATOR = "/";
 
