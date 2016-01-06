@@ -198,7 +198,11 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                     throw new RuntimeException(e);
                 }
 
-                checkNotNull(defaultView, "field %s in %s is annotated with @DefaultUI and therefore must not be null");
+                checkNotNull(
+                        defaultView,
+                        "%s is annotated with @DefaultUI and therefore must not be null",
+                        defaultViewField.getName()
+                );
 
                 Navigator navigator;
 
@@ -209,7 +213,12 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                 } else if (defaultView instanceof ViewDisplay) {
                     navigator = new Navigator(instance, (ViewDisplay) defaultView);
                 } else {
-                    throw new IllegalArgumentException("%s.%s is annotated with @DefaultUI, must be either ComponentContainer, SingleComponentContainer or ViewDisplay");
+                    throw new IllegalArgumentException(
+                            String.format(
+                                    "%s is annotated with @DefaultUI, must be either ComponentContainer, SingleComponentContainer or ViewDisplay",
+                                    defaultView
+                            )
+                    );
                 }
 
                 navigator.addProvider(InjectorHolder.getInjector().getInstance(ViewProvider.class));
