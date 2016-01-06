@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.vaadin.guice.internal;
+package com.vaadin.guice.server;
 
-import com.vaadin.guice.server.UIID;
 import com.vaadin.ui.UI;
 
 import org.junit.After;
