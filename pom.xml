@@ -10,12 +10,11 @@
         <version>1.0.0</version>
     </parent>
 
-    <groupId>com.vaadin</groupId>
-    <artifactId>vaadin-guice-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>guice-vaadin-parent</artifactId>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>vaadin-guice-parent</name>
+    <name>guice-vaadin-parent</name>
     <description>
         Parent module for guice integration for Vaadin applications.
     </description>
@@ -203,7 +202,7 @@
     </build>
 
     <modules>
-        <module>vaadin-guice</module>
+        <module>guice-vaadin</module>
     </modules>
 
 </project>

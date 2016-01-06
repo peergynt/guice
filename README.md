@@ -5,7 +5,7 @@ Vaadin guice is the official guice integration for Vaadin Framework version 7.
 
 Building the project
 ----
-Execute `mvn clean install` in the root directory to build vaadin-guice and vaadin-guice-boot.
+Execute `mvn clean install` in the root directory to build guice-vaadin.
 
 Porting from vaadin-spring
 ----
