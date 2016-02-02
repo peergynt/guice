@@ -45,7 +45,7 @@ public class GuiceVaadinServlet extends VaadinServlet {
 
     private final VaadinModule vaadinModule;
 
-    public GuiceVaadinServlet() {
+    public GuiceVaadinServlet() throws InstantiationException, IllegalAccessException {
         Configuration annotation = getClass().getAnnotation(Configuration.class);
 
         if (annotation == null) {

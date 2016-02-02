@@ -74,6 +74,7 @@ class SessionBasedScoper implements Scope, SessionDestroyListener, SessionInitLi
 
     private void returnMap(Map<Key, Object> map) {
         if (mapSizeInit < map.size()) {
+            //if the returned map's size is larger than mapSizeInit, increase it but don't exceed MAP_INIT_SIZE_MAX
             mapSizeInit = Math.min(map.size(), MAP_INIT_SIZE_MAX);
         }
 
