@@ -86,7 +86,9 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
                     char c = className.charAt(i);
 
                     if (isUpperCase(c)) {
-                        viewNameBuilder.append('-');
+                        if(i != 0) {
+                            viewNameBuilder.append('-');
+                        }
                         viewNameBuilder.append(toLowerCase(c));
                     } else {
                         viewNameBuilder.append(c);
