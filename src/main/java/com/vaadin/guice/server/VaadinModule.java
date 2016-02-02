@@ -30,7 +30,7 @@ class VaadinModule extends AbstractModule {
     private final SessionBasedScoper uiScoper;
     private final TransactionBasedScoper viewScoper;
 
-    public VaadinModule(SessionProvider sessionProvider, String... basePackages) throws IllegalAccessException, InstantiationException {
+    public VaadinModule(SessionProvider sessionProvider, String... basePackages) throws IllegalAccessException {
         Reflections reflections = new Reflections(basePackages);
 
         Set<Class<?>> uis = reflections.getTypesAnnotatedWith(GuiceUI.class);
@@ -42,7 +42,11 @@ class VaadinModule extends AbstractModule {
                 throw new IllegalArgumentException("@UIModule can only be attached to classes implementing com.google.inject.Module");
             }
 
-            install((Module)moduleClass.newInstance());
+            try {
+                install((Module)moduleClass.newInstance());
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         viewScoper = new TransactionBasedScoper();

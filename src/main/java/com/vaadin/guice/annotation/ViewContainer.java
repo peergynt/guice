@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * {@literal @}GuiceUI
  * public class MyUI extends UI {
  * {@literal @}Inject
- * {@literal @}DefaultView
+ * {@literal @}ViewContainer
  * private MyDefaultView myDefaultView;
  *
  * {@literal @}Inject
@@ -56,5 +56,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Documented
-public @interface DefaultView {
+public @interface ViewContainer {
 }

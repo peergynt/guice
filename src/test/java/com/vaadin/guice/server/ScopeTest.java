@@ -43,7 +43,7 @@ public class ScopeTest {
     private Injector injector;
 
     @Before
-    public void setup() throws NoSuchFieldException, IllegalAccessException, InstantiationException {
+    public void setup() throws NoSuchFieldException, IllegalAccessException {
         sessionProvider = mock(SessionProvider.class);
         VaadinModule vaadinModule = new VaadinModule(sessionProvider, "com.vaadin.guice.server.testClasses");
         injector = Guice.createInjector(vaadinModule);

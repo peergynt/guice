@@ -15,7 +15,7 @@
  */
 package com.vaadin.guice.server;
 
-import com.vaadin.guice.annotation.DefaultView;
+import com.vaadin.guice.annotation.ViewContainer;
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewDisplay;
@@ -100,11 +100,11 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
         Field defaultViewField = null;
 
         for (java.lang.reflect.Field field : uiClass.getDeclaredFields()) {
-            if (field.getAnnotation(DefaultView.class) == null) {
+            if (field.getAnnotation(ViewContainer.class) == null) {
                 continue;
             }
 
-            checkArgument(defaultViewField == null, "more than one field annotated with @DefaultView in class " + uiClass);
+            checkArgument(defaultViewField == null, "more than one field annotated with @ViewContainer in class " + uiClass);
 
             defaultViewField = field;
         }
