@@ -17,23 +17,11 @@ package com.vaadin.guice.server;
 
 import com.google.common.net.UrlEscapers;
 
-import org.slf4j.LoggerFactory;
-
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
-
-
-
-
-
 //NOTE: repackaged spring class!!!
-
-
-
-
-
 
 /**
  * Helper class for URL path matching. Provides support for URL paths in RequestDispatcher includes
@@ -56,8 +44,6 @@ class UrlPathHelper {
     static volatile Boolean websphereComplianceFlag;
 
     private boolean urlDecode = true;
-
-    private org.slf4j.Logger logger = LoggerFactory.getLogger(UrlPathHelper.class);
 
     /**
      * Return the path within the servlet mapping for the given request, i.e. the part of the
@@ -295,9 +281,7 @@ class UrlPathHelper {
                 Properties prop = (Properties) cl.getMethod(methodName).invoke(null);
                 flag = Boolean.parseBoolean(prop.getProperty(propName));
             } catch (Throwable ex) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Could not introspect WebSphere web container properties: " + ex);
-                }
+                System.err.println("Could not introspect WebSphere web container properties: " + ex);
             }
             websphereComplianceFlag = flag;
         }

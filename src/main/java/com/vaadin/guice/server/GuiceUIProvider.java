@@ -18,6 +18,7 @@ package com.vaadin.guice.server;
 import com.vaadin.guice.annotation.ViewContainer;
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.ServiceException;
@@ -32,16 +33,17 @@ import com.vaadin.ui.SingleComponentContainer;
 import com.vaadin.ui.UI;
 import com.vaadin.util.CurrentInstance;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Vaadin {@link com.vaadin.server.UIProvider} that looks up UI classes from the Guice application
@@ -53,16 +55,30 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = Logger.getLogger(getClass().getName());
     private final Map<String, Class<? extends UI>> pathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<String, Class<? extends UI>> wildcardPathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<Class<? extends UI>, Field> uiToDefaultViewField = new ConcurrentHashMap<Class<? extends UI>, Field>();
+    private final Set<Class<? extends ViewChangeListener>> viewChangeListeners;
 
-    public GuiceUIProvider(Set<Class<?>> uiClasses) {
+    @SuppressWarnings("unchecked")
+    public GuiceUIProvider(Set<Class<?>> uiClasses, Set<Class<?>> viewChangeListeners) {
         detectUIs(uiClasses);
 
         if (pathToUIMap.isEmpty()) {
-            logger.warn("Found no Vaadin UIs in the application context");
+            logger.log(Level.WARNING, "Found no Vaadin UIs in the application context");
+        }
+
+        this.viewChangeListeners = new HashSet<Class<? extends ViewChangeListener>>(viewChangeListeners.size());
+
+        for (Class<?> viewChangeListenerCandidate : viewChangeListeners) {
+            checkArgument(
+                    ViewChangeListener.class.isAssignableFrom(viewChangeListenerCandidate),
+                    "%s is annotated with @GuiceViewChangeListener but does not implement com.vaadin.navigator.ViewChangeListener",
+                    viewChangeListenerCandidate
+            );
+
+            this.viewChangeListeners.add((Class<? extends ViewChangeListener>) viewChangeListenerCandidate);
         }
     }
 
@@ -75,7 +91,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
             Class<? extends UI> uiClass = (Class<? extends UI>) uiClassRaw;
 
-            logger.info("Found Vaadin UI [{}]", uiClass.getCanonicalName());
+            logger.log(Level.INFO, "Found Vaadin UI [{0}]", uiClass.getCanonicalName());
 
             GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
 
@@ -83,13 +99,16 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
             path = preparePath(path);
 
             Class<? extends UI> existingUiForPath = getUIByPath(path);
-            if (existingUiForPath != null) {
-                throw new IllegalStateException(String.format(
-                        "[%s] is already mapped to the path [%s]",
-                        existingUiForPath.getCanonicalName(), path));
-            }
-            logger.debug("Mapping Vaadin UI [{}] to path [{}]",
-                    uiClass.getCanonicalName(), path);
+
+            checkState(
+                    existingUiForPath == null,
+                    "[%s] is already mapped to the path [%s]",
+                    existingUiForPath.getName(),
+                    path
+            );
+
+            logger.log(Level.INFO, "Mapping Vaadin UI [{0}] to path [{1}]",
+                    new Object[]{uiClass.getCanonicalName(), path});
             mapPathToUI(path, uiClass);
             mapToDefaultViewField(uiClass);
         }
@@ -222,6 +241,12 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                 }
 
                 navigator.addProvider(InjectorHolder.getInjector().getInstance(ViewProvider.class));
+
+                for (Class<? extends ViewChangeListener> viewChangeListenerClass : viewChangeListeners) {
+                    ViewChangeListener viewChangeListener = InjectorHolder.getInjector().getInstance(viewChangeListenerClass);
+                    navigator.addViewChangeListener(viewChangeListener);
+                }
+
                 instance.setNavigator(navigator);
             }
 

@@ -5,9 +5,9 @@ import com.google.inject.Module;
 
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
+import com.vaadin.guice.annotation.GuiceViewChangeListener;
 import com.vaadin.guice.annotation.UIModule;
 import com.vaadin.guice.annotation.UIScope;
-import com.vaadin.guice.annotation.ViewScope;
 import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.DefaultUIProvider;
 import com.vaadin.server.ServiceException;
@@ -28,7 +28,6 @@ class VaadinModule extends AbstractModule {
     private final GuiceViewProvider viewProvider;
     private final GuiceUIProvider uiProvider;
     private final SessionBasedScoper uiScoper;
-    private final TransactionBasedScoper viewScoper;
 
     public VaadinModule(SessionProvider sessionProvider, String... basePackages) throws IllegalAccessException {
         Reflections reflections = new Reflections(basePackages);
@@ -36,6 +35,7 @@ class VaadinModule extends AbstractModule {
         Set<Class<?>> uis = reflections.getTypesAnnotatedWith(GuiceUI.class);
         Set<Class<?>> views = reflections.getTypesAnnotatedWith(GuiceView.class);
         Set<Class<?>> modules = reflections.getTypesAnnotatedWith(UIModule.class);
+        Set<Class<?>> viewChangeListeners = reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class);
 
         for(Class<?> moduleClass: modules){
             if(!Module.class.isAssignableFrom(moduleClass)){
@@ -49,17 +49,15 @@ class VaadinModule extends AbstractModule {
             }
         }
 
-        viewScoper = new TransactionBasedScoper();
         uiScoper = new SessionBasedScoper(sessionProvider);
-        viewProvider = new GuiceViewProvider(views, viewScoper);
-        uiProvider = new GuiceUIProvider(uis);
+        viewProvider = new GuiceViewProvider(views);
+        uiProvider = new GuiceUIProvider(uis, viewChangeListeners);
     }
 
     @Override
     protected void configure() {
         bindScope(UIScope.class, uiScoper);
-        bindScope(GuiceView.class, viewScoper);
-        bindScope(ViewScope.class, viewScoper);
+        bindScope(GuiceView.class, uiScoper);
         bind(UIProvider.class).toInstance(uiProvider);
         bind(ViewProvider.class).toInstance(viewProvider);
     }

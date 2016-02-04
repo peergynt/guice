@@ -5,27 +5,26 @@
     <artifactId>guice-vaadin</artifactId>
     <packaging>jar</packaging>
     <groupId>com.vaadin</groupId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <name>guice-vaadin</name>
     <description>
         Provides Google Guice integration for Vaadin applications.
     </description>
     <url>https://github.com/vaadin/guice</url>
-
     <properties>
         <project.build.encoding>UTF-8</project.build.encoding>
         <project.build.target>1.7</project.build.target>
         <project.build.source>1.7</project.build.source>
-        <!-- These are typically overridden with BOMs -->
-        <guice.version>4.0</guice.version>
-        <vaadin.version>7.5.1</vaadin.version>
-        <slf4j.version>1.7.7</slf4j.version>
-        <reflections.version>0.9.8</reflections.version>
-        <!-- Additional manifest fields -->
         <Vaadin-License-Title>Apache License 2.0</Vaadin-License-Title>
         <Implementation-Title>Guice Vaadin integration</Implementation-Title>
+        <guice.version>4.0</guice.version>
+        <vaadin.version>7.6.1</vaadin.version>
+        <reflections.version>0.9.10</reflections.version>
+        <javassist.version>3.20.0-GA</javassist.version>
+        <mockito-core.version>1.9.5</mockito-core.version>
+        <maven-surefire-plugin.version>2.10</maven-surefire-plugin.version>
+        <maven-jar-plugin.version>2.3.1</maven-jar-plugin.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -52,17 +51,12 @@
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.18.1-GA</version>
+            <version>${javassist.version}</version>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-server</artifactId>
             <version>${vaadin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -73,17 +67,16 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>1.9.5</version>
+            <version>${mockito-core.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.10</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <forkMode>always</forkMode>
                     <threadCount>50</threadCount>
@@ -92,7 +85,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>${maven-jar-plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifest>

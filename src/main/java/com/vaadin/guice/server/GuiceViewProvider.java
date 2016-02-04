@@ -52,10 +52,8 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
     private final Map<String, Class<? extends View>> viewNamesToViewClassesMap;
     private final Map<VaadinSession, Map<String, View>> viewsBySessionMap;
     private final Set<String> viewNames;
-    private final TransactionBasedScoper viewScoper;
 
-    public GuiceViewProvider(Set<Class<?>> viewClasses, TransactionBasedScoper viewScoper) {
-        this.viewScoper = viewScoper;
+    public GuiceViewProvider(Set<Class<?>> viewClasses) {
 
         viewNamesToViewClassesMap = scanForViews(viewClasses);
         viewNames = viewNamesToViewClassesMap.keySet();
@@ -135,13 +133,8 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
 
             checkArgument(viewClass != null, "no view for name %s registered", viewName);
 
-            try {
-                viewScoper.startTransaction();
-                view = InjectorHolder.getInjector().getInstance(viewClass);
-                views.put(viewName, view);
-            } finally {
-                viewScoper.endTransaction();
-            }
+            view = InjectorHolder.getInjector().getInstance(viewClass);
+            views.put(viewName, view);
         }
 
         return view;
