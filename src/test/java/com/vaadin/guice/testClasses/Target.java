@@ -15,12 +15,6 @@ public class Target {
     @Inject
     private UIScoped2 uiScoped2;
 
-    @Inject
-    private ViewScoped1 viewScoped1;
-
-    @Inject
-    private ViewScoped2 viewScoped2;
-
     public Prototype1 getPrototype1() {
         return prototype1;
     }
@@ -51,21 +45,5 @@ public class Target {
 
     public void setUiScoped2(UIScoped2 uiScoped2) {
         this.uiScoped2 = uiScoped2;
-    }
-
-    public ViewScoped1 getViewScoped1() {
-        return viewScoped1;
-    }
-
-    public void setViewScoped1(ViewScoped1 viewScoped1) {
-        this.viewScoped1 = viewScoped1;
-    }
-
-    public ViewScoped2 getViewScoped2() {
-        return viewScoped2;
-    }
-
-    public void setViewScoped2(ViewScoped2 viewScoped2) {
-        this.viewScoped2 = viewScoped2;
     }
 }

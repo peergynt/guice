@@ -38,7 +38,6 @@ public class ScopeTest {
 
     private SessionProvider sessionProvider;
     private SessionBasedScoper uiScoper;
-    private TransactionBasedScoper transactionBasedScoper;
     private GuiceUIProvider uiProvider;
     private Injector injector;
 
@@ -50,10 +49,6 @@ public class ScopeTest {
         final Field uiScoperField = VaadinModule.class.getDeclaredField("uiScoper");
         uiScoperField.setAccessible(true);
         this.uiScoper = (SessionBasedScoper) uiScoperField.get(vaadinModule);
-        final Field viewScoperField = VaadinModule.class.getDeclaredField("viewScoper");
-        viewScoperField.setAccessible(true);
-        transactionBasedScoper = (TransactionBasedScoper) viewScoperField.get(vaadinModule);
-
 
         final Field uiProviderField = VaadinModule.class.getDeclaredField("uiProvider");
         uiProviderField.setAccessible(true);
@@ -63,31 +58,21 @@ public class ScopeTest {
     @Test //default prototype behaviour should not be affected
     public void testPrototype() throws ServiceException, NoSuchFieldException, IllegalAccessException {
         newSession();
-        transactionBasedScoper.startTransaction();
         Target target1 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
         newSession();
-        transactionBasedScoper.startTransaction();
         Target target2 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
         assertNotEquals(target1.getPrototype1(), target2.getPrototype1());
     }
 
     @Test //default singleton behaviour should not be affected
     public void testSingleton() throws ServiceException, NoSuchFieldException, IllegalAccessException {
-        System.err.println("jarkz!");
-
         newSession();
-        transactionBasedScoper.startTransaction();
         Target target1 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
         newSession();
-        transactionBasedScoper.startTransaction();
         Target target2 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
         assertEquals(target1.getSingleton1(), target2.getSingleton1());
     }
@@ -97,14 +82,10 @@ public class ScopeTest {
     public void testSessionScopeDifferent() throws ServiceException, NoSuchFieldException, IllegalAccessException {
 
         newSession();
-        transactionBasedScoper.startTransaction();
         Target target1 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
         newSession();
-        transactionBasedScoper.startTransaction();
         Target target2 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
         assertNotNull(target1);
         assertNotNull(target2);
@@ -120,13 +101,9 @@ public class ScopeTest {
     public void testSessionScopeSame() throws ServiceException, NoSuchFieldException, IllegalAccessException {
 
         newSession();
-        transactionBasedScoper.startTransaction();
         Target target1 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
-        transactionBasedScoper.startTransaction();
         Target target2 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
         assertNotNull(target1);
         assertNotNull(target2);
@@ -135,9 +112,6 @@ public class ScopeTest {
         assertEquals(target1.getUiScoped1(), target2.getUiScoped1());
         assertEquals(target1.getUiScoped2(), target2.getUiScoped2());
         assertEquals(target1.getUiScoped1().getUiScoped2(), target2.getUiScoped1().getUiScoped2());
-        assertNotEquals(target1.getViewScoped1(), target2.getViewScoped1());
-        assertNotEquals(target1.getViewScoped2(), target2.getViewScoped2());
-        assertNotEquals(target1.getViewScoped1().getViewScoped2(), target2.getViewScoped1().getViewScoped2());
     }
 
     //different transaction-scopes should lead to a different set of transaction-scoped objects
@@ -145,46 +119,28 @@ public class ScopeTest {
     public void testTransactionScopeDifferent() throws ServiceException, NoSuchFieldException, IllegalAccessException {
 
         newSession();
-        transactionBasedScoper.startTransaction();
         Target target1 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
         newSession();
-        transactionBasedScoper.startTransaction();
         Target target2 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
         assertNotNull(target1);
         assertNotNull(target2);
-
-        assertEquals(target1.getViewScoped1().getViewScoped2(), target1.getViewScoped2());
-        assertEquals(target2.getViewScoped1().getViewScoped2(), target2.getViewScoped2());
-        assertNotEquals(target1.getViewScoped1(), target2.getViewScoped1());
-        assertNotEquals(target1.getViewScoped2(), target2.getViewScoped2());
-        assertNotEquals(target1.getViewScoped1().getViewScoped2(), target2.getViewScoped1().getViewScoped2());
     }
-
 
     //a single transaction-scope should lead to the same set of transaction-scoped objects being injected
     @Test
     public void testTransactionScopeSame() throws ServiceException, NoSuchFieldException, IllegalAccessException {
 
         newSession();
-        transactionBasedScoper.startTransaction();
         Target target1 = injector.getInstance(Target.class);
 
         newSession();
         Target target2 = injector.getInstance(Target.class);
-        transactionBasedScoper.endTransaction();
 
         assertNotNull(target1);
         assertNotNull(target2);
 
-        assertEquals(target1.getViewScoped1().getViewScoped2(), target1.getViewScoped2());
-        assertEquals(target2.getViewScoped1().getViewScoped2(), target2.getViewScoped2());
-        assertEquals(target1.getViewScoped1(), target2.getViewScoped1());
-        assertEquals(target1.getViewScoped2(), target2.getViewScoped2());
-        assertEquals(target1.getViewScoped1().getViewScoped2(), target2.getViewScoped1().getViewScoped2());
         assertNotEquals(target1.getUiScoped1(), target2.getUiScoped1());
         assertNotEquals(target1.getUiScoped2(), target2.getUiScoped2());
         assertNotEquals(target1.getUiScoped1().getUiScoped2(), target2.getUiScoped1().getUiScoped2());
