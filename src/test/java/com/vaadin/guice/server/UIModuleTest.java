@@ -1,7 +1,5 @@
 package com.vaadin.guice.server;
 
-import com.google.inject.AbstractModule;
-
 import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.testClasses.AnImplementation;
 import com.vaadin.guice.testClasses.AnInterface;
@@ -15,18 +13,11 @@ import static org.junit.Assert.assertTrue;
 
 public class UIModuleTest {
 
-    public static class TestModule extends AbstractModule{
-        @Override
-        protected void configure() {
-            bind(AnInterface.class).to(AnImplementation.class);
-        }
-    }
-
-    @Configuration(modules = {TestModule.class}, basePackage = "com.vaadin.guice.testClasses")
+    @Configuration(modules = {StaticlyLoadedModule.class}, basePackage = "com.vaadin.guice.testClasses")
     private static class VaadinServletWithStaticAndDynamicLoadedModules extends GuiceVaadinServlet{
     }
 
-    @Configuration(modules = {TestModule.class}, basePackage = "com.vaadin.guice.server")
+    @Configuration(modules = {StaticlyLoadedModule.class}, basePackage = "com.vaadin.guice.server")
     private static class VaadinServletWithStaticLoadedModule extends GuiceVaadinServlet{
     }
 
