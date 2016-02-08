@@ -15,10 +15,8 @@
  */
 package com.vaadin.guice.server;
 
-import com.google.common.base.Strings;
 import com.google.inject.Guice;
 import com.google.inject.Module;
-import com.google.inject.util.Modules;
 
 import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.navigator.View;
