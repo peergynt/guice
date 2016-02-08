@@ -1,6 +1,6 @@
 package com.vaadin.guice.testClasses;
 
-public class AnotherImplementation implements AnInterface{
+public class ASecondImplementation implements AnInterface{
     @Override
     public void foo() {
         ;

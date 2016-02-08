@@ -8,6 +8,6 @@ import com.vaadin.guice.annotation.UIModule;
 public class DynamicallyLoadedModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(AnInterface.class).to(AnotherImplementation.class);
+        bind(AnInterface.class).to(ASecondImplementation.class);
     }
 }
