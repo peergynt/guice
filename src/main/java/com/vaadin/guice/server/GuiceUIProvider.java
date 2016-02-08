@@ -62,7 +62,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     private final Set<Class<? extends ViewChangeListener>> viewChangeListeners;
 
     @SuppressWarnings("unchecked")
-    public GuiceUIProvider(Set<Class<?>> uiClasses, Set<Class<?>> viewChangeListeners) {
+    public GuiceUIProvider(Set<Class<? extends UI>> uiClasses, Set<Class<? extends ViewChangeListener>> viewChangeListeners) {
         detectUIs(uiClasses);
 
         if (pathToUIMap.isEmpty()) {
@@ -83,17 +83,16 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     }
 
     @SuppressWarnings("unchecked")
-    private void detectUIs(Set<Class<?>> uiClasses) {
+    private void detectUIs(Set<Class<? extends UI>> uiClasses) {
         logger.info("Checking the application context for Vaadin UIs");
 
-        for (Class<?> uiClassRaw : uiClasses) {
-            checkArgument(UI.class.isAssignableFrom(uiClassRaw), "class %s has GuiceUI annotation but is not of type com.vaadin.ui.UI.", uiClassRaw);
-
-            Class<? extends UI> uiClass = (Class<? extends UI>) uiClassRaw;
+        for (Class<? extends UI> uiClass : uiClasses) {
 
             logger.log(Level.INFO, "Found Vaadin UI [{0}]", uiClass.getCanonicalName());
 
             GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
+
+            checkState(annotation != null);
 
             String path = annotation.path();
             path = preparePath(path);
@@ -103,7 +102,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
             checkState(
                     existingUiForPath == null,
                     "[%s] is already mapped to the path [%s]",
-                    existingUiForPath.getName(),
+                    existingUiForPath,
                     path
             );
 

@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
 
@@ -53,7 +54,7 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
     private final Map<VaadinSession, Map<String, View>> viewsBySessionMap;
     private final Set<String> viewNames;
 
-    public GuiceViewProvider(Set<Class<?>> viewClasses) {
+    public GuiceViewProvider(Set<Class<? extends View>> viewClasses) {
 
         viewNamesToViewClassesMap = scanForViews(viewClasses);
         viewNames = viewNamesToViewClassesMap.keySet();
@@ -62,17 +63,14 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Class<? extends View>> scanForViews(Set<Class<?>> viewClasses) {
+    private Map<String, Class<? extends View>> scanForViews(Set<Class<? extends View>> viewClasses) {
         ImmutableMap.Builder<String, Class<? extends View>> viewMapBuilder = ImmutableMap.builder();
 
-        for (Class viewClass : viewClasses) {
-            checkArgument(
-                    View.class.isAssignableFrom(viewClass),
-                    "class %s has GuiceView-Annotation but does not implement com.vaadin.navigator.view",
-                    viewClass
-            );
+        for (Class<? extends View> viewClass : viewClasses) {
 
             GuiceView annotation = (GuiceView) viewClass.getAnnotation(GuiceView.class);
+
+            checkState(annotation != null);
 
             if (GuiceView.USE_CONVENTIONS.equals(annotation.name())) {
 

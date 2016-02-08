@@ -2,12 +2,15 @@ package com.vaadin.guice.server;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import com.google.inject.util.Modules;
 
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.GuiceViewChangeListener;
 import com.vaadin.guice.annotation.UIModule;
 import com.vaadin.guice.annotation.UIScope;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.DefaultUIProvider;
 import com.vaadin.server.ServiceException;
@@ -16,6 +19,7 @@ import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.UIProvider;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
 
 import org.reflections.Reflections;
 
@@ -29,26 +33,7 @@ class VaadinModule extends AbstractModule {
     private final GuiceUIProvider uiProvider;
     private final SessionBasedScoper uiScoper;
 
-    public VaadinModule(SessionProvider sessionProvider, String... basePackages) throws IllegalAccessException {
-        Reflections reflections = new Reflections(basePackages);
-
-        Set<Class<?>> uis = reflections.getTypesAnnotatedWith(GuiceUI.class);
-        Set<Class<?>> views = reflections.getTypesAnnotatedWith(GuiceView.class);
-        Set<Class<?>> modules = reflections.getTypesAnnotatedWith(UIModule.class);
-        Set<Class<?>> viewChangeListeners = reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class);
-
-        for(Class<?> moduleClass: modules){
-            if(!Module.class.isAssignableFrom(moduleClass)){
-                throw new IllegalArgumentException("@UIModule can only be attached to classes implementing com.google.inject.Module");
-            }
-
-            try {
-                install((Module)moduleClass.newInstance());
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
+    public VaadinModule(SessionProvider sessionProvider, Set<Class<? extends View>> views, Set<Class<? extends UI>> uis, Set<Class<? extends ViewChangeListener>> viewChangeListeners) {
         uiScoper = new SessionBasedScoper(sessionProvider);
         viewProvider = new GuiceViewProvider(views);
         uiProvider = new GuiceUIProvider(uis, viewChangeListeners);

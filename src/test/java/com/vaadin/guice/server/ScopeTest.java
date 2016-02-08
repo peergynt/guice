@@ -25,9 +25,13 @@ import com.vaadin.server.VaadinSession;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.reflections.Reflections;
 
 import java.lang.reflect.Field;
 
+import static com.vaadin.guice.server.ReflectionUtils.getGuiceUIClasses;
+import static com.vaadin.guice.server.ReflectionUtils.getGuiceViewClasses;
+import static com.vaadin.guice.server.ReflectionUtils.getViewChangeListenerClasses;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -44,7 +48,16 @@ public class ScopeTest {
     @Before
     public void setup() throws NoSuchFieldException, IllegalAccessException {
         sessionProvider = mock(SessionProvider.class);
-        VaadinModule vaadinModule = new VaadinModule(sessionProvider, "com.vaadin.guice.server.testClasses");
+
+        Reflections reflections = new Reflections("com.vaadin.guice.server.testClasses");
+
+        VaadinModule vaadinModule = new VaadinModule(
+                sessionProvider,
+                getGuiceViewClasses(reflections),
+                getGuiceUIClasses(reflections),
+                getViewChangeListenerClasses(reflections)
+        );
+
         injector = Guice.createInjector(vaadinModule);
         final Field uiScoperField = VaadinModule.class.getDeclaredField("uiScoper");
         uiScoperField.setAccessible(true);
@@ -144,6 +157,11 @@ public class ScopeTest {
         assertNotEquals(target1.getUiScoped1(), target2.getUiScoped1());
         assertNotEquals(target1.getUiScoped2(), target2.getUiScoped2());
         assertNotEquals(target1.getUiScoped1().getUiScoped2(), target2.getUiScoped1().getUiScoped2());
+    }
+
+    @Test
+    public void test_external_jar_load(){
+
     }
 
     private void newSession() throws ServiceException {

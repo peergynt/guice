@@ -17,8 +17,11 @@ package com.vaadin.guice.server;
 
 import com.google.inject.Guice;
 import com.google.inject.Module;
+import com.google.inject.util.Modules;
 
 import com.vaadin.guice.annotation.Configuration;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinService;
@@ -26,12 +29,19 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
+
+import org.reflections.Reflections;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+
+import static com.vaadin.guice.server.ReflectionUtils.getGuiceUIClasses;
+import static com.vaadin.guice.server.ReflectionUtils.getGuiceViewClasses;
 
 /**
  * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin servlet} that adds a
@@ -45,18 +55,18 @@ public class GuiceVaadinServlet extends VaadinServlet {
 
     private final VaadinModule vaadinModule;
 
-    public GuiceVaadinServlet() throws InstantiationException, IllegalAccessException {
+    public GuiceVaadinServlet() {
         Configuration annotation = getClass().getAnnotation(Configuration.class);
 
         if (annotation == null) {
             throw new IllegalStateException("GuiceVaadinServlet cannot be used without 'Configuration' annotation");
         }
 
-        List<Module> modules = new ArrayList<Module>(annotation.modules().length + 1);
+        List<Module> hardWiredModules = new ArrayList<Module>(annotation.modules().length + 1);
 
         for (Class<? extends Module> moduleClass : annotation.modules()) {
             try {
-                modules.add(moduleClass.newInstance());
+                hardWiredModules.add(moduleClass.newInstance());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -69,11 +79,21 @@ public class GuiceVaadinServlet extends VaadinServlet {
             }
         };
 
-        this.vaadinModule = new VaadinModule(sessionProvider, annotation.basePackage());
+        Reflections reflections = new Reflections(annotation.basePackage());
 
-        modules.add(vaadinModule);
+        Set<Class<? extends UI>> uis = getGuiceUIClasses(reflections);
 
-        InjectorHolder.setInjector(Guice.createInjector(modules));
+        Set<Class<? extends View>> views = getGuiceViewClasses(reflections);
+
+        Set<Class<? extends ViewChangeListener>> viewChangeListeners = ReflectionUtils.getViewChangeListenerClasses(reflections);
+
+        Set<Module> dynamicallyLoadedModules = ReflectionUtils.getUIModules(reflections);
+
+        this.vaadinModule = new VaadinModule(sessionProvider, views, uis, viewChangeListeners);
+
+        Module combinedModule = Modules.override(hardWiredModules).with(dynamicallyLoadedModules);
+
+        InjectorHolder.setInjector(Guice.createInjector(vaadinModule, combinedModule));
     }
 
     @Override
