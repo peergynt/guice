@@ -15,6 +15,7 @@
  */
 package com.vaadin.guice.server;
 
+import com.google.common.base.Strings;
 import com.google.inject.Guice;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
@@ -40,8 +41,13 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.inject.util.Modules.override;
 import static com.vaadin.guice.server.ReflectionUtils.getGuiceUIClasses;
 import static com.vaadin.guice.server.ReflectionUtils.getGuiceViewClasses;
+import static com.vaadin.guice.server.ReflectionUtils.getUIModules;
+import static com.vaadin.guice.server.ReflectionUtils.getViewChangeListenerClasses;
 
 /**
  * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin servlet} that adds a
@@ -58,9 +64,15 @@ public class GuiceVaadinServlet extends VaadinServlet {
     public GuiceVaadinServlet() {
         Configuration annotation = getClass().getAnnotation(Configuration.class);
 
-        if (annotation == null) {
-            throw new IllegalStateException("GuiceVaadinServlet cannot be used without 'Configuration' annotation");
-        }
+        checkState(
+            annotation != null,
+            "GuiceVaadinServlet cannot be used without 'Configuration' annotation"
+        );
+
+        checkArgument(
+            annotation.basePackage().length > 0,
+            "at least on 'basePackage'-parameter expected in Configuration of " + getClass()
+        );
 
         List<Module> hardWiredModules = new ArrayList<Module>(annotation.modules().length + 1);
 
@@ -85,13 +97,13 @@ public class GuiceVaadinServlet extends VaadinServlet {
 
         Set<Class<? extends View>> views = getGuiceViewClasses(reflections);
 
-        Set<Class<? extends ViewChangeListener>> viewChangeListeners = ReflectionUtils.getViewChangeListenerClasses(reflections);
+        Set<Class<? extends ViewChangeListener>> viewChangeListeners = getViewChangeListenerClasses(reflections);
 
-        Set<Module> dynamicallyLoadedModules = ReflectionUtils.getUIModules(reflections);
+        Set<Module> dynamicallyLoadedModules = getUIModules(reflections);
 
         this.vaadinModule = new VaadinModule(sessionProvider, views, uis, viewChangeListeners);
 
-        Module combinedModule = Modules.override(hardWiredModules).with(dynamicallyLoadedModules);
+        Module combinedModule = override(hardWiredModules).with(dynamicallyLoadedModules);
 
         InjectorHolder.setInjector(Guice.createInjector(vaadinModule, combinedModule));
     }
