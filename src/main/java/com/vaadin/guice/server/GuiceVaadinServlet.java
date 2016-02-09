@@ -62,14 +62,14 @@ public class GuiceVaadinServlet extends VaadinServlet {
     public GuiceVaadinServlet() {
         Configuration annotation = getClass().getAnnotation(Configuration.class);
 
-        checkState(
+        checkArgument(
             annotation != null,
             "GuiceVaadinServlet cannot be used without 'Configuration' annotation"
         );
 
         checkArgument(
-            annotation.basePackage().length > 0,
-            "at least on 'basePackage'-parameter expected in Configuration of " + getClass()
+            annotation.basePackages().length > 0,
+            "at least on 'basePackages'-parameter expected in Configuration of " + getClass()
         );
 
         List<Module> hardWiredModules = new ArrayList<Module>(annotation.modules().length + 1);
@@ -89,7 +89,7 @@ public class GuiceVaadinServlet extends VaadinServlet {
             }
         };
 
-        Reflections reflections = new Reflections(annotation.basePackage());
+        Reflections reflections = new Reflections(annotation.basePackages());
 
         Set<Class<? extends UI>> uis = getGuiceUIClasses(reflections);
 
@@ -120,11 +120,5 @@ public class GuiceVaadinServlet extends VaadinServlet {
                 this, deploymentConfiguration, null);
         service.init();
         return service;
-    }
-
-    @Override
-    protected VaadinServletRequest createVaadinRequest(
-            HttpServletRequest request) {
-        return new VaadinServletRequest(request, getService());
     }
 }

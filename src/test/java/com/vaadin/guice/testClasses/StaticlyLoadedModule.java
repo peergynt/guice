@@ -1,11 +1,6 @@
-package com.vaadin.guice.server;
+package com.vaadin.guice.testClasses;
 
 import com.google.inject.AbstractModule;
-
-import com.vaadin.guice.testClasses.AnImplementation;
-import com.vaadin.guice.testClasses.AnInterface;
-import com.vaadin.guice.testClasses.AnotherInterface;
-import com.vaadin.guice.testClasses.AnotherInterfaceImplementation;
 
 public class StaticlyLoadedModule extends AbstractModule {
     @Override

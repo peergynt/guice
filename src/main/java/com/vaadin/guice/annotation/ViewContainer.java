@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * public class MyUI extends UI {
  * {@literal @}Inject
  * {@literal @}ViewContainer
- * private MyDefaultView myDefaultView;
+ * private MyViewContainer myViewContainer;
  *
  * {@literal @}Inject
  * private MyMainComponent myMainComponent;
@@ -44,8 +44,8 @@ import java.lang.annotation.Target;
  * {@literal @}UIScope
  * public class MyMainComponent extends VerticalLayout {
  * {@literal @}Inject
- * MyMainComponent(MyDefaultView myDefaultView){
- * addComponent(myDefaultView);
+ * MyMainComponent(MyMainComponent myViewContainer){
+ * addComponent(myViewContainer);
  * }
  * }
  *      </code>

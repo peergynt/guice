@@ -8,6 +8,7 @@ import com.vaadin.guice.testClasses.AnInterface;
 import com.vaadin.guice.testClasses.ASecondImplementation;
 import com.vaadin.guice.testClasses.AnotherInterface;
 import com.vaadin.guice.testClasses.AnotherInterfaceImplementation;
+import com.vaadin.guice.testClasses.StaticlyLoadedModule;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,15 +18,15 @@ import static org.junit.Assert.assertTrue;
 
 public class UIModuleTest {
 
-    @Configuration(modules = {StaticlyLoadedModule.class}, basePackage = "com.vaadin.guice.testClasses")
+    @Configuration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.testClasses")
     private static class VaadinServletWithStaticAndDynamicLoadedModules extends GuiceVaadinServlet{
     }
 
-    @Configuration(modules = {StaticlyLoadedModule.class}, basePackage = "com.vaadin.guice.server")
+    @Configuration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.server")
     private static class VaadinServletWithStaticLoadedModule extends GuiceVaadinServlet{
     }
 
-    @Configuration(modules = {}, basePackage = "com.vaadin.guice.testClasses")
+    @Configuration(modules = {}, basePackages = "com.vaadin.guice.testClasses")
     private static class VaadinServletWithDynamicLoadedModule extends GuiceVaadinServlet{
     }
 
@@ -35,7 +36,7 @@ public class UIModuleTest {
     }
 
     @Test
-    public void dynamicly_loaded_modules_should_override(){
+    public void dynamically_loaded_modules_should_override(){
         new VaadinServletWithStaticAndDynamicLoadedModules();
 
         AnInterface anInterface = InjectorHolder.getInjector().getInstance(AnInterface.class);
@@ -50,7 +51,7 @@ public class UIModuleTest {
     }
 
     @Test
-    public void staticly_loaded_modules_should_be_considered(){
+    public void statically_loaded_modules_should_be_considered(){
         new VaadinServletWithStaticLoadedModule();
 
         AnInterface anInterface = InjectorHolder.getInjector().getInstance(AnInterface.class);
@@ -65,7 +66,7 @@ public class UIModuleTest {
     }
 
     @Test
-    public void dynamicly_loaded_modules_should_be_considered(){
+    public void dynamically_loaded_modules_should_be_considered(){
         new VaadinServletWithDynamicLoadedModule();
 
         AnInterface anInterface = InjectorHolder.getInjector().getInstance(AnInterface.class);

@@ -159,11 +159,6 @@ public class ScopeTest {
         assertNotEquals(target1.getUiScoped1().getUiScoped2(), target2.getUiScoped1().getUiScoped2());
     }
 
-    @Test
-    public void test_external_jar_load(){
-
-    }
-
     private void newSession() throws ServiceException {
         VaadinSession vaadinSession = mock(VaadinSession.class);
 
