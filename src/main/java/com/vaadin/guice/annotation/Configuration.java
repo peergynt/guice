@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * declaration like
  * <pre>
  *      <code>
- * {@literal @}Configuration(modules={MyModule.class}, basePackage="com.myproject")
+ * {@literal @}Configuration(modules={MyModule.class}, basePackages="com.myproject")
  * {@literal @}WebServlet(urlPatterns = "/*", name = "MyServlet", asyncSupported = true)
  * public static class MyServlet extends GuiceVaadinServlet {
  * }
@@ -36,5 +36,5 @@ public @interface Configuration {
      *
      * @return A list of packages that is to be scanned for the guice-context
      */
-    String[] basePackage();
+    String[] basePackages();
 }
