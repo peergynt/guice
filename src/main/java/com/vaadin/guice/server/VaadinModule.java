@@ -36,7 +36,7 @@ class VaadinModule extends AbstractModule {
     public VaadinModule(SessionProvider sessionProvider, Set<Class<? extends View>> views, Set<Class<? extends UI>> uis, Set<Class<? extends ViewChangeListener>> viewChangeListeners) {
         uiScoper = new SessionBasedScoper(sessionProvider);
         viewProvider = new GuiceViewProvider(views);
-        uiProvider = new GuiceUIProvider(uis, viewChangeListeners);
+        uiProvider = new GuiceUIProvider(uis, viewChangeListeners, viewProvider);
     }
 
     @Override

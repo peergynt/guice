@@ -68,7 +68,7 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
 
         for (Class<? extends View> viewClass : viewClasses) {
 
-            GuiceView annotation = (GuiceView) viewClass.getAnnotation(GuiceView.class);
+            GuiceView annotation = viewClass.getAnnotation(GuiceView.class);
 
             checkState(annotation != null);
 

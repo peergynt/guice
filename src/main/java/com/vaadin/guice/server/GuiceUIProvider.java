@@ -60,26 +60,18 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     private final Map<String, Class<? extends UI>> wildcardPathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<Class<? extends UI>, Field> uiToDefaultViewField = new ConcurrentHashMap<Class<? extends UI>, Field>();
     private final Set<Class<? extends ViewChangeListener>> viewChangeListeners;
+    private final GuiceViewProvider viewProvider;
 
     @SuppressWarnings("unchecked")
-    public GuiceUIProvider(Set<Class<? extends UI>> uiClasses, Set<Class<? extends ViewChangeListener>> viewChangeListeners) {
+    public GuiceUIProvider(Set<Class<? extends UI>> uiClasses, Set<Class<? extends ViewChangeListener>> viewChangeListeners, GuiceViewProvider viewProvider) {
+        this.viewProvider = viewProvider;
         detectUIs(uiClasses);
 
         if (pathToUIMap.isEmpty()) {
             logger.log(Level.WARNING, "Found no Vaadin UIs in the application context");
         }
 
-        this.viewChangeListeners = new HashSet<Class<? extends ViewChangeListener>>(viewChangeListeners.size());
-
-        for (Class<?> viewChangeListenerCandidate : viewChangeListeners) {
-            checkArgument(
-                    ViewChangeListener.class.isAssignableFrom(viewChangeListenerCandidate),
-                    "%s is annotated with @GuiceViewChangeListener but does not implement com.vaadin.navigator.ViewChangeListener",
-                    viewChangeListenerCandidate
-            );
-
-            this.viewChangeListeners.add((Class<? extends ViewChangeListener>) viewChangeListenerCandidate);
-        }
+        this.viewChangeListeners = viewChangeListeners;
     }
 
     @SuppressWarnings("unchecked")
@@ -239,7 +231,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                     );
                 }
 
-                navigator.addProvider(InjectorHolder.getInjector().getInstance(ViewProvider.class));
+                navigator.addProvider(viewProvider);
 
                 for (Class<? extends ViewChangeListener> viewChangeListenerClass : viewChangeListeners) {
                     ViewChangeListener viewChangeListener = InjectorHolder.getInjector().getInstance(viewChangeListenerClass);

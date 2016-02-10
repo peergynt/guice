@@ -25,7 +25,6 @@ import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
@@ -37,10 +36,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.inject.util.Modules.override;
 import static com.vaadin.guice.server.ReflectionUtils.getGuiceUIClasses;
 import static com.vaadin.guice.server.ReflectionUtils.getGuiceViewClasses;
@@ -72,7 +69,7 @@ public class GuiceVaadinServlet extends VaadinServlet {
             "at least on 'basePackages'-parameter expected in Configuration of " + getClass()
         );
 
-        List<Module> hardWiredModules = new ArrayList<Module>(annotation.modules().length + 1);
+        List<Module> hardWiredModules = new ArrayList<Module>(annotation.modules().length);
 
         for (Class<? extends Module> moduleClass : annotation.modules()) {
             try {
