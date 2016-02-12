@@ -15,12 +15,15 @@
  */
 package com.vaadin.guice.server;
 
-import com.vaadin.guice.annotation.ViewContainer;
+import com.google.common.base.Optional;
+
 import com.vaadin.guice.annotation.GuiceUI;
+import com.vaadin.guice.annotation.GuiceView;
+import com.vaadin.guice.annotation.ViewContainer;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
-import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.SessionInitListener;
@@ -34,7 +37,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.util.CurrentInstance;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,18 +62,45 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     private final Map<String, Class<? extends UI>> wildcardPathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<Class<? extends UI>, Field> uiToDefaultViewField = new ConcurrentHashMap<Class<? extends UI>, Field>();
     private final Set<Class<? extends ViewChangeListener>> viewChangeListeners;
+    private Optional<Class<? extends View>> errorView;
     private final GuiceViewProvider viewProvider;
 
     @SuppressWarnings("unchecked")
-    public GuiceUIProvider(Set<Class<? extends UI>> uiClasses, Set<Class<? extends ViewChangeListener>> viewChangeListeners, GuiceViewProvider viewProvider) {
+    public GuiceUIProvider(Set<Class<? extends UI>> uiClasses, Set<Class<? extends ViewChangeListener>> viewChangeListeners, GuiceViewProvider viewProvider, Set<Class<? extends View>> viewClasses) {
         this.viewProvider = viewProvider;
         detectUIs(uiClasses);
+
+        errorView = findErrorView(viewClasses);
 
         if (pathToUIMap.isEmpty()) {
             logger.log(Level.WARNING, "Found no Vaadin UIs in the application context");
         }
 
         this.viewChangeListeners = viewChangeListeners;
+    }
+
+    private Optional<Class<? extends View>> findErrorView(Set<Class<? extends View>> viewClasses) {
+
+        Class<? extends View> errorView = null;
+
+        for (Class<? extends View> viewClass : viewClasses) {
+            GuiceView annotation = viewClass.getAnnotation(GuiceView.class);
+
+            checkState(annotation != null);
+
+            if(annotation.isErrorView()){
+                checkState(
+                        errorView == null,
+                        "%s and %s have an @GuiceView-annotation with isErrorView set to true",
+                        errorView,
+                        viewClass
+                );
+
+                errorView = viewClass;
+            }
+        }
+
+        return Optional.<Class<? extends View>>fromNullable(errorView);
     }
 
     @SuppressWarnings("unchecked")
@@ -232,6 +261,10 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                 }
 
                 navigator.addProvider(viewProvider);
+
+                if(errorView.isPresent()){
+                    navigator.setErrorView(errorView.get());
+                }
 
                 for (Class<? extends ViewChangeListener> viewChangeListenerClass : viewChangeListeners) {
                     ViewChangeListener viewChangeListener = InjectorHolder.getInjector().getInstance(viewChangeListenerClass);

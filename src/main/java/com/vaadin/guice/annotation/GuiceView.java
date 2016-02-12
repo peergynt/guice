@@ -23,12 +23,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation to be placed on {@link com.vaadin.navigator.View}-classes that should be handled by
- * the {@link com.vaadin.navigator.ViewProvider}. <p> This annotation is also a stereotype
- * annotation, so guice will automatically detect the annotated classes. This annotation also puts
- * the view into the {@link com.vaadin.guice.annotation.ViewScope view scope}. <b>Note that in
- * contrast to the spring vaadin integration, this cannot be overwritten with other
- * scope-annotations like {@link UIScope}.</b>This is an example of a view that is mapped to an
- * empty view name and is available for all UI subclasses in the application:
+ * the {@link com.vaadin.navigator.ViewProvider}.
  *
  * <pre>
  * &#064;GuiceView(name = &quot;&quot;)
@@ -53,7 +48,6 @@ import java.lang.annotation.Target;
 @Target({java.lang.annotation.ElementType.TYPE})
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Documented
-@ScopeAnnotation
 public @interface GuiceView {
 
     /**
@@ -72,4 +66,9 @@ public @interface GuiceView {
      * view names are supported, using explicit naming of views is strongly recommended.
      */
     String name() default USE_CONVENTIONS;
+
+    /*
+    * determining if this view is navigated to in case an error occurs.
+    * */
+    boolean isErrorView() default false;
 }
