@@ -5,7 +5,7 @@
     <artifactId>guice-vaadin</artifactId>
     <packaging>jar</packaging>
     <groupId>com.vaadin</groupId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <name>guice-vaadin</name>
     <description>
         Provides Google Guice integration for Vaadin applications.

@@ -86,6 +86,13 @@ public class GuiceVaadinServlet extends VaadinServlet {
             }
         };
 
+        CurrentUIProvider currentUIProvider = new CurrentUIProvider() {
+            @Override
+            public UI getCurrentUI() {
+                return UI.getCurrent();
+            }
+        };
+
         Reflections reflections = new Reflections(annotation.basePackages());
 
         Set<Class<? extends UI>> uis = getGuiceUIClasses(reflections);
@@ -96,7 +103,7 @@ public class GuiceVaadinServlet extends VaadinServlet {
 
         Set<Module> dynamicallyLoadedModules = getUIModules(reflections);
 
-        this.vaadinModule = new VaadinModule(sessionProvider, views, uis, viewChangeListeners);
+        this.vaadinModule = new VaadinModule(sessionProvider, views, uis, viewChangeListeners, currentUIProvider);
 
         Module combinedModule = override(hardWiredModules).with(dynamicallyLoadedModules);
 

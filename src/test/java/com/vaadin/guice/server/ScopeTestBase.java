@@ -16,12 +16,16 @@
 package com.vaadin.guice.server;
 
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 
 import com.vaadin.guice.testClasses.Target;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.VaadinSession;
+
+import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,16 +42,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ScopeTest {
+public abstract class ScopeTestBase {
 
     private SessionProvider sessionProvider;
-    private SessionBasedScoper uiScoper;
+    protected CurrentUIProvider currentUIProvider;
+    protected UIScoper uiScoper;
     private GuiceUIProvider uiProvider;
-    private Injector injector;
+    protected Injector injector;
 
     @Before
     public void setup() throws NoSuchFieldException, IllegalAccessException {
         sessionProvider = mock(SessionProvider.class);
+        currentUIProvider = mock(CurrentUIProvider.class);
 
         Reflections reflections = new Reflections("com.vaadin.guice.server.testClasses");
 
@@ -55,13 +61,13 @@ public class ScopeTest {
                 sessionProvider,
                 getGuiceViewClasses(reflections),
                 getGuiceUIClasses(reflections),
-                getViewChangeListenerClasses(reflections)
-        );
+                getViewChangeListenerClasses(reflections),
+                currentUIProvider);
 
         injector = Guice.createInjector(vaadinModule);
         final Field uiScoperField = VaadinModule.class.getDeclaredField("uiScoper");
         uiScoperField.setAccessible(true);
-        this.uiScoper = (SessionBasedScoper) uiScoperField.get(vaadinModule);
+        this.uiScoper = (UIScoper) uiScoperField.get(vaadinModule);
 
         final Field uiProviderField = VaadinModule.class.getDeclaredField("uiProvider");
         uiProviderField.setAccessible(true);
@@ -71,10 +77,13 @@ public class ScopeTest {
     @Test //default prototype behaviour should not be affected
     public void testPrototype() throws ServiceException, NoSuchFieldException, IllegalAccessException {
         newSession();
+        uiScoper.startInitialization();
         Target target1 = injector.getInstance(Target.class);
-
+        uiScoper.endInitialization(target1);
+        uiScoper.startInitialization();
         newSession();
         Target target2 = injector.getInstance(Target.class);
+        uiScoper.endInitialization(target2);
 
         assertNotEquals(target1.getPrototype1(), target2.getPrototype1());
     }
@@ -82,49 +91,15 @@ public class ScopeTest {
     @Test //default singleton behaviour should not be affected
     public void testSingleton() throws ServiceException, NoSuchFieldException, IllegalAccessException {
         newSession();
+        uiScoper.startInitialization();
         Target target1 = injector.getInstance(Target.class);
-
+        uiScoper.endInitialization(target1);
+        uiScoper.startInitialization();
         newSession();
         Target target2 = injector.getInstance(Target.class);
+        uiScoper.endInitialization(target2);
 
         assertEquals(target1.getSingleton1(), target2.getSingleton1());
-    }
-
-    //different session-scoped should lead to a different set of session-scoped objects
-    @Test
-    public void testSessionScopeDifferent() throws ServiceException, NoSuchFieldException, IllegalAccessException {
-
-        newSession();
-        Target target1 = injector.getInstance(Target.class);
-
-        newSession();
-        Target target2 = injector.getInstance(Target.class);
-
-        assertNotNull(target1);
-        assertNotNull(target2);
-        assertEquals(target1.getUiScoped1().getUiScoped2(), target1.getUiScoped2());
-        assertEquals(target2.getUiScoped1().getUiScoped2(), target2.getUiScoped2());
-        assertNotEquals(target1.getUiScoped1(), target2.getUiScoped1());
-        assertNotEquals(target1.getUiScoped2(), target2.getUiScoped2());
-        assertNotEquals(target1.getUiScoped1().getUiScoped2(), target2.getUiScoped1().getUiScoped2());
-    }
-
-    //a single session-scope should lead to the same set of session-scoped objects being injected
-    @Test
-    public void testSessionScopeSame() throws ServiceException, NoSuchFieldException, IllegalAccessException {
-
-        newSession();
-        Target target1 = injector.getInstance(Target.class);
-
-        Target target2 = injector.getInstance(Target.class);
-
-        assertNotNull(target1);
-        assertNotNull(target2);
-        assertEquals(target1.getUiScoped1().getUiScoped2(), target1.getUiScoped2());
-        assertEquals(target2.getUiScoped1().getUiScoped2(), target2.getUiScoped2());
-        assertEquals(target1.getUiScoped1(), target2.getUiScoped1());
-        assertEquals(target1.getUiScoped2(), target2.getUiScoped2());
-        assertEquals(target1.getUiScoped1().getUiScoped2(), target2.getUiScoped1().getUiScoped2());
     }
 
     //different transaction-scopes should lead to a different set of transaction-scoped objects
@@ -132,10 +107,13 @@ public class ScopeTest {
     public void testTransactionScopeDifferent() throws ServiceException, NoSuchFieldException, IllegalAccessException {
 
         newSession();
+        uiScoper.startInitialization();
         Target target1 = injector.getInstance(Target.class);
-
+        uiScoper.endInitialization(target1);
+        uiScoper.startInitialization();
         newSession();
         Target target2 = injector.getInstance(Target.class);
+        uiScoper.endInitialization(target2);
 
         assertNotNull(target1);
         assertNotNull(target2);
@@ -146,10 +124,13 @@ public class ScopeTest {
     public void testTransactionScopeSame() throws ServiceException, NoSuchFieldException, IllegalAccessException {
 
         newSession();
+        uiScoper.startInitialization();
         Target target1 = injector.getInstance(Target.class);
-
+        uiScoper.endInitialization(target1);
+        uiScoper.startInitialization();
         newSession();
         Target target2 = injector.getInstance(Target.class);
+        uiScoper.endInitialization(target2);
 
         assertNotNull(target1);
         assertNotNull(target2);
@@ -159,16 +140,21 @@ public class ScopeTest {
         assertNotEquals(target1.getUiScoped1().getUiScoped2(), target2.getUiScoped1().getUiScoped2());
     }
 
-    private void newSession() throws ServiceException {
+    protected void setVaadinSession(VaadinSession vaadinSession){
+        when(sessionProvider.getCurrentSession()).thenReturn(vaadinSession);
+    }
+
+    protected VaadinSession newSession() throws ServiceException {
         VaadinSession vaadinSession = mock(VaadinSession.class);
 
         SessionInitEvent sessionInitEvent = mock(SessionInitEvent.class);
 
-        when(sessionProvider.getCurrentSession()).thenReturn(vaadinSession);
-
+        setVaadinSession(vaadinSession);
         when(sessionInitEvent.getSession()).thenReturn(vaadinSession);
 
         uiScoper.sessionInit(sessionInitEvent);
         uiProvider.sessionInit(sessionInitEvent);
+
+        return vaadinSession;
     }
 }

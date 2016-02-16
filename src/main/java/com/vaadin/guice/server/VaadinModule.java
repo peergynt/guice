@@ -1,13 +1,8 @@
 package com.vaadin.guice.server;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Module;
-import com.google.inject.util.Modules;
 
-import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
-import com.vaadin.guice.annotation.GuiceViewChangeListener;
-import com.vaadin.guice.annotation.UIModule;
 import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -21,8 +16,6 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
-import org.reflections.Reflections;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -31,12 +24,12 @@ class VaadinModule extends AbstractModule {
 
     private final GuiceViewProvider viewProvider;
     private final GuiceUIProvider uiProvider;
-    private final SessionBasedScoper uiScoper;
+    private final UIScoper uiScoper;
 
-    public VaadinModule(SessionProvider sessionProvider, Set<Class<? extends View>> views, Set<Class<? extends UI>> uis, Set<Class<? extends ViewChangeListener>> viewChangeListeners) {
-        uiScoper = new SessionBasedScoper(sessionProvider);
+    public VaadinModule(SessionProvider sessionProvider, Set<Class<? extends View>> views, Set<Class<? extends UI>> uis, Set<Class<? extends ViewChangeListener>> viewChangeListeners, CurrentUIProvider currentUIProvider) {
+        uiScoper = new UIScoper(sessionProvider, currentUIProvider);
         viewProvider = new GuiceViewProvider(views);
-        uiProvider = new GuiceUIProvider(uis, viewChangeListeners, viewProvider);
+        uiProvider = new GuiceUIProvider(uis, viewChangeListeners, viewProvider, views, uiScoper);
     }
 
     @Override

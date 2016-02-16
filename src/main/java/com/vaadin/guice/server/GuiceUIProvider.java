@@ -64,10 +64,12 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     private final Set<Class<? extends ViewChangeListener>> viewChangeListeners;
     private Optional<Class<? extends View>> errorView;
     private final GuiceViewProvider viewProvider;
+    private final UIScoper uiScoper;
 
     @SuppressWarnings("unchecked")
-    public GuiceUIProvider(Set<Class<? extends UI>> uiClasses, Set<Class<? extends ViewChangeListener>> viewChangeListeners, GuiceViewProvider viewProvider, Set<Class<? extends View>> viewClasses) {
+    public GuiceUIProvider(Set<Class<? extends UI>> uiClasses, Set<Class<? extends ViewChangeListener>> viewChangeListeners, GuiceViewProvider viewProvider, Set<Class<? extends View>> viewClasses, UIScoper uiScoper) {
         this.viewProvider = viewProvider;
+        this.uiScoper = uiScoper;
         detectUIs(uiClasses);
 
         errorView = findErrorView(viewClasses);
@@ -223,6 +225,8 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
         CurrentInstance.set(key, identifier);
 
         try {
+            uiScoper.startInitialization();
+
             UI instance = InjectorHolder.getInjector().getInstance(event.getUIClass());
 
             Field defaultViewField = uiToDefaultViewField.get(event.getUIClass());
@@ -243,22 +247,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                         defaultViewField.getName()
                 );
 
-                Navigator navigator;
-
-                if (defaultView instanceof ComponentContainer) {
-                    navigator = new Navigator(instance, (ComponentContainer) defaultView);
-                } else if (defaultView instanceof SingleComponentContainer) {
-                    navigator = new Navigator(instance, (SingleComponentContainer) defaultView);
-                } else if (defaultView instanceof ViewDisplay) {
-                    navigator = new Navigator(instance, (ViewDisplay) defaultView);
-                } else {
-                    throw new IllegalArgumentException(
-                            String.format(
-                                    "%s is annotated with @DefaultUI, must be either ComponentContainer, SingleComponentContainer or ViewDisplay",
-                                    defaultView
-                            )
-                    );
-                }
+                Navigator navigator = createNavigator(instance, defaultView);
 
                 navigator.addProvider(viewProvider);
 
@@ -274,10 +263,35 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                 instance.setNavigator(navigator);
             }
 
+            uiScoper.endInitialization(instance);
+
             return instance;
+        } catch(RuntimeException e){
+            uiScoper.rollbackInitialization();
+            throw e;
         } finally {
             CurrentInstance.set(key, null);
         }
+    }
+
+    Navigator createNavigator(UI instance, Object defaultView) {
+        Navigator navigator;
+
+        if (defaultView instanceof ComponentContainer) {
+            navigator = new Navigator(instance, (ComponentContainer) defaultView);
+        } else if (defaultView instanceof SingleComponentContainer) {
+            navigator = new Navigator(instance, (SingleComponentContainer) defaultView);
+        } else if (defaultView instanceof ViewDisplay) {
+            navigator = new Navigator(instance, (ViewDisplay) defaultView);
+        } else {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "%s is annotated with @DefaultUI, must be either ComponentContainer, SingleComponentContainer or ViewDisplay",
+                            defaultView
+                    )
+            );
+        }
+        return navigator;
     }
 
     @Override
