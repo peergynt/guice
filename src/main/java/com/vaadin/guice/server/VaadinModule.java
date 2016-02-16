@@ -1,7 +1,9 @@
 package com.vaadin.guice.server;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 
+import com.vaadin.guice.annotation.AllKnownGuiceViews;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.navigator.View;
@@ -25,8 +27,10 @@ class VaadinModule extends AbstractModule {
     private final GuiceViewProvider viewProvider;
     private final GuiceUIProvider uiProvider;
     private final UIScoper uiScoper;
+    private final Set<Class<? extends View>> views;
 
     public VaadinModule(SessionProvider sessionProvider, Set<Class<? extends View>> views, Set<Class<? extends UI>> uis, Set<Class<? extends ViewChangeListener>> viewChangeListeners, CurrentUIProvider currentUIProvider) {
+        this.views = views;
         uiScoper = new UIScoper(sessionProvider, currentUIProvider);
         viewProvider = new GuiceViewProvider(views);
         uiProvider = new GuiceUIProvider(uis, viewChangeListeners, viewProvider, views, uiScoper);
@@ -38,6 +42,11 @@ class VaadinModule extends AbstractModule {
         bindScope(GuiceView.class, uiScoper);
         bind(UIProvider.class).toInstance(uiProvider);
         bind(ViewProvider.class).toInstance(viewProvider);
+        final Multibinder<View> viewMultibinder = Multibinder.newSetBinder(binder(), View.class, AllKnownGuiceViews.class);
+
+        for (Class<? extends View> guiceViewClass : views) {
+            viewMultibinder.addBinding().to(guiceViewClass);
+        }
     }
 
     public void vaadinInitialized(VaadinService service) {

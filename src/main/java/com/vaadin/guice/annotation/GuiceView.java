@@ -15,6 +15,7 @@
  */
 package com.vaadin.guice.annotation;
 
+import com.google.inject.BindingAnnotation;
 import com.google.inject.ScopeAnnotation;
 
 import java.lang.annotation.Documented;
