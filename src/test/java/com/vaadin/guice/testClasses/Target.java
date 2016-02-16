@@ -1,8 +1,12 @@
 package com.vaadin.guice.testClasses;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
-public class Target {
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.UI;
+
+public class Target extends UI{
     @Inject
     private Prototype1 prototype1;
 
@@ -14,6 +18,18 @@ public class Target {
 
     @Inject
     private UIScoped2 uiScoped2;
+
+    @Inject
+    private Provider<Prototype1> prototype1Provider;
+
+    @Inject
+    private Provider<Singleton1> singleton1Provider;
+
+    @Inject
+    private Provider<UIScoped1> uiScoped1Provider;
+
+    @Inject
+    private Provider<UIScoped2> uiScoped2Provider;
 
     public Prototype1 getPrototype1() {
         return prototype1;
@@ -45,5 +61,25 @@ public class Target {
 
     public void setUiScoped2(UIScoped2 uiScoped2) {
         this.uiScoped2 = uiScoped2;
+    }
+
+    public Provider<Prototype1> getPrototype1Provider() {
+        return prototype1Provider;
+    }
+
+    public Provider<Singleton1> getSingleton1Provider() {
+        return singleton1Provider;
+    }
+
+    public Provider<UIScoped1> getUiScoped1Provider() {
+        return uiScoped1Provider;
+    }
+
+    public Provider<UIScoped2> getUiScoped2Provider() {
+        return uiScoped2Provider;
+    }
+
+    @Override
+    protected void init(VaadinRequest request) {
     }
 }
