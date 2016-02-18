@@ -5,8 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that adds a ViewChangeListener to every {@see com.vaadin.navigation.Navigator} created by
- * guice-vaadin via {@see ViewContainer}.
+ * Annotation that adds a ViewChangeListener to every {@see com.vaadin.navigation.Navigator} created
+ * by guice-vaadin via {@see ViewContainer}.
  *
  * <pre>
  * &#064;GuiceViewChangeListener

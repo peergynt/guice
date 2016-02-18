@@ -17,15 +17,7 @@ package com.vaadin.guice.server;
 */
 
 
-
-
-
-
 //NOTE: repackaged spring class!!!
-
-
-
-
 
 
 /**

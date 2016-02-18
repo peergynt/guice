@@ -19,7 +19,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 final class ReflectionUtils {
 
-    private ReflectionUtils(){
+    private ReflectionUtils() {
     }
 
     static Set<Module> getUIModules(Reflections reflections) {

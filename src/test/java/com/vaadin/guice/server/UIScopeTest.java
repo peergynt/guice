@@ -8,7 +8,6 @@ import com.vaadin.guice.testClasses.UIScoped2;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinSession;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

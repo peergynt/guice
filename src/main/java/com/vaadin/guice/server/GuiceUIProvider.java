@@ -62,9 +62,9 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     private final Map<String, Class<? extends UI>> wildcardPathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<Class<? extends UI>, Field> uiToDefaultViewField = new ConcurrentHashMap<Class<? extends UI>, Field>();
     private final Set<Class<? extends ViewChangeListener>> viewChangeListeners;
-    private Optional<Class<? extends View>> errorView;
     private final GuiceViewProvider viewProvider;
     private final UIScoper uiScoper;
+    private Optional<Class<? extends View>> errorView;
 
     @SuppressWarnings("unchecked")
     public GuiceUIProvider(Set<Class<? extends UI>> uiClasses, Set<Class<? extends ViewChangeListener>> viewChangeListeners, GuiceViewProvider viewProvider, Set<Class<? extends View>> viewClasses, UIScoper uiScoper) {
@@ -90,7 +90,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
             checkState(annotation != null);
 
-            if(annotation.isErrorView()){
+            if (annotation.isErrorView()) {
                 checkState(
                         errorView == null,
                         "%s and %s have an @GuiceView-annotation with isErrorView set to true",
@@ -251,7 +251,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
                 navigator.addProvider(viewProvider);
 
-                if(errorView.isPresent()){
+                if (errorView.isPresent()) {
                     navigator.setErrorView(errorView.get());
                 }
 
@@ -266,7 +266,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
             uiScoper.endInitialization(instance);
 
             return instance;
-        } catch(RuntimeException e){
+        } catch (RuntimeException e) {
             uiScoper.rollbackInitialization();
             throw e;
         } finally {

@@ -41,27 +41,27 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
     private final CurrentUIProvider currentUIProvider;
     private Optional<Map<Key, Object>> currentInitializationScopeSet = Optional.absent();
 
-    public void startInitialization(){
-        checkState(!currentInitializationScopeSet.isPresent());
-        currentInitializationScopeSet = Optional.of((Map<Key, Object>)new HashMap<Key, Object>());
+    UIScoper(SessionProvider sessionProvider, CurrentUIProvider currentUIProvider) {
+        this.sessionProvider = sessionProvider;
+        this.currentUIProvider = currentUIProvider;
     }
 
-    public void rollbackInitialization(){
+    public void startInitialization() {
+        checkState(!currentInitializationScopeSet.isPresent());
+        currentInitializationScopeSet = Optional.of((Map<Key, Object>) new HashMap<Key, Object>());
+    }
+
+    public void rollbackInitialization() {
         checkState(currentInitializationScopeSet.isPresent());
         currentInitializationScopeSet = Optional.absent();
     }
 
-    public void endInitialization(UI ui){
+    public void endInitialization(UI ui) {
         checkState(currentInitializationScopeSet.isPresent());
         final Map<UI, Map<Key, Object>> uiScopes = sessionToScopedObjectsMap.get(sessionProvider.getCurrentSession());
         checkState(uiScopes != null);
         uiScopes.put(ui, currentInitializationScopeSet.get());
         currentInitializationScopeSet = Optional.absent();
-    }
-
-    UIScoper(SessionProvider sessionProvider, CurrentUIProvider currentUIProvider) {
-        this.sessionProvider = sessionProvider;
-        this.currentUIProvider = currentUIProvider;
     }
 
     @Override
@@ -72,9 +72,9 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
             public T get() {
                 Map<Key, Object> scopedObjects = getCurrentScopeMap();
 
-                T t = (T)scopedObjects.get(key);
+                T t = (T) scopedObjects.get(key);
 
-                if(t == null){
+                if (t == null) {
                     t = unscoped.get();
                     scopedObjects.put(key, t);
                 }
@@ -87,7 +87,7 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
     Map<Key, Object> getCurrentScopeMap() {
         Map<Key, Object> scopedObjects;
 
-        if(currentInitializationScopeSet.isPresent()){
+        if (currentInitializationScopeSet.isPresent()) {
             scopedObjects = currentInitializationScopeSet.get();
         } else {
             final Map<UI, Map<Key, Object>> sessionToUIScopes = sessionToScopedObjectsMap.get(sessionProvider.getCurrentSession());

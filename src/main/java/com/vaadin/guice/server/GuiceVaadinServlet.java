@@ -60,13 +60,13 @@ public class GuiceVaadinServlet extends VaadinServlet {
         Configuration annotation = getClass().getAnnotation(Configuration.class);
 
         checkArgument(
-            annotation != null,
-            "GuiceVaadinServlet cannot be used without 'Configuration' annotation"
+                annotation != null,
+                "GuiceVaadinServlet cannot be used without 'Configuration' annotation"
         );
 
         checkArgument(
-            annotation.basePackages().length > 0,
-            "at least on 'basePackages'-parameter expected in Configuration of " + getClass()
+                annotation.basePackages().length > 0,
+                "at least on 'basePackages'-parameter expected in Configuration of " + getClass()
         );
 
         List<Module> hardWiredModules = new ArrayList<Module>(annotation.modules().length);
