@@ -19,6 +19,8 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import com.google.inject.ScopeAnnotation;
+
 /**
  * Annotation to be put on {@link com.vaadin.ui.UI}-subclasses that are to be automatically detected
  * and configured by guice. Use it like this:
@@ -49,6 +51,7 @@ import java.lang.annotation.Target;
 @Target({java.lang.annotation.ElementType.TYPE})
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Documented
+@ScopeAnnotation
 public @interface GuiceUI {
 
     /**
