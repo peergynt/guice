@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 
 import com.vaadin.guice.annotation.AllKnownGuiceViews;
+import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.navigator.View;
@@ -39,6 +40,7 @@ class VaadinModule extends AbstractModule {
     @Override
     protected void configure() {
         bindScope(UIScope.class, uiScoper);
+        bindScope(GuiceUI.class, uiScoper);
         bindScope(GuiceView.class, uiScoper);
         bind(UIProvider.class).toInstance(uiProvider);
         bind(ViewProvider.class).toInstance(viewProvider);

@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
  * @author Henri Sara (hesara@vaadin.com)
  * @author Bernd Hopp (bernd@vaadin.com)
  */
-@Target({ElementType.FIELD})
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Documented
 @BindingAnnotation

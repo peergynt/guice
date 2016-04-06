@@ -76,7 +76,7 @@ final class ReflectionUtils {
 
         for (Class<?> viewChangeListenerClass : reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class)) {
             checkArgument(
-                    Module.class.isAssignableFrom(viewChangeListenerClass),
+                    ViewChangeListener.class.isAssignableFrom(viewChangeListenerClass),
                     "class %s is annotated with @GuiceViewChangeListener but does not implement com.vaadin.navigator.ViewChangeListener",
                     viewChangeListenerClass
             );
