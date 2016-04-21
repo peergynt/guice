@@ -35,11 +35,38 @@ in contrast to spring, guice will default to a 'prototype' strategy ( that is wh
 Your SpringVaadinServlet needs to be adjusted manually, GuiceVaadinServlet expects a @Configuration annotation like this:
 
 ```Java
-@Configuration(modules = {MyModule.class}, basePackage = "com.mycompany")
+@Configuration(modules = {MyModule.class}, basePackages = "com.mycompany")
 @WebServlet(urlPatterns = "/*", name = "MyServlet", asyncSupported = true)
 public static class MyServlet extends GuiceVaadinServlet {
 }
 ```
+
+UI Scope
+----
+
+Vaadin guice includes several UI-scoped annotations:
+
+* `@UIScope`: stereotype annotation for guice's UI scope.
+* `@GuiceUI`: annotation to be put on UI-subclasses that are to be automatically detected and configured by guice. The annotated UI will be automatically placed in the `@UIScope`.
+* `@ViewContainer`: annotation to mark a view container as a UI's default view container for navigation. ViewContainers are used by a UI's `Navigator` A view container must implement one of the following interface:
+  - `ComponentContainer`
+  - `SingleComponentContainer`
+  - `ViewDisplay`
+* `@GuiceViewChangeListener`: annotation that adds a `ViewChangeListener` to every `Navigator` created by guice.
+
+Example:
+
+```Java
+// MyGuiceUI will be automatically be UI-scoped.
+@GuiceUI
+public class MyGuiceUI extends UI {
+    // ...
+    @Inject
+    @ViewContainer
+    private MyViewContainer myViewContainer;
+}
+```
+
 
 Issue tracking
 ----
@@ -57,7 +84,7 @@ use this file except in compliance with the License. You may obtain a copy of
 the License at
 
 http://www.apache.org/licenses/LICENSE-2.0
- 
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
