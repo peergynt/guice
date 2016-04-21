@@ -16,6 +16,7 @@
 package com.vaadin.guice.server;
 
 import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.Module;
 
 import com.vaadin.guice.annotation.Configuration;
@@ -108,6 +109,10 @@ public class GuiceVaadinServlet extends VaadinServlet {
         Module combinedModule = override(hardWiredModules).with(dynamicallyLoadedModules);
 
         InjectorHolder.setInjector(Guice.createInjector(vaadinModule, combinedModule));
+    }
+
+    protected Injector getInjector() {
+        return InjectorHolder.getInjector();
     }
 
     @Override
