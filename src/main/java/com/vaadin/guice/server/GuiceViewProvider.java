@@ -16,6 +16,7 @@
 package com.vaadin.guice.server;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gwt.thirdparty.guava.common.collect.ImmutableSortedMap;
 import com.google.inject.Singleton;
 
 import com.vaadin.guice.annotation.GuiceView;
@@ -29,6 +30,7 @@ import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.VaadinSession;
 
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,19 +52,20 @@ import static java.lang.Character.toLowerCase;
 @Singleton
 class GuiceViewProvider implements ViewProvider, SessionDestroyListener, SessionInitListener {
 
+    private static final long serialVersionUID = 6113953554214462809L;
+
     private final Map<String, Class<? extends View>> viewNamesToViewClassesMap;
     private final Map<VaadinSession, Map<String, View>> viewsBySessionMap;
-    private final Set<String> viewNames;
+    private final NavigableSet<String> viewNames;
 
     public GuiceViewProvider(Set<Class<? extends View>> viewClasses) {
 
         viewNamesToViewClassesMap = scanForViews(viewClasses);
-        viewNames = viewNamesToViewClassesMap.keySet();
+        viewNames = ImmutableSortedMap.copyOf(viewNamesToViewClassesMap).keySet();
 
         viewsBySessionMap = new ConcurrentHashMap<VaadinSession, Map<String, View>>();
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Class<? extends View>> scanForViews(Set<Class<? extends View>> viewClasses) {
         ImmutableMap.Builder<String, Class<? extends View>> viewMapBuilder = ImmutableMap.builder();
 
@@ -103,17 +106,18 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
     @Override
     public String getViewName(String viewAndParameters) {
 
-        for (String viewName : viewNames) {
-            if (viewName.isEmpty()) {
-                continue;//skip default view
-            }
-
-            if (viewAndParameters.startsWith(viewName)) {
-                return viewName;
-            }
+        if (viewAndParameters == null) {
+            return null;
         }
-
-        return viewAndParameters;
+        String viewName = viewNames.floor(viewAndParameters);
+        if (viewName == null) {
+            return null;
+        }
+        if (viewAndParameters.equals(viewName)
+                || viewAndParameters.startsWith(viewName + "/")) {
+            return viewName;
+        }
+        return null;
     }
 
     @Override
