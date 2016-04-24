@@ -19,4 +19,9 @@ hs_err_pid*
 *.iml
 out
 gen
-# Created by .ignore support plugin (hsz.mobi)
+
+# Eclipse project files
+.classpath
+.project
+.settings
+target/
