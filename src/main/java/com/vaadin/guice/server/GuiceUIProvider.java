@@ -243,7 +243,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
                 checkNotNull(
                         defaultView,
-                        "%s is annotated with @DefaultUI and therefore must not be null",
+                        "%s is annotated with @ViewContainer and therefore must not be null",
                         defaultViewField.getName()
                 );
 
@@ -286,7 +286,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
         } else {
             throw new IllegalArgumentException(
                     String.format(
-                            "%s is annotated with @DefaultUI, must be either ComponentContainer, SingleComponentContainer or ViewDisplay",
+                            "%s is annotated with @ViewContainer, must be either ComponentContainer, SingleComponentContainer or ViewDisplay",
                             defaultView
                     )
             );
