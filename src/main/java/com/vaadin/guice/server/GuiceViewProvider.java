@@ -16,7 +16,7 @@
 package com.vaadin.guice.server;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.gwt.thirdparty.guava.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.inject.Singleton;
 
 import com.vaadin.guice.annotation.GuiceView;
@@ -61,6 +61,8 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
     public GuiceViewProvider(Set<Class<? extends View>> viewClasses) {
 
         viewNamesToViewClassesMap = scanForViews(viewClasses);
+        // Set of view names sorted by their natural ordering (lexicographic).
+        // This is useful for quickly looking up views by name
         viewNames = ImmutableSortedMap.copyOf(viewNamesToViewClassesMap).keySet();
 
         viewsBySessionMap = new ConcurrentHashMap<VaadinSession, Map<String, View>>();
@@ -109,10 +111,15 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
         if (viewAndParameters == null) {
             return null;
         }
+        // Since viewNames is sorted, floor() gives us the view name
+        // less than or equal to the view and parameters string.
+        // If the view name found is less than the view and parameters
+        // string, we will test that the string starts with 'viewName/'.
         String viewName = viewNames.floor(viewAndParameters);
         if (viewName == null) {
             return null;
         }
+        // 
         if (viewAndParameters.equals(viewName)
                 || viewAndParameters.startsWith(viewName + "/")) {
             return viewName;
