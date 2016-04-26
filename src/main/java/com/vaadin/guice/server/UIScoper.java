@@ -15,7 +15,6 @@
  */
 package com.vaadin.guice.server;
 
-import com.google.common.base.Optional;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
@@ -32,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
@@ -39,29 +39,30 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
     private final Map<VaadinSession, Map<UI, Map<Key, Object>>> sessionToScopedObjectsMap = new ConcurrentHashMap<VaadinSession, Map<UI, Map<Key, Object>>>();
     private final SessionProvider sessionProvider;
     private final CurrentUIProvider currentUIProvider;
-    private Optional<Map<Key, Object>> currentInitializationScopeSet = Optional.absent();
+    private Map<Key, Object> currentInitializationScopeSet = null;
 
     UIScoper(SessionProvider sessionProvider, CurrentUIProvider currentUIProvider) {
         this.sessionProvider = sessionProvider;
         this.currentUIProvider = currentUIProvider;
     }
 
-    public void startInitialization() {
-        checkState(!currentInitializationScopeSet.isPresent());
-        currentInitializationScopeSet = Optional.of((Map<Key, Object>) new HashMap<Key, Object>());
+    void startInitialization() {
+        checkState(currentInitializationScopeSet == null);
+        currentInitializationScopeSet = KeyObjectMapPool.getKeyObjectMap();
     }
 
-    public void rollbackInitialization() {
-        checkState(currentInitializationScopeSet.isPresent());
-        currentInitializationScopeSet = Optional.absent();
+    void rollbackInitialization() {
+        checkState(currentInitializationScopeSet != null);
+        KeyObjectMapPool.returnKeyObjectMap(currentInitializationScopeSet);
+        currentInitializationScopeSet = null;
     }
 
-    public void endInitialization(UI ui) {
-        checkState(currentInitializationScopeSet.isPresent());
+    void endInitialization(UI ui) {
+        checkState(currentInitializationScopeSet != null);
         final Map<UI, Map<Key, Object>> uiScopes = sessionToScopedObjectsMap.get(sessionProvider.getCurrentSession());
         checkState(uiScopes != null);
-        uiScopes.put(ui, currentInitializationScopeSet.get());
-        currentInitializationScopeSet = Optional.absent();
+        uiScopes.put(ui, currentInitializationScopeSet);
+        currentInitializationScopeSet = null;
     }
 
     @Override
@@ -84,11 +85,11 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
         };
     }
 
-    Map<Key, Object> getCurrentScopeMap() {
+    private Map<Key, Object> getCurrentScopeMap() {
         Map<Key, Object> scopedObjects;
 
-        if (currentInitializationScopeSet.isPresent()) {
-            scopedObjects = currentInitializationScopeSet.get();
+        if (currentInitializationScopeSet != null) {
+            scopedObjects = currentInitializationScopeSet;
         } else {
             final Map<UI, Map<Key, Object>> sessionToUIScopes = sessionToScopedObjectsMap.get(sessionProvider.getCurrentSession());
             checkState(sessionToUIScopes != null);
@@ -100,7 +101,11 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
 
     @Override
     public void sessionDestroy(SessionDestroyEvent event) {
-        checkState(sessionToScopedObjectsMap.remove(event.getSession()) != null);
+        final Map<UI, Map<Key, Object>> map = checkNotNull(sessionToScopedObjectsMap.remove(event.getSession()));
+
+        for (Map<Key, Object> keyObjectMap : map.values()) {
+            KeyObjectMapPool.returnKeyObjectMap(keyObjectMap);
+        }
     }
 
     @Override
