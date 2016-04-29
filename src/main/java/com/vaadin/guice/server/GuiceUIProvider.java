@@ -278,49 +278,6 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
                 navigator.addProvider(viewProvider);
 
-                if (errorView.isPresent()) {
-                    navigator.setErrorProvider(
-                            new ViewProvider() {
-                                @Override
-                                public String getViewName(String viewAndParameters) {
-                                    return viewAndParameters;
-                                }
-
-                                @Override
-                                public View getView(String viewName) {
-                                    return InjectorHolder.getInjector().getInstance(errorView.get());
-                                }
-                            }
-                    );
-                }
-
-                String accessDeniedTarget = null;
-
-                if (accessDeniedView.isPresent()) {
-                    accessDeniedTarget = viewProvider.getViewName(accessDeniedView.get());
-                }
-
-                if (configuration.viewAccessControl() != null) {
-                    final ViewAccessControl viewAccessControl = InjectorHolder.getInjector().getInstance(configuration.viewAccessControl());
-
-                    ViewAccessControlChangeListener viewAccessControlChangeListener = new ViewAccessControlChangeListener(viewAccessControl, accessDeniedTarget);
-
-                    navigator.addViewChangeListener(viewAccessControlChangeListener);
-                }
-
-                if (configuration.viewInstanceAccessControl() != null) {
-                    final ViewInstanceAccessControl viewInstanceAccessControl = InjectorHolder.getInjector().getInstance(configuration.viewInstanceAccessControl());
-
-                    ViewInstanceAccessControlChangeListener viewInstanceAccessControlChangeListener = new ViewInstanceAccessControlChangeListener(viewInstanceAccessControl, accessDeniedTarget);
-
-                    navigator.addViewChangeListener(viewInstanceAccessControlChangeListener);
-                }
-
-                for (Class<? extends ViewChangeListener> viewChangeListenerClass : viewChangeListeners) {
-                    ViewChangeListener viewChangeListener = InjectorHolder.getInjector().getInstance(viewChangeListenerClass);
-                    navigator.addViewChangeListener(viewChangeListener);
-                }
-
                 instance.setNavigator(navigator);
             }
 
@@ -351,6 +308,45 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                             defaultView
                     )
             );
+        }
+
+        if (errorView.isPresent()) {
+            navigator.setErrorProvider(
+                    new ViewProvider() {
+                        @Override
+                        public String getViewName(String viewAndParameters) {
+                            return viewAndParameters;
+                        }
+
+                        @Override
+                        public View getView(String viewName) {
+                            return InjectorHolder.getInjector().getInstance(errorView.get());
+                        }
+                    }
+            );
+        }
+
+        String accessDeniedTarget = null;
+
+        if (accessDeniedView.isPresent()) {
+            accessDeniedTarget = viewProvider.getViewName(accessDeniedView.get());
+        }
+
+        final ViewAccessControl viewAccessControl = InjectorHolder.getInjector().getInstance(configuration.viewAccessControl());
+
+        ViewAccessControlChangeListener viewAccessControlChangeListener = new ViewAccessControlChangeListener(viewAccessControl, accessDeniedTarget);
+
+        navigator.addViewChangeListener(viewAccessControlChangeListener);
+
+        final ViewInstanceAccessControl viewInstanceAccessControl = InjectorHolder.getInjector().getInstance(configuration.viewInstanceAccessControl());
+
+        ViewInstanceAccessControlChangeListener viewInstanceAccessControlChangeListener = new ViewInstanceAccessControlChangeListener(viewInstanceAccessControl, accessDeniedTarget);
+
+        navigator.addViewChangeListener(viewInstanceAccessControlChangeListener);
+
+        for (Class<? extends ViewChangeListener> viewChangeListenerClass : viewChangeListeners) {
+            ViewChangeListener viewChangeListener = InjectorHolder.getInjector().getInstance(viewChangeListenerClass);
+            navigator.addViewChangeListener(viewChangeListener);
         }
 
         return navigator;

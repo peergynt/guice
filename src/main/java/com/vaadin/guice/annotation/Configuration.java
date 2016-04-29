@@ -1,10 +1,13 @@
 package com.vaadin.guice.annotation;
 
+import com.google.common.base.Optional;
 import com.google.inject.Module;
 
 import com.vaadin.guice.access.ViewAccessControl;
 import com.vaadin.guice.access.ViewInstanceAccessControl;
 import com.vaadin.guice.server.GuiceVaadinServlet;
+import com.vaadin.navigator.View;
+import com.vaadin.ui.UI;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -40,11 +43,25 @@ public @interface Configuration {
      * the {@link ViewAccessControl} that restricts the navigation flow so that only users with
      * proper permissions can visit restricted views
      */
-    Class<? extends ViewAccessControl> viewAccessControl();
+    Class<? extends ViewAccessControl> viewAccessControl() default ViewAccessControlNoImpl.class;
 
     /**
      * the {@link ViewInstanceAccessControl} that restricts the navigation flow so that only users with
      * proper permissions can visit restricted views
      */
-    Class<? extends ViewInstanceAccessControl> viewInstanceAccessControl();
+    Class<? extends ViewInstanceAccessControl> viewInstanceAccessControl() default ViewInstanceAccessControlNoImpl.class;
+
+    class ViewAccessControlNoImpl implements ViewAccessControl{
+        @Override
+        public boolean isAccessGranted(UI ui, String beanName) {
+            return true;
+        }
+    }
+
+    class ViewInstanceAccessControlNoImpl implements ViewInstanceAccessControl{
+        @Override
+        public boolean isAccessGranted(UI ui, String beanName, View view) {
+            return true;
+        }
+    }
 }

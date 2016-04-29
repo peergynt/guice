@@ -128,7 +128,7 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
         return null;
     }
 
-    public String getViewName(Class<? extends View> viewClass) {
+    String getViewName(Class<? extends View> viewClass) {
 
         checkNotNull(viewClass);
 
@@ -140,7 +140,6 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
 
         throw new IllegalArgumentException(viewClass + " is not a registered view-class");
     }
-
 
     @Override
     public View getView(String viewName) {
