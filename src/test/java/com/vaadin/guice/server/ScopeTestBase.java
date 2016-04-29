@@ -16,16 +16,12 @@
 package com.vaadin.guice.server;
 
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Singleton;
 
 import com.vaadin.guice.testClasses.Target;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.VaadinSession;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,11 +40,11 @@ import static org.mockito.Mockito.when;
 
 public abstract class ScopeTestBase {
 
-    private SessionProvider sessionProvider;
     protected CurrentUIProvider currentUIProvider;
     protected UIScoper uiScoper;
-    private GuiceUIProvider uiProvider;
     protected Injector injector;
+    private SessionProvider sessionProvider;
+    private GuiceUIProvider uiProvider;
 
     @Before
     public void setup() throws NoSuchFieldException, IllegalAccessException {
@@ -140,7 +136,7 @@ public abstract class ScopeTestBase {
         assertNotEquals(target1.getUiScoped1().getUiScoped2(), target2.getUiScoped1().getUiScoped2());
     }
 
-    protected void setVaadinSession(VaadinSession vaadinSession){
+    protected void setVaadinSession(VaadinSession vaadinSession) {
         when(sessionProvider.getCurrentSession()).thenReturn(vaadinSession);
     }
 

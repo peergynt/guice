@@ -2,11 +2,14 @@ package com.vaadin.guice.server;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+
 import com.vaadin.server.ServiceException;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.reflections.Reflections;
+
+import java.lang.reflect.Field;
 
 import static com.vaadin.guice.server.ReflectionUtils.getGuiceUIClasses;
 import static com.vaadin.guice.server.ReflectionUtils.getGuiceViewClasses;
@@ -14,15 +17,14 @@ import static com.vaadin.guice.server.ReflectionUtils.getViewChangeListenerClass
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-import java.lang.reflect.Field;
 
 public class ViewProviderTest {
 
-    private SessionProvider sessionProvider;
     protected CurrentUIProvider currentUIProvider;
     protected UIScoper uiScoper;
     protected GuiceViewProvider viewProvider;
     protected Injector injector;
+    private SessionProvider sessionProvider;
 
     @Before
     public void setup() throws NoSuchFieldException, IllegalAccessException {

@@ -22,12 +22,9 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation marks a view container as a UI's default view container for navigation.
- * ViewContainers are used by a UI's {@link com.vaadin.navigator.Navigator}.
- * A view container must implement one of the following interface:
- * <p><ul>
- *   <li>{@link com.vaadin.ui.ComponentContainer}
- *   <li>{@link com.vaadin.ui.SingleComponentContainer}
- *   <li>{@link com.vaadin.navigator.ViewDisplay}
+ * ViewContainers are used by a UI's {@link com.vaadin.navigator.Navigator}. A view container must
+ * implement one of the following interface: <p><ul> <li>{@link com.vaadin.ui.ComponentContainer}
+ * <li>{@link com.vaadin.ui.SingleComponentContainer} <li>{@link com.vaadin.navigator.ViewDisplay}
  * </ul><p>
  * <pre>
  *      <code>

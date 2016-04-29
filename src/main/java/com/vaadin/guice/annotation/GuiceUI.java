@@ -15,11 +15,11 @@
  */
 package com.vaadin.guice.annotation;
 
+import com.google.inject.ScopeAnnotation;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
-import com.google.inject.ScopeAnnotation;
 
 /**
  * Annotation to be put on {@link com.vaadin.ui.UI}-subclasses that are to be automatically detected

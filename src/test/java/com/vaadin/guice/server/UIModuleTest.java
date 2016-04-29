@@ -3,9 +3,9 @@ package com.vaadin.guice.server;
 import com.google.inject.ConfigurationException;
 
 import com.vaadin.guice.annotation.Configuration;
+import com.vaadin.guice.testClasses.ASecondImplementation;
 import com.vaadin.guice.testClasses.AnImplementation;
 import com.vaadin.guice.testClasses.AnInterface;
-import com.vaadin.guice.testClasses.ASecondImplementation;
 import com.vaadin.guice.testClasses.AnotherInterface;
 import com.vaadin.guice.testClasses.AnotherInterfaceImplementation;
 import com.vaadin.guice.testClasses.StaticlyLoadedModule;
@@ -18,25 +18,13 @@ import static org.junit.Assert.assertTrue;
 
 public class UIModuleTest {
 
-    @Configuration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.testClasses")
-    private static class VaadinServletWithStaticAndDynamicLoadedModules extends GuiceVaadinServlet{
-    }
-
-    @Configuration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.server")
-    private static class VaadinServletWithStaticLoadedModule extends GuiceVaadinServlet{
-    }
-
-    @Configuration(modules = {}, basePackages = "com.vaadin.guice.testClasses")
-    private static class VaadinServletWithDynamicLoadedModule extends GuiceVaadinServlet{
-    }
-
     @Before
-    public void init(){
+    public void init() {
         InjectorHolder.setInjector(null);
     }
 
     @Test
-    public void dynamically_loaded_modules_should_override(){
+    public void dynamically_loaded_modules_should_override() {
         new VaadinServletWithStaticAndDynamicLoadedModules();
 
         AnInterface anInterface = InjectorHolder.getInjector().getInstance(AnInterface.class);
@@ -51,7 +39,7 @@ public class UIModuleTest {
     }
 
     @Test
-    public void statically_loaded_modules_should_be_considered(){
+    public void statically_loaded_modules_should_be_considered() {
         new VaadinServletWithStaticLoadedModule();
 
         AnInterface anInterface = InjectorHolder.getInjector().getInstance(AnInterface.class);
@@ -66,7 +54,7 @@ public class UIModuleTest {
     }
 
     @Test
-    public void dynamically_loaded_modules_should_be_considered(){
+    public void dynamically_loaded_modules_should_be_considered() {
         new VaadinServletWithDynamicLoadedModule();
 
         AnInterface anInterface = InjectorHolder.getInjector().getInstance(AnInterface.class);
@@ -76,8 +64,20 @@ public class UIModuleTest {
     }
 
     @Test(expected = ConfigurationException.class)
-    public void unbound_classes_should_not_be_available(){
+    public void unbound_classes_should_not_be_available() {
         new VaadinServletWithDynamicLoadedModule();
         InjectorHolder.getInjector().getInstance(AnotherInterface.class);
+    }
+
+    @Configuration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.testClasses")
+    private static class VaadinServletWithStaticAndDynamicLoadedModules extends GuiceVaadinServlet {
+    }
+
+    @Configuration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.server")
+    private static class VaadinServletWithStaticLoadedModule extends GuiceVaadinServlet {
+    }
+
+    @Configuration(modules = {}, basePackages = "com.vaadin.guice.testClasses")
+    private static class VaadinServletWithDynamicLoadedModule extends GuiceVaadinServlet {
     }
 }

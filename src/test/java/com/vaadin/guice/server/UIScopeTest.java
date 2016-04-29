@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
-public class UIScopeTest extends ScopeTestBase{
+public class UIScopeTest extends ScopeTestBase {
 
     @Test
     public void ui_scopes_should_not_overlap_in_same_session() throws ServiceException, NoSuchFieldException, IllegalAccessException {
@@ -178,11 +178,11 @@ public class UIScopeTest extends ScopeTestBase{
         assertNotEquals(target2.getPrototype1(), prototype1FromTarget2);
     }
 
-    private void setCurrentUi(Target target){
+    private void setCurrentUi(Target target) {
         when(currentUIProvider.getCurrentUI()).thenReturn(target);
     }
 
-    private Target createTarget(){
+    private Target createTarget() {
         uiScoper.startInitialization();
         Target target = injector.getInstance(Target.class);
         uiScoper.endInitialization(target);

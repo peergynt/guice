@@ -6,7 +6,7 @@ import com.google.inject.Provider;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
 
-public class Target extends UI{
+public class Target extends UI {
     @Inject
     private Prototype1 prototype1;
 
