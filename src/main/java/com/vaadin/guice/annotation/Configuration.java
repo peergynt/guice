@@ -2,6 +2,8 @@ package com.vaadin.guice.annotation;
 
 import com.google.inject.Module;
 
+import com.vaadin.guice.access.ViewAccessControl;
+import com.vaadin.guice.access.ViewInstanceAccessControl;
 import com.vaadin.guice.server.GuiceVaadinServlet;
 
 import java.lang.annotation.Retention;
@@ -25,16 +27,24 @@ public @interface Configuration {
 
     /**
      * An array of classes for modules to be installed by guice
-     *
-     * @return an array of classes for modules to be installed by guice
      */
     Class<? extends Module>[] modules();
 
     /**
      * A list of packages that is to be scanned for the guice-context. Sub-packages are included as
      * well.
-     *
-     * @return A list of packages that is to be scanned for the guice-context
      */
     String[] basePackages();
+
+    /**
+     * the {@link ViewAccessControl} that restricts the navigation flow so that only users with
+     * proper permissions can visit restricted views
+     */
+    Class<? extends ViewAccessControl> viewAccessControl();
+
+    /**
+     * the {@link ViewInstanceAccessControl} that restricts the navigation flow so that only users with
+     * proper permissions can visit restricted views
+     */
+    Class<? extends ViewInstanceAccessControl> viewInstanceAccessControl();
 }
