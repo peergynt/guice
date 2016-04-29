@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
@@ -126,6 +127,20 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
         }
         return null;
     }
+
+    public String getViewName(Class<? extends View> viewClass) {
+
+        checkNotNull(viewClass);
+
+        for (Map.Entry<String, Class<? extends View>> entry : viewNamesToViewClassesMap.entrySet()) {
+            if (viewClass.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+
+        throw new IllegalArgumentException(viewClass + " is not a registered view-class");
+    }
+
 
     @Override
     public View getView(String viewName) {

@@ -1,27 +1,26 @@
 package com.vaadin.guice.server;
 
-import com.google.common.base.Strings;
-
 import com.vaadin.guice.access.ViewAccessControl;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.UI;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-class ViewAccessControlChangeListener implements ViewChangeListener{
+class ViewAccessControlChangeListener implements ViewChangeListener {
 
     private final ViewAccessControl viewInstanceAccessControl;
-    private String accessDeniedTarget;
+    private final String accessDeniedTarget;
 
-    ViewAccessControlChangeListener(ViewAccessControl viewInstanceAccessControl){
+    ViewAccessControlChangeListener(ViewAccessControl viewInstanceAccessControl, String accessDeniedTarget) {
         this.viewInstanceAccessControl = viewInstanceAccessControl;
+        this.accessDeniedTarget = accessDeniedTarget;
     }
 
     @Override
     public boolean beforeViewChange(ViewChangeEvent viewChangeEvent) {
         boolean accessGranted = viewInstanceAccessControl.isAccessGranted(UI.getCurrent(), viewChangeEvent.getViewName());
 
-        if(!accessGranted && !isNullOrEmpty(accessDeniedTarget)){
+        if (!accessGranted && !isNullOrEmpty(accessDeniedTarget)) {
             viewChangeEvent.getNavigator().navigateTo(accessDeniedTarget);
         }
 
@@ -31,9 +30,5 @@ class ViewAccessControlChangeListener implements ViewChangeListener{
     @Override
     public void afterViewChange(ViewChangeEvent viewChangeEvent) {
         ;
-    }
-
-    public void setAccessDeniedTarget(String accessDeniedTarget) {
-        this.accessDeniedTarget = accessDeniedTarget;
     }
 }

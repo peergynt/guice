@@ -116,7 +116,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                 errorView = viewClass;
             }
 
-            if (annotation.isAccessDeniedView()){
+            if (annotation.isAccessDeniedView()) {
                 checkState(
                         accessDeniedView == null,
                         "%s and %s have an @GuiceView-annotation with isAccessDeniedView set to true",
@@ -294,18 +294,24 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                     );
                 }
 
-                if(configuration.viewAccessControl() != null){
+                String accessDeniedTarget = null;
+
+                if (accessDeniedView.isPresent()) {
+                    accessDeniedTarget = viewProvider.getViewName(accessDeniedView.get());
+                }
+
+                if (configuration.viewAccessControl() != null) {
                     final ViewAccessControl viewAccessControl = InjectorHolder.getInjector().getInstance(configuration.viewAccessControl());
 
-                    ViewAccessControlChangeListener viewAccessControlChangeListener = new ViewAccessControlChangeListener(viewAccessControl);
+                    ViewAccessControlChangeListener viewAccessControlChangeListener = new ViewAccessControlChangeListener(viewAccessControl, accessDeniedTarget);
 
                     navigator.addViewChangeListener(viewAccessControlChangeListener);
                 }
 
-                if(configuration.viewInstanceAccessControl() != null){
+                if (configuration.viewInstanceAccessControl() != null) {
                     final ViewInstanceAccessControl viewInstanceAccessControl = InjectorHolder.getInjector().getInstance(configuration.viewInstanceAccessControl());
 
-                    ViewInstanceAccessControlChangeListener viewInstanceAccessControlChangeListener = new ViewInstanceAccessControlChangeListener(viewInstanceAccessControl);
+                    ViewInstanceAccessControlChangeListener viewInstanceAccessControlChangeListener = new ViewInstanceAccessControlChangeListener(viewInstanceAccessControl, accessDeniedTarget);
 
                     navigator.addViewChangeListener(viewInstanceAccessControlChangeListener);
                 }
