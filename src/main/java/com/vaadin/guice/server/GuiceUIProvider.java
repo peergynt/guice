@@ -17,6 +17,9 @@ package com.vaadin.guice.server;
 
 import com.google.common.base.Optional;
 
+import com.vaadin.guice.access.ViewAccessControl;
+import com.vaadin.guice.access.ViewInstanceAccessControl;
+import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.ViewContainer;
@@ -64,15 +67,25 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     private final Set<Class<? extends ViewChangeListener>> viewChangeListeners;
     private final GuiceViewProvider viewProvider;
     private final UIScoper uiScoper;
+    private final Configuration configuration;
     private Optional<Class<? extends View>> errorView;
+    private Optional<Class<? extends View>> accessDeniedView;
 
     @SuppressWarnings("unchecked")
-    public GuiceUIProvider(Set<Class<? extends UI>> uiClasses, Set<Class<? extends ViewChangeListener>> viewChangeListeners, GuiceViewProvider viewProvider, Set<Class<? extends View>> viewClasses, UIScoper uiScoper) {
+    public GuiceUIProvider(
+            Set<Class<? extends UI>> uiClasses,
+            Set<Class<? extends ViewChangeListener>> viewChangeListeners,
+            GuiceViewProvider viewProvider,
+            Set<Class<? extends View>> viewClasses,
+            UIScoper uiScoper,
+            Configuration configuration
+    ) {
         this.viewProvider = viewProvider;
         this.uiScoper = uiScoper;
+        this.configuration = configuration;
         detectUIs(uiClasses);
 
-        errorView = findErrorView(viewClasses);
+        findErrorView(viewClasses);
 
         if (pathToUIMap.isEmpty()) {
             logger.log(Level.WARNING, "Found no Vaadin UIs in the application context");
@@ -81,9 +94,10 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
         this.viewChangeListeners = viewChangeListeners;
     }
 
-    private Optional<Class<? extends View>> findErrorView(Set<Class<? extends View>> viewClasses) {
+    private void findErrorView(Set<Class<? extends View>> viewClasses) {
 
         Class<? extends View> errorView = null;
+        Class<? extends View> accessDeniedView = null;
 
         for (Class<? extends View> viewClass : viewClasses) {
             GuiceView annotation = viewClass.getAnnotation(GuiceView.class);
@@ -100,9 +114,21 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
                 errorView = viewClass;
             }
+
+            if (annotation.isAccessDeniedView()){
+                checkState(
+                        accessDeniedView == null,
+                        "%s and %s have an @GuiceView-annotation with isAccessDeniedView set to true",
+                        accessDeniedView,
+                        viewClass
+                );
+
+                accessDeniedView = viewClass;
+            }
         }
 
-        return Optional.<Class<? extends View>>fromNullable(errorView);
+        this.errorView = Optional.<Class<? extends View>>fromNullable(errorView);
+        this.accessDeniedView = Optional.<Class<? extends View>>fromNullable(accessDeniedView);
     }
 
     @SuppressWarnings("unchecked")
@@ -255,6 +281,22 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                     navigator.setErrorView(errorView.get());
                 }
 
+                if(configuration.viewAccessControl() != null){
+                    final ViewAccessControl viewAccessControl = InjectorHolder.getInjector().getInstance(configuration.viewAccessControl());
+
+                    ViewAccessControlChangeListener viewAccessControlChangeListener = new ViewAccessControlChangeListener(viewAccessControl);
+
+                    navigator.addViewChangeListener(viewAccessControlChangeListener);
+                }
+
+                if(configuration.viewInstanceAccessControl() != null){
+                    final ViewInstanceAccessControl viewInstanceAccessControl = InjectorHolder.getInjector().getInstance(configuration.viewInstanceAccessControl());
+
+                    ViewInstanceAccessControlChangeListener viewInstanceAccessControlChangeListener = new ViewInstanceAccessControlChangeListener(viewInstanceAccessControl);
+
+                    navigator.addViewChangeListener(viewInstanceAccessControlChangeListener);
+                }
+
                 for (Class<? extends ViewChangeListener> viewChangeListenerClass : viewChangeListeners) {
                     ViewChangeListener viewChangeListener = InjectorHolder.getInjector().getInstance(viewChangeListenerClass);
                     navigator.addViewChangeListener(viewChangeListener);
@@ -274,7 +316,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
         }
     }
 
-    Navigator createNavigator(UI instance, Object defaultView) {
+    private Navigator createNavigator(UI instance, Object defaultView) {
         Navigator navigator;
 
         if (defaultView instanceof ComponentContainer) {
@@ -291,6 +333,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                     )
             );
         }
+
         return navigator;
     }
 
