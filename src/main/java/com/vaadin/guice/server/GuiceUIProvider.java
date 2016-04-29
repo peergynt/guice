@@ -27,6 +27,7 @@ import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
+import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.SessionInitListener;
@@ -278,7 +279,19 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                 navigator.addProvider(viewProvider);
 
                 if (errorView.isPresent()) {
-                    navigator.setErrorView(errorView.get());
+                    navigator.setErrorProvider(
+                            new ViewProvider() {
+                                @Override
+                                public String getViewName(String viewAndParameters) {
+                                    return viewAndParameters;
+                                }
+
+                                @Override
+                                public View getView(String viewName) {
+                                    return InjectorHolder.getInjector().getInstance(errorView.get());
+                                }
+                            }
+                    );
                 }
 
                 if(configuration.viewAccessControl() != null){
