@@ -25,7 +25,7 @@ final class ReflectionUtils {
     static Set<Module> getUIModules(Reflections reflections) {
         Set<Module> dynamicallyLoadedModules = new HashSet<Module>();
 
-        for (Class<?> dynamicallyLoadedModuleClass : reflections.getTypesAnnotatedWith(UIModule.class)) {
+        for (Class<?> dynamicallyLoadedModuleClass : reflections.getTypesAnnotatedWith(UIModule.class, true)) {
             checkArgument(
                     Module.class.isAssignableFrom(dynamicallyLoadedModuleClass),
                     "class %s is annotated with @UIModule but does not extend com.google.inject.Module",
@@ -74,7 +74,7 @@ final class ReflectionUtils {
     static Set<Class<? extends ViewChangeListener>> getViewChangeListenerClasses(Reflections reflections) {
         Set<Class<? extends ViewChangeListener>> viewChangeListeners = new HashSet<Class<? extends ViewChangeListener>>();
 
-        for (Class<?> viewChangeListenerClass : reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class)) {
+        for (Class<?> viewChangeListenerClass : reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class, true)) {
             checkArgument(
                     ViewChangeListener.class.isAssignableFrom(viewChangeListenerClass),
                     "class %s is annotated with @GuiceViewChangeListener but does not implement com.vaadin.navigator.ViewChangeListener",

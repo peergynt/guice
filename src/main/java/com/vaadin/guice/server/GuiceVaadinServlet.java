@@ -15,6 +15,7 @@
  */
 package com.vaadin.guice.server;
 
+import com.google.common.collect.Iterables;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -32,6 +33,8 @@ import com.vaadin.ui.UI;
 
 import org.reflections.Reflections;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +42,7 @@ import java.util.Set;
 import javax.servlet.ServletException;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.inject.util.Modules.override;
 import static com.vaadin.guice.server.ReflectionUtils.getGuiceUIClasses;
 import static com.vaadin.guice.server.ReflectionUtils.getGuiceViewClasses;
@@ -70,11 +74,37 @@ public class GuiceVaadinServlet extends VaadinServlet {
                 "at least on 'basePackages'-parameter expected in Configuration of " + getClass()
         );
 
+        Reflections reflections = new Reflections((Object[])annotation.basePackages());
+
         List<Module> hardWiredModules = new ArrayList<Module>(annotation.modules().length);
 
         for (Class<? extends Module> moduleClass : annotation.modules()) {
             try {
-                hardWiredModules.add(moduleClass.newInstance());
+                Module module = null;
+
+                checkArgument(moduleClass.getConstructors().length == 1, moduleClass + " has more than 1 constructors");
+
+                Constructor<Module> constructor = (Constructor<Module>)moduleClass.getConstructors()[0];
+
+                constructor.setAccessible(true);
+
+                switch (constructor.getParameterTypes().length){
+                        case 0:
+                            module = constructor.newInstance();
+                            break;
+                        case 1:
+                            if(constructor.getParameterTypes()[0].equals(Reflections.class)){
+                                module = constructor.newInstance(reflections);
+                            } else {
+                                throw new IllegalArgumentException("no suitable constructor found for " + moduleClass);
+                            }
+                            break;
+                        default:
+                            throw new IllegalArgumentException("no suitable constructor found for " + moduleClass);
+                }
+
+                hardWiredModules.add(module);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -93,8 +123,6 @@ public class GuiceVaadinServlet extends VaadinServlet {
                 return UI.getCurrent();
             }
         };
-
-        Reflections reflections = new Reflections((Object[])annotation.basePackages());
 
         Set<Class<? extends UI>> uis = getGuiceUIClasses(reflections);
 
