@@ -94,7 +94,7 @@ public class GuiceVaadinServlet extends VaadinServlet {
             }
         };
 
-        Reflections reflections = new Reflections(annotation.basePackages());
+        Reflections reflections = new Reflections((Object[])annotation.basePackages());
 
         Set<Class<? extends UI>> uis = getGuiceUIClasses(reflections);
 

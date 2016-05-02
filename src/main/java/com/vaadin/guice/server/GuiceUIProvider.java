@@ -17,9 +17,6 @@ package com.vaadin.guice.server;
 
 import com.google.common.base.Optional;
 
-import com.vaadin.guice.access.ViewAccessControl;
-import com.vaadin.guice.access.ViewInstanceAccessControl;
-import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.ViewContainer;
@@ -68,22 +65,17 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     private final Set<Class<? extends ViewChangeListener>> viewChangeListeners;
     private final GuiceViewProvider viewProvider;
     private final UIScoper uiScoper;
-    private final Configuration configuration;
     private Optional<Class<? extends View>> errorView;
-    private Optional<Class<? extends View>> accessDeniedView;
 
-    @SuppressWarnings("unchecked")
-    public GuiceUIProvider(
+    GuiceUIProvider(
             Set<Class<? extends UI>> uiClasses,
             Set<Class<? extends ViewChangeListener>> viewChangeListeners,
             GuiceViewProvider viewProvider,
             Set<Class<? extends View>> viewClasses,
-            UIScoper uiScoper,
-            Configuration configuration
+            UIScoper uiScoper
     ) {
         this.viewProvider = viewProvider;
         this.uiScoper = uiScoper;
-        this.configuration = configuration;
         detectUIs(uiClasses);
 
         findErrorView(viewClasses);
@@ -98,7 +90,6 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     private void findErrorView(Set<Class<? extends View>> viewClasses) {
 
         Class<? extends View> errorView = null;
-        Class<? extends View> accessDeniedView = null;
 
         for (Class<? extends View> viewClass : viewClasses) {
             GuiceView annotation = viewClass.getAnnotation(GuiceView.class);
@@ -115,21 +106,9 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
                 errorView = viewClass;
             }
-
-            if (annotation.isAccessDeniedView()) {
-                checkState(
-                        accessDeniedView == null,
-                        "%s and %s have an @GuiceView-annotation with isAccessDeniedView set to true",
-                        accessDeniedView,
-                        viewClass
-                );
-
-                accessDeniedView = viewClass;
-            }
         }
 
         this.errorView = Optional.<Class<? extends View>>fromNullable(errorView);
-        this.accessDeniedView = Optional.<Class<? extends View>>fromNullable(accessDeniedView);
     }
 
     @SuppressWarnings("unchecked")
@@ -167,7 +146,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
         Field defaultViewField = null;
 
-        for (java.lang.reflect.Field field : uiClass.getDeclaredFields()) {
+        for (Field field : uiClass.getDeclaredFields()) {
             if (field.getAnnotation(ViewContainer.class) == null) {
                 continue;
             }
@@ -325,24 +304,6 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                     }
             );
         }
-
-        String accessDeniedTarget = null;
-
-        if (accessDeniedView.isPresent()) {
-            accessDeniedTarget = viewProvider.getViewName(accessDeniedView.get());
-        }
-
-        final ViewAccessControl viewAccessControl = InjectorHolder.getInjector().getInstance(configuration.viewAccessControl());
-
-        ViewAccessControlChangeListener viewAccessControlChangeListener = new ViewAccessControlChangeListener(viewAccessControl, accessDeniedTarget);
-
-        navigator.addViewChangeListener(viewAccessControlChangeListener);
-
-        final ViewInstanceAccessControl viewInstanceAccessControl = InjectorHolder.getInjector().getInstance(configuration.viewInstanceAccessControl());
-
-        ViewInstanceAccessControlChangeListener viewInstanceAccessControlChangeListener = new ViewInstanceAccessControlChangeListener(viewInstanceAccessControl, accessDeniedTarget);
-
-        navigator.addViewChangeListener(viewInstanceAccessControlChangeListener);
 
         for (Class<? extends ViewChangeListener> viewChangeListenerClass : viewChangeListeners) {
             ViewChangeListener viewChangeListener = InjectorHolder.getInjector().getInstance(viewChangeListenerClass);
