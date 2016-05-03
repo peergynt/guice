@@ -12,6 +12,8 @@ import com.vaadin.ui.UI;
 
 import org.reflections.Reflections;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,18 +24,40 @@ final class ReflectionUtils {
     private ReflectionUtils() {
     }
 
-    static Set<Module> getUIModules(Reflections reflections) {
+    static Module create(Class<? extends Module> type, Reflections reflections) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        checkArgument(type.getConstructors().length == 1, type + " has more than 1 constructors");
+
+        @SuppressWarnings("unchecked")
+        Constructor<Module> constructor = (Constructor<Module>) type.getConstructors()[0];
+
+        constructor.setAccessible(true);
+
+        switch (constructor.getParameterTypes().length) {
+            case 0:
+                return constructor.newInstance();
+            case 1:
+                if (constructor.getParameterTypes()[0].equals(Reflections.class)) {
+                    return constructor.newInstance(reflections);
+                }
+                break;
+        }
+
+        throw new IllegalArgumentException("no suitable constructor found for " + type);
+    }
+
+    @SuppressWarnings("unchecked")
+    static Set<Module> getDynamicModules(Reflections reflections) {
         Set<Module> dynamicallyLoadedModules = new HashSet<Module>();
 
         for (Class<?> dynamicallyLoadedModuleClass : reflections.getTypesAnnotatedWith(UIModule.class, true)) {
             checkArgument(
                     Module.class.isAssignableFrom(dynamicallyLoadedModuleClass),
-                    "class %s is annotated with @UIModule but does not extend com.google.inject.Module",
+                    "class %s is annotated with @UIModule but does not implement com.google.inject.Module",
                     dynamicallyLoadedModuleClass
             );
 
             try {
-                dynamicallyLoadedModules.add(((Class<? extends Module>) dynamicallyLoadedModuleClass).newInstance());
+                dynamicallyLoadedModules.add(create((Class<? extends Module>) dynamicallyLoadedModuleClass, reflections));
             } catch (Exception e) {
                 throw new RuntimeException("unable to instantiate " + dynamicallyLoadedModuleClass, e);
             }
@@ -41,6 +65,7 @@ final class ReflectionUtils {
         return dynamicallyLoadedModules;
     }
 
+    @SuppressWarnings("unchecked")
     static Set<Class<? extends View>> getGuiceViewClasses(Reflections reflections) {
         Set<Class<? extends View>> views = new HashSet<Class<? extends View>>();
 
@@ -56,6 +81,7 @@ final class ReflectionUtils {
         return views;
     }
 
+    @SuppressWarnings("unchecked")
     static Set<Class<? extends UI>> getGuiceUIClasses(Reflections reflections) {
         Set<Class<? extends UI>> uis = new HashSet<Class<? extends UI>>();
 
@@ -71,6 +97,7 @@ final class ReflectionUtils {
         return uis;
     }
 
+    @SuppressWarnings("unchecked")
     static Set<Class<? extends ViewChangeListener>> getViewChangeListenerClasses(Reflections reflections) {
         Set<Class<? extends ViewChangeListener>> viewChangeListeners = new HashSet<Class<? extends ViewChangeListener>>();
 

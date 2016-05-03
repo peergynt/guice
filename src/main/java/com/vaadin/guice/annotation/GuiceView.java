@@ -31,6 +31,7 @@ import java.lang.annotation.Target;
  *     // ...
  * }
  * </pre>
+ *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Henri Sara (hesara@vaadin.com)
  * @author Bernd Hopp (bernd@vaadin.com)
@@ -62,9 +63,4 @@ public @interface GuiceView {
     * determining if this view is navigated to in case an error occurs.
     * */
     boolean isErrorView() default false;
-
-    /*
-    * determining if this view is navigated to in case navigation to another view is interrupted because of denied access.
-    * */
-    boolean isAccessDeniedView() default false;
 }

@@ -24,7 +24,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Stereotype annotation for guice's {@code @Scope("vaadin-ui")}.
+ * This annotation will put elements in guice's 'UI'-scope, so for every {@link com.vaadin.ui.UI}
+ * constructed by guice, there is exactly one instance of any given type in the UI-scope.
  *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Josh Long (josh@joshlong.com)

@@ -1,13 +1,8 @@
 package com.vaadin.guice.annotation;
 
-import com.google.common.base.Optional;
 import com.google.inject.Module;
 
-import com.vaadin.guice.access.ViewAccessControl;
-import com.vaadin.guice.access.ViewInstanceAccessControl;
 import com.vaadin.guice.server.GuiceVaadinServlet;
-import com.vaadin.navigator.View;
-import com.vaadin.ui.UI;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -29,7 +24,9 @@ import java.lang.annotation.Target;
 public @interface Configuration {
 
     /**
-     * An array of classes for modules to be installed by guice
+     * An array of classes for modules to be installed by guice. Each of these classes must have
+     * exactly one constructor, which can either have no arguments ( standard-constructor ) or a
+     * single argument that is of type {@link org.reflections.Reflections}
      */
     Class<? extends Module>[] modules();
 
@@ -38,30 +35,4 @@ public @interface Configuration {
      * well.
      */
     String[] basePackages();
-
-    /**
-     * the {@link ViewAccessControl} that restricts the navigation flow so that only users with
-     * proper permissions can visit restricted views
-     */
-    Class<? extends ViewAccessControl> viewAccessControl() default ViewAccessControlNoImpl.class;
-
-    /**
-     * the {@link ViewInstanceAccessControl} that restricts the navigation flow so that only users with
-     * proper permissions can visit restricted views
-     */
-    Class<? extends ViewInstanceAccessControl> viewInstanceAccessControl() default ViewInstanceAccessControlNoImpl.class;
-
-    class ViewAccessControlNoImpl implements ViewAccessControl{
-        @Override
-        public boolean isAccessGranted(UI ui, String beanName) {
-            return true;
-        }
-    }
-
-    class ViewInstanceAccessControlNoImpl implements ViewInstanceAccessControl{
-        @Override
-        public boolean isAccessGranted(UI ui, String beanName, View view) {
-            return true;
-        }
-    }
 }
