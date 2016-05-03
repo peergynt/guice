@@ -19,6 +19,8 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 
+import com.vaadin.guice.providers.CurrentUIProvider;
+import com.vaadin.guice.providers.VaadinSessionProvider;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionDestroyEvent;
 import com.vaadin.server.SessionDestroyListener;
@@ -37,12 +39,12 @@ import static com.google.common.base.Preconditions.checkState;
 class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
 
     private final Map<VaadinSession, Map<UI, Map<Key, Object>>> sessionToScopedObjectsMap = new ConcurrentHashMap<VaadinSession, Map<UI, Map<Key, Object>>>();
-    private final SessionProvider sessionProvider;
+    private final VaadinSessionProvider vaadinSessionProvider;
     private final CurrentUIProvider currentUIProvider;
     private Map<Key, Object> currentInitializationScopeSet = null;
 
-    UIScoper(SessionProvider sessionProvider, CurrentUIProvider currentUIProvider) {
-        this.sessionProvider = sessionProvider;
+    UIScoper(VaadinSessionProvider vaadinSessionProvider, CurrentUIProvider currentUIProvider) {
+        this.vaadinSessionProvider = vaadinSessionProvider;
         this.currentUIProvider = currentUIProvider;
     }
 
@@ -59,7 +61,7 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
 
     void endInitialization(UI ui) {
         checkState(currentInitializationScopeSet != null);
-        final Map<UI, Map<Key, Object>> uiScopes = sessionToScopedObjectsMap.get(sessionProvider.getCurrentSession());
+        final Map<UI, Map<Key, Object>> uiScopes = sessionToScopedObjectsMap.get(vaadinSessionProvider.get());
         checkState(uiScopes != null);
         uiScopes.put(ui, currentInitializationScopeSet);
         currentInitializationScopeSet = null;
@@ -91,9 +93,9 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
         if (currentInitializationScopeSet != null) {
             scopedObjects = currentInitializationScopeSet;
         } else {
-            final Map<UI, Map<Key, Object>> sessionToUIScopes = sessionToScopedObjectsMap.get(sessionProvider.getCurrentSession());
+            final Map<UI, Map<Key, Object>> sessionToUIScopes = sessionToScopedObjectsMap.get(vaadinSessionProvider.get());
             checkState(sessionToUIScopes != null);
-            scopedObjects = sessionToUIScopes.get(currentUIProvider.getCurrentUI());
+            scopedObjects = sessionToUIScopes.get(currentUIProvider.get());
             checkState(scopedObjects != null);
         }
         return scopedObjects;

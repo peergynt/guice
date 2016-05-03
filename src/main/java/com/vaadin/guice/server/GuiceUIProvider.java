@@ -18,22 +18,15 @@ package com.vaadin.guice.server;
 import com.google.common.base.Optional;
 
 import com.vaadin.guice.annotation.GuiceUI;
-import com.vaadin.guice.annotation.GuiceView;
-import com.vaadin.guice.annotation.ViewContainer;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.navigator.ViewDisplay;
-import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.UIClassSelectionEvent;
 import com.vaadin.server.UICreateEvent;
 import com.vaadin.server.UIProvider;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.ui.ComponentContainer;
-import com.vaadin.ui.SingleComponentContainer;
 import com.vaadin.ui.UI;
 import com.vaadin.util.CurrentInstance;
 
@@ -41,12 +34,12 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static com.vaadin.guice.server.NavigatorUtil.createNavigator;
+import static com.vaadin.guice.server.PathUtil.extractUIPathFromRequest;
+import static com.vaadin.guice.server.ReflectionUtils.detectUIs;
+import static com.vaadin.guice.server.ReflectionUtils.findErrorView;
 
 /**
  * Vaadin {@link com.vaadin.server.UIProvider} that looks up UI classes from the Guice application
@@ -58,7 +51,6 @@ import static com.google.common.base.Preconditions.checkState;
  */
 class GuiceUIProvider extends UIProvider implements SessionInitListener {
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
     private final Map<String, Class<? extends UI>> pathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<String, Class<? extends UI>> wildcardPathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<Class<? extends UI>, Field> uiToDefaultViewField = new ConcurrentHashMap<Class<? extends UI>, Field>();
@@ -76,103 +68,12 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
     ) {
         this.viewProvider = viewProvider;
         this.uiScoper = uiScoper;
-        detectUIs(uiClasses);
 
-        findErrorView(viewClasses);
+        detectUIs(uiClasses, pathToUIMap, wildcardPathToUIMap, uiToDefaultViewField);
 
-        if (pathToUIMap.isEmpty()) {
-            logger.log(Level.WARNING, "Found no Vaadin UIs in the application context");
-        }
+        this.errorView = findErrorView(viewClasses);
 
         this.viewChangeListeners = viewChangeListeners;
-    }
-
-    private void findErrorView(Set<Class<? extends View>> viewClasses) {
-
-        Class<? extends View> errorView = null;
-
-        for (Class<? extends View> viewClass : viewClasses) {
-            GuiceView annotation = viewClass.getAnnotation(GuiceView.class);
-
-            checkState(annotation != null);
-
-            if (annotation.isErrorView()) {
-                checkState(
-                        errorView == null,
-                        "%s and %s have an @GuiceView-annotation with isErrorView set to true",
-                        errorView,
-                        viewClass
-                );
-
-                errorView = viewClass;
-            }
-        }
-
-        this.errorView = Optional.<Class<? extends View>>fromNullable(errorView);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void detectUIs(Set<Class<? extends UI>> uiClasses) {
-        logger.info("Checking the application context for Vaadin UIs");
-
-        for (Class<? extends UI> uiClass : uiClasses) {
-
-            logger.log(Level.INFO, "Found Vaadin UI [{0}]", uiClass.getCanonicalName());
-
-            GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
-
-            checkState(annotation != null);
-
-            String path = annotation.path();
-            path = preparePath(path);
-
-            Class<? extends UI> existingUiForPath = getUIByPath(path);
-
-            checkState(
-                    existingUiForPath == null,
-                    "[%s] is already mapped to the path [%s]",
-                    existingUiForPath,
-                    path
-            );
-
-            logger.log(Level.INFO, "Mapping Vaadin UI [{0}] to path [{1}]",
-                    new Object[]{uiClass.getCanonicalName(), path});
-            mapPathToUI(path, uiClass);
-            mapToDefaultViewField(uiClass);
-        }
-    }
-
-    private void mapToDefaultViewField(Class<? extends UI> uiClass) {
-
-        Field defaultViewField = null;
-
-        for (Field field : uiClass.getDeclaredFields()) {
-            if (field.getAnnotation(ViewContainer.class) == null) {
-                continue;
-            }
-
-            checkArgument(defaultViewField == null, "more than one field annotated with @ViewContainer in class " + uiClass);
-
-            defaultViewField = field;
-        }
-
-        if (defaultViewField == null) {
-            return;
-        }
-
-        defaultViewField.setAccessible(true);
-        uiToDefaultViewField.put(uiClass, defaultViewField);
-    }
-
-    private String preparePath(String path) {
-        if (path.length() > 0 && !path.startsWith("/")) {
-            path = "/".concat(path);
-        } else {
-            // remove terminal slash from mapping
-            path = path.replaceAll("/$", "");
-        }
-
-        return path;
     }
 
     @Override
@@ -192,36 +93,6 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
         }
 
         return null;
-    }
-
-    private String extractUIPathFromRequest(VaadinRequest request) {
-        String pathInfo = request.getPathInfo();
-        if (pathInfo != null && pathInfo.length() > 1) {
-            String path = pathInfo;
-            final int indexOfBang = path.indexOf('!');
-            if (indexOfBang > -1) {
-                path = path.substring(0, indexOfBang);
-            }
-
-            if (path.endsWith("/")) {
-                path = path.substring(0, path.length() - 1);
-            }
-            return path;
-        }
-        return "";
-    }
-
-    private void mapPathToUI(String path, Class<? extends UI> uiClass) {
-        if (path.endsWith("/*")) {
-            wildcardPathToUIMap.put(path.substring(0, path.length() - 2),
-                    uiClass);
-        } else {
-            pathToUIMap.put(path, uiClass);
-        }
-    }
-
-    private Class<? extends UI> getUIByPath(String path) {
-        return pathToUIMap.get(path);
     }
 
     @Override
@@ -253,7 +124,7 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
                         defaultViewField.getName()
                 );
 
-                Navigator navigator = createNavigator(instance, defaultView);
+                Navigator navigator = createNavigator(instance, defaultView, errorView, viewChangeListeners);
 
                 navigator.addProvider(viewProvider);
 
@@ -269,48 +140,6 @@ class GuiceUIProvider extends UIProvider implements SessionInitListener {
         } finally {
             CurrentInstance.set(key, null);
         }
-    }
-
-    private Navigator createNavigator(UI instance, Object defaultView) {
-        Navigator navigator;
-
-        if (defaultView instanceof ComponentContainer) {
-            navigator = new Navigator(instance, (ComponentContainer) defaultView);
-        } else if (defaultView instanceof SingleComponentContainer) {
-            navigator = new Navigator(instance, (SingleComponentContainer) defaultView);
-        } else if (defaultView instanceof ViewDisplay) {
-            navigator = new Navigator(instance, (ViewDisplay) defaultView);
-        } else {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "%s is annotated with @ViewContainer, must be either ComponentContainer, SingleComponentContainer or ViewDisplay",
-                            defaultView
-                    )
-            );
-        }
-
-        if (errorView.isPresent()) {
-            navigator.setErrorProvider(
-                    new ViewProvider() {
-                        @Override
-                        public String getViewName(String viewAndParameters) {
-                            return viewAndParameters;
-                        }
-
-                        @Override
-                        public View getView(String viewName) {
-                            return InjectorHolder.getInjector().getInstance(errorView.get());
-                        }
-                    }
-            );
-        }
-
-        for (Class<? extends ViewChangeListener> viewChangeListenerClass : viewChangeListeners) {
-            ViewChangeListener viewChangeListener = InjectorHolder.getInjector().getInstance(viewChangeListenerClass);
-            navigator.addViewChangeListener(viewChangeListener);
-        }
-
-        return navigator;
     }
 
     @Override

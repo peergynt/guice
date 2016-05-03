@@ -18,6 +18,9 @@ package com.vaadin.guice.server;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+import com.vaadin.guice.providers.CurrentUIProvider;
+import com.vaadin.guice.providers.VaadinServiceProvider;
+import com.vaadin.guice.providers.VaadinSessionProvider;
 import com.vaadin.guice.testClasses.Target;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
@@ -29,9 +32,6 @@ import org.reflections.Reflections;
 
 import java.lang.reflect.Field;
 
-import static com.vaadin.guice.server.ReflectionUtils.getGuiceUIClasses;
-import static com.vaadin.guice.server.ReflectionUtils.getGuiceViewClasses;
-import static com.vaadin.guice.server.ReflectionUtils.getViewChangeListenerClasses;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -40,25 +40,27 @@ import static org.mockito.Mockito.when;
 
 public abstract class ScopeTestBase {
 
-    protected CurrentUIProvider currentUIProvider;
-    protected UIScoper uiScoper;
-    protected Injector injector;
-    private SessionProvider sessionProvider;
+    CurrentUIProvider currentUIProvider;
+    UIScoper uiScoper;
+    Injector injector;
+    private VaadinSessionProvider vaadinSessionProvider;
     private GuiceUIProvider uiProvider;
+    private VaadinServiceProvider vaadinServiceProvider;
 
     @Before
     public void setup() throws NoSuchFieldException, IllegalAccessException {
-        sessionProvider = mock(SessionProvider.class);
+        vaadinSessionProvider = mock(VaadinSessionProvider.class);
         currentUIProvider = mock(CurrentUIProvider.class);
+        vaadinServiceProvider = mock(VaadinServiceProvider.class);
 
         Reflections reflections = new Reflections("com.vaadin.guice.server.testClasses");
 
         VaadinModule vaadinModule = new VaadinModule(
-                sessionProvider,
-                getGuiceViewClasses(reflections),
-                getGuiceUIClasses(reflections),
-                getViewChangeListenerClasses(reflections),
-                currentUIProvider);
+            vaadinSessionProvider,
+            currentUIProvider,
+            vaadinServiceProvider,
+            reflections
+        );
 
         injector = Guice.createInjector(vaadinModule);
         final Field uiScoperField = VaadinModule.class.getDeclaredField("uiScoper");
@@ -136,11 +138,11 @@ public abstract class ScopeTestBase {
         assertNotEquals(target1.getUiScoped1().getUiScoped2(), target2.getUiScoped1().getUiScoped2());
     }
 
-    protected void setVaadinSession(VaadinSession vaadinSession) {
-        when(sessionProvider.getCurrentSession()).thenReturn(vaadinSession);
+    void setVaadinSession(VaadinSession vaadinSession) {
+        when(vaadinSessionProvider.get()).thenReturn(vaadinSession);
     }
 
-    protected VaadinSession newSession() throws ServiceException {
+    VaadinSession newSession() throws ServiceException {
         VaadinSession vaadinSession = mock(VaadinSession.class);
 
         SessionInitEvent sessionInitEvent = mock(SessionInitEvent.class);

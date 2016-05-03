@@ -179,7 +179,7 @@ public class UIScopeTest extends ScopeTestBase {
     }
 
     private void setCurrentUi(Target target) {
-        when(currentUIProvider.getCurrentUI()).thenReturn(target);
+        when(currentUIProvider.get()).thenReturn(target);
     }
 
     private Target createTarget() {

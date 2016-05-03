@@ -1,11 +1,14 @@
 package com.vaadin.guice.server;
 
+import com.google.common.base.Optional;
 import com.google.inject.Module;
 
+import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.GuiceViewChangeListener;
 import com.vaadin.guice.annotation.UIModule;
+import com.vaadin.guice.annotation.ViewContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.UI;
@@ -13,11 +16,19 @@ import com.vaadin.ui.UI;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static com.vaadin.guice.server.PathUtil.preparePath;
 
 final class ReflectionUtils {
 
@@ -43,6 +54,19 @@ final class ReflectionUtils {
         }
 
         throw new IllegalArgumentException("no suitable constructor found for " + type);
+    }
+
+    static List<Module> getStaticModules(Configuration annotation, Reflections reflections) {
+        List<Module> hardWiredModules = new ArrayList<Module>(annotation.modules().length);
+
+        for (Class<? extends Module> moduleClass : annotation.modules()) {
+            try {
+                hardWiredModules.add(create(moduleClass, reflections));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return hardWiredModules;
     }
 
     @SuppressWarnings("unchecked")
@@ -112,4 +136,100 @@ final class ReflectionUtils {
         }
         return viewChangeListeners;
     }
+
+    static Optional<Field> getDefaultViewField(Class<? extends UI> uiClass) {
+
+        Field defaultViewField = null;
+
+        for (Field field : uiClass.getDeclaredFields()) {
+            if (field.getAnnotation(ViewContainer.class) == null) {
+                continue;
+            }
+
+            checkArgument(defaultViewField == null, "more than one field annotated with @ViewContainer in class " + uiClass);
+
+            defaultViewField = field;
+        }
+
+        if (defaultViewField == null) {
+            return Optional.absent();
+        }
+
+        defaultViewField.setAccessible(true);
+        return Optional.of(defaultViewField);
+    }
+
+    static Optional<Class<? extends View>> findErrorView(Set<Class<? extends View>> viewClasses) {
+
+        Class<? extends View> errorView = null;
+
+        for (Class<? extends View> viewClass : viewClasses) {
+            GuiceView annotation = viewClass.getAnnotation(GuiceView.class);
+
+            checkState(annotation != null);
+
+            if (annotation.isErrorView()) {
+                checkState(
+                        errorView == null,
+                        "%s and %s have an @GuiceView-annotation with isErrorView set to true",
+                        errorView,
+                        viewClass
+                );
+
+                errorView = viewClass;
+            }
+        }
+
+        return Optional.<Class<? extends View>>fromNullable(errorView);
+    }
+
+    @SuppressWarnings("unchecked")
+    static void detectUIs(Set<Class<? extends UI>> uiClasses, Map<String, Class<? extends UI>> pathToUIMap, Map<String, Class<? extends UI>> wildcardPathToUIMap, Map<Class<? extends UI>, Field> uiToDefaultViewField) {
+        Logger logger = Logger.getLogger(ReflectionUtils.class.getName());
+
+        logger.info("Checking the application context for Vaadin UIs");
+
+        for (Class<? extends UI> uiClass : uiClasses) {
+
+            logger.log(Level.INFO, "Found Vaadin UI [{0}]", uiClass.getCanonicalName());
+
+            GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
+
+            checkState(annotation != null);
+
+            String path = annotation.path();
+            path = preparePath(path);
+
+            Class<? extends UI> existingUiForPath = pathToUIMap.get(path);
+
+            checkState(
+                    existingUiForPath == null,
+                    "[%s] is already mapped to the path [%s]",
+                    existingUiForPath,
+                    path
+            );
+
+            logger.log(Level.INFO, "Mapping Vaadin UI [{0}] to path [{1}]",
+                    new Object[]{uiClass.getCanonicalName(), path});
+
+            if (path.endsWith("/*")) {
+                wildcardPathToUIMap.put(path.substring(0, path.length() - 2),
+                        uiClass);
+            } else {
+                pathToUIMap.put(path, uiClass);
+            }
+
+            final Optional<Field> defaultViewFieldOptional = getDefaultViewField(uiClass);
+
+            if(defaultViewFieldOptional.isPresent()){
+                uiToDefaultViewField.put(uiClass, defaultViewFieldOptional.get());
+            }
+        }
+
+        if (pathToUIMap.isEmpty()) {
+            logger.log(Level.WARNING, "Found no Vaadin UIs in the application context");
+        }
+    }
+
 }
+

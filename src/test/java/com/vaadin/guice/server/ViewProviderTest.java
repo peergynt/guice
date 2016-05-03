@@ -3,6 +3,9 @@ package com.vaadin.guice.server;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+import com.vaadin.guice.providers.CurrentUIProvider;
+import com.vaadin.guice.providers.VaadinServiceProvider;
+import com.vaadin.guice.providers.VaadinSessionProvider;
 import com.vaadin.server.ServiceException;
 
 import org.junit.Before;
@@ -17,28 +20,30 @@ import static com.vaadin.guice.server.ReflectionUtils.getViewChangeListenerClass
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 
 public class ViewProviderTest {
 
-    protected CurrentUIProvider currentUIProvider;
-    protected UIScoper uiScoper;
-    protected GuiceViewProvider viewProvider;
-    protected Injector injector;
-    private SessionProvider sessionProvider;
+    CurrentUIProvider currentUIProvider;
+    GuiceViewProvider viewProvider;
+    Injector injector;
+    private VaadinSessionProvider vaadinSessionProvider;
+    private VaadinServiceProvider vaadinServiceProvider;
 
     @Before
     public void setup() throws NoSuchFieldException, IllegalAccessException {
-        sessionProvider = mock(SessionProvider.class);
+        vaadinSessionProvider = mock(VaadinSessionProvider.class);
         currentUIProvider = mock(CurrentUIProvider.class);
+        vaadinServiceProvider = mock(VaadinServiceProvider.class);
 
         Reflections reflections = new Reflections("com.vaadin.guice.testClasses");
 
         VaadinModule vaadinModule = new VaadinModule(
-                sessionProvider,
-                getGuiceViewClasses(reflections),
-                getGuiceUIClasses(reflections),
-                getViewChangeListenerClasses(reflections),
-                currentUIProvider);
+            vaadinSessionProvider,
+            currentUIProvider,
+            vaadinServiceProvider,
+            reflections
+        );
 
         injector = Guice.createInjector(vaadinModule);
 
