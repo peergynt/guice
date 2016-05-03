@@ -2,6 +2,7 @@ package com.vaadin.guice.server;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 
 import com.vaadin.guice.providers.CurrentUIProvider;
 import com.vaadin.guice.providers.VaadinServiceProvider;
@@ -24,32 +25,23 @@ import static org.mockito.Mockito.mockingDetails;
 
 public class ViewProviderTest {
 
-    CurrentUIProvider currentUIProvider;
-    GuiceViewProvider viewProvider;
-    Injector injector;
-    private VaadinSessionProvider vaadinSessionProvider;
-    private VaadinServiceProvider vaadinServiceProvider;
+    private GuiceViewProvider viewProvider;
 
     @Before
     public void setup() throws NoSuchFieldException, IllegalAccessException {
-        vaadinSessionProvider = mock(VaadinSessionProvider.class);
-        currentUIProvider = mock(CurrentUIProvider.class);
-        vaadinServiceProvider = mock(VaadinServiceProvider.class);
+        VaadinSessionProvider vaadinSessionProvider = mock(VaadinSessionProvider.class);
+        CurrentUIProvider currentUIProvider = mock(CurrentUIProvider.class);
+        VaadinServiceProvider vaadinServiceProvider = mock(VaadinServiceProvider.class);
 
         Reflections reflections = new Reflections("com.vaadin.guice.testClasses");
 
-        VaadinModule vaadinModule = new VaadinModule(
-            vaadinSessionProvider,
-            currentUIProvider,
-            vaadinServiceProvider,
-            reflections
-        );
+        final GuiceVaadin guiceVaadin = new GuiceVaadin(
+                vaadinSessionProvider,
+                currentUIProvider,
+                vaadinServiceProvider,
+                reflections, new Class[]{});
 
-        injector = Guice.createInjector(vaadinModule);
-
-        final Field viewProviderField = VaadinModule.class.getDeclaredField("viewProvider");
-        viewProviderField.setAccessible(true);
-        viewProvider = (GuiceViewProvider) viewProviderField.get(vaadinModule);
+        viewProvider = guiceVaadin.getViewProvider();
     }
 
     @Test

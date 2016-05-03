@@ -56,10 +56,10 @@ final class ReflectionUtils {
         throw new IllegalArgumentException("no suitable constructor found for " + type);
     }
 
-    static List<Module> getStaticModules(Configuration annotation, Reflections reflections) {
-        List<Module> hardWiredModules = new ArrayList<Module>(annotation.modules().length);
+    static List<Module> getStaticModules(Class<? extends Module>[] modules, Reflections reflections) {
+        List<Module> hardWiredModules = new ArrayList<Module>(modules.length);
 
-        for (Class<? extends Module> moduleClass : annotation.modules()) {
+        for (Class<? extends Module> moduleClass : modules) {
             try {
                 hardWiredModules.add(create(moduleClass, reflections));
             } catch (Exception e) {
@@ -159,7 +159,7 @@ final class ReflectionUtils {
         return Optional.of(defaultViewField);
     }
 
-    static Optional<Class<? extends View>> findErrorView(Set<Class<? extends View>> viewClasses) {
+    static Optional<Class<? extends View>> findErrorView(Iterable<Class<? extends View>> viewClasses) {
 
         Class<? extends View> errorView = null;
 
@@ -184,7 +184,7 @@ final class ReflectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    static void detectUIs(Set<Class<? extends UI>> uiClasses, Map<String, Class<? extends UI>> pathToUIMap, Map<String, Class<? extends UI>> wildcardPathToUIMap, Map<Class<? extends UI>, Field> uiToDefaultViewField) {
+    static void detectUIs(Set<Class<? extends UI>> uiClasses, Map<String, Class<? extends UI>> pathToUIMap, Map<String, Class<? extends UI>> wildcardPathToUIMap) {
         Logger logger = Logger.getLogger(ReflectionUtils.class.getName());
 
         logger.info("Checking the application context for Vaadin UIs");
@@ -217,12 +217,6 @@ final class ReflectionUtils {
                         uiClass);
             } else {
                 pathToUIMap.put(path, uiClass);
-            }
-
-            final Optional<Field> defaultViewFieldOptional = getDefaultViewField(uiClass);
-
-            if(defaultViewFieldOptional.isPresent()){
-                uiToDefaultViewField.put(uiClass, defaultViewFieldOptional.get());
             }
         }
 

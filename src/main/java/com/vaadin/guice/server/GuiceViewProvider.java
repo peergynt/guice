@@ -56,12 +56,14 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
     private static final long serialVersionUID = 6113953554214462809L;
 
     private final Map<String, Class<? extends View>> viewNamesToViewClassesMap;
+    private final GuiceVaadin guiceVaadin;
     private final Map<VaadinSession, Map<String, View>> viewsBySessionMap;
     private final NavigableSet<String> viewNames;
 
-    public GuiceViewProvider(Set<Class<? extends View>> viewClasses) {
+    public GuiceViewProvider(Set<Class<? extends View>> viewClasses, GuiceVaadin guiceVaadin) {
 
         viewNamesToViewClassesMap = scanForViews(viewClasses);
+        this.guiceVaadin = guiceVaadin;
         // Set of view names sorted by their natural ordering (lexicographic).
         // This is useful for quickly looking up views by name
         viewNames = ImmutableSortedMap.copyOf(viewNamesToViewClassesMap).keySet();
@@ -156,7 +158,7 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
 
             checkArgument(viewClass != null, "no view for name %s registered", viewName);
 
-            view = InjectorHolder.getInjector().getInstance(viewClass);
+            view = guiceVaadin.assemble(viewClass);
             views.put(viewName, view);
         }
 

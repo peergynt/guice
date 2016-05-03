@@ -15,9 +15,6 @@
  */
 package com.vaadin.guice.server;
 
-import com.google.inject.Module;
-import com.google.inject.util.Modules;
-
 import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.server.VaadinServlet;
 
@@ -26,22 +23,15 @@ import org.reflections.Reflections;
 import javax.servlet.ServletException;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.inject.Guice.createInjector;
-import static com.google.inject.util.Modules.override;
-import static com.vaadin.guice.server.ReflectionUtils.getDynamicModules;
-import static com.vaadin.guice.server.ReflectionUtils.getStaticModules;
 
 /**
  * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin servlet} that adds a
  * {@link GuiceUIProvider} to every new Vaadin session
- *
- * @author Petter Holmström (petter@vaadin.com)
- * @author Josh Long (josh@joshlong.com)
  * @author Bernd Hopp (bernd@vaadin.com)
  */
 public class GuiceVaadinServlet extends VaadinServlet {
 
-    private final VaadinModule vaadinModule;
+    private final GuiceVaadin guiceVaadin;
 
     public GuiceVaadinServlet() {
         Configuration annotation = getClass().getAnnotation(Configuration.class);
@@ -58,23 +48,11 @@ public class GuiceVaadinServlet extends VaadinServlet {
 
         Reflections reflections = new Reflections((Object[]) annotation.basePackages());
 
-        /**
-         * combine bindings from the static modules in {@link Configuration#modules()} with those bindings
-         * from dynamically loaded modules, see {@link com.vaadin.guice.annotation.UIModule}.
-         */
-        Module dynamicAndStaticModules = override(getStaticModules(annotation, reflections)).with(getDynamicModules(reflections));
-
-        //sets up the basic vaadin stuff like UIProvider
-        this.vaadinModule = new VaadinModule(reflections);
-
-        //combines static modules, dynamic modules and the VaadinModule
-        Module combinedModule = Modules.combine(vaadinModule, dynamicAndStaticModules);
-
-        InjectorHolder.setInjector(createInjector(combinedModule));
+        this.guiceVaadin = new GuiceVaadin(reflections, annotation.modules());
     }
 
     @Override
     protected void servletInitialized() throws ServletException {
-        vaadinModule.vaadinInitialized();
+        guiceVaadin.vaadinInitialized();
     }
 }

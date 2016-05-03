@@ -13,60 +13,58 @@ import com.vaadin.guice.testClasses.StaticlyLoadedModule;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class UIModuleTest {
 
-    @Before
-    public void init() {
-        InjectorHolder.setInjector(null);
-    }
-
     @Test
-    public void dynamically_loaded_modules_should_override() {
-        new VaadinServletWithStaticAndDynamicLoadedModules();
+    public void dynamically_loaded_modules_should_override() throws NoSuchFieldException, IllegalAccessException {
+        GuiceVaadin guiceVaadin = getGuiceVaadin(new VaadinServletWithStaticAndDynamicLoadedModules());
 
-        AnInterface anInterface = InjectorHolder.getInjector().getInstance(AnInterface.class);
+        AnInterface anInterface = guiceVaadin.assemble(AnInterface.class);
 
         assertNotNull(anInterface);
         assertTrue(anInterface instanceof ASecondImplementation);
 
-        AnotherInterface anotherInterface = InjectorHolder.getInjector().getInstance(AnotherInterface.class);
+        AnotherInterface anotherInterface = guiceVaadin.assemble(AnotherInterface.class);
 
         assertNotNull(anotherInterface);
         assertTrue(anotherInterface instanceof AnotherInterfaceImplementation);
     }
 
     @Test
-    public void statically_loaded_modules_should_be_considered() {
-        new VaadinServletWithStaticLoadedModule();
+    public void statically_loaded_modules_should_be_considered() throws NoSuchFieldException, IllegalAccessException {
+        GuiceVaadin guiceVaadin = getGuiceVaadin(new VaadinServletWithStaticLoadedModule());
 
-        AnInterface anInterface = InjectorHolder.getInjector().getInstance(AnInterface.class);
+        AnInterface anInterface = guiceVaadin.assemble(AnInterface.class);
 
         assertNotNull(anInterface);
         assertTrue(anInterface instanceof AnImplementation);
 
-        AnotherInterface anotherInterface = InjectorHolder.getInjector().getInstance(AnotherInterface.class);
+        AnotherInterface anotherInterface = guiceVaadin.assemble(AnotherInterface.class);
 
         assertNotNull(anotherInterface);
         assertTrue(anotherInterface instanceof AnotherInterfaceImplementation);
     }
 
     @Test
-    public void dynamically_loaded_modules_should_be_considered() {
-        new VaadinServletWithDynamicLoadedModule();
+    public void dynamically_loaded_modules_should_be_considered() throws NoSuchFieldException, IllegalAccessException {
+        GuiceVaadin guiceVaadin = getGuiceVaadin(new VaadinServletWithDynamicLoadedModule());
 
-        AnInterface anInterface = InjectorHolder.getInjector().getInstance(AnInterface.class);
+        AnInterface anInterface = guiceVaadin.assemble(AnInterface.class);
 
         assertNotNull(anInterface);
         assertTrue(anInterface instanceof ASecondImplementation);
     }
 
     @Test(expected = ConfigurationException.class)
-    public void unbound_classes_should_not_be_available() {
-        new VaadinServletWithDynamicLoadedModule();
-        InjectorHolder.getInjector().getInstance(AnotherInterface.class);
+    public void unbound_classes_should_not_be_available() throws NoSuchFieldException, IllegalAccessException {
+        GuiceVaadin guiceVaadin = getGuiceVaadin(new VaadinServletWithDynamicLoadedModule());
+
+        guiceVaadin.assemble(AnotherInterface.class);
     }
 
     @Configuration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.testClasses")
@@ -79,5 +77,11 @@ public class UIModuleTest {
 
     @Configuration(modules = {}, basePackages = "com.vaadin.guice.testClasses")
     private static class VaadinServletWithDynamicLoadedModule extends GuiceVaadinServlet {
+    }
+    
+    private GuiceVaadin getGuiceVaadin(GuiceVaadinServlet servlet) throws NoSuchFieldException, IllegalAccessException {
+        final Field field = servlet.getClass().getField("guiceVaadin");
+        field.setAccessible(true);
+        return (GuiceVaadin) field.get(servlet);
     }
 }
