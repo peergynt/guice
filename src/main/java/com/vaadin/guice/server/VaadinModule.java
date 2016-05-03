@@ -8,29 +8,14 @@ import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.guice.providers.CurrentUIProvider;
-import com.vaadin.guice.providers.VaadinSessionProvider;
 import com.vaadin.guice.providers.VaadinServiceProvider;
+import com.vaadin.guice.providers.VaadinSessionProvider;
 import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewProvider;
-import com.vaadin.server.DefaultUIProvider;
-import com.vaadin.server.ServiceException;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.UIProvider;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
-
-import org.reflections.Reflections;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import static com.vaadin.guice.server.ReflectionUtils.getGuiceUIClasses;
-import static com.vaadin.guice.server.ReflectionUtils.getGuiceViewClasses;
-import static com.vaadin.guice.server.ReflectionUtils.getViewChangeListenerClasses;
 
 class VaadinModule extends AbstractModule{
 

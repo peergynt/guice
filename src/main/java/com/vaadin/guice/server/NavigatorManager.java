@@ -22,20 +22,15 @@ import static com.vaadin.guice.server.ReflectionUtils.getDefaultViewField;
 final class NavigatorManager {
 
     private final Map<Class<? extends UI>, Field> uiToDefaultViewField = new ConcurrentHashMap<Class<? extends UI>, Field>();
-    private final Optional<Class<? extends View>> errorView;
+    private final Optional<Class<? extends View>> errorViewClassOptional;
     private final GuiceVaadin guiceVaadin;
-    private final Iterable<Class<? extends ViewChangeListener>> viewChangeListeners;
-    private final ViewProvider viewProvider;
 
-    NavigatorManager(Iterable<Class<? extends UI>> knownUIs, Iterable<Class<? extends View>> knownViews, Iterable<Class<? extends ViewChangeListener>> viewChangeListeners, ViewProvider viewProvider,
-    GuiceVaadin guiceVaadin){
-        this.viewChangeListeners = viewChangeListeners;
-        this.viewProvider = viewProvider;
+    NavigatorManager(GuiceVaadin guiceVaadin){
 
-        this.errorView = findErrorView(knownViews);
+        this.errorViewClassOptional = findErrorView(guiceVaadin.getViews());
         this.guiceVaadin = guiceVaadin;
 
-        for (Class<? extends UI> knownUI : knownUIs) {
+        for (Class<? extends UI> knownUI : guiceVaadin.getUis()) {
             final Optional<Field> defaultViewFieldOptional = getDefaultViewField(knownUI);
 
             if(defaultViewFieldOptional.isPresent()){
@@ -44,7 +39,28 @@ final class NavigatorManager {
         }
     }
 
-    private Navigator createNavigator(UI instance, Object defaultView) {
+    void addNavigator(UI instance) {
+
+        Field defaultViewField = uiToDefaultViewField.get(instance.getClass());
+
+        if (defaultViewField == null) {
+            return;
+        }
+
+        Object defaultView;
+
+        try {
+            defaultView = defaultViewField.get(instance);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        checkNotNull(
+                defaultView,
+                "%s is annotated with @ViewContainer and therefore must not be null",
+                defaultViewField.getName()
+        );
+
         Navigator navigator;
 
         if (defaultView instanceof ComponentContainer) {
@@ -62,10 +78,10 @@ final class NavigatorManager {
             );
         }
 
-        if (errorView.isPresent()) {
+        if (errorViewClassOptional.isPresent()) {
             navigator.setErrorProvider(
                     new ViewProvider() {
-                        View instance;
+                        View view;
 
                         @Override
                         public String getViewName(String viewAndParameters) {
@@ -74,49 +90,23 @@ final class NavigatorManager {
 
                         @Override
                         public View getView(String viewName) {
-                            if(instance == null){
-                                instance = guiceVaadin.assemble(errorView.get());
+                            if(view == null){
+                                view = guiceVaadin.assemble(errorViewClassOptional.get());
                             }
 
-                            return instance;
+                            return view;
                         }
                     }
             );
         }
 
-        for (Class<? extends ViewChangeListener> viewChangeListenerClass : viewChangeListeners) {
+        for (Class<? extends ViewChangeListener> viewChangeListenerClass : guiceVaadin.getViewChangeListeners()) {
             ViewChangeListener viewChangeListener = guiceVaadin.assemble(viewChangeListenerClass);
             navigator.addViewChangeListener(viewChangeListener);
         }
 
-        navigator.addProvider(viewProvider);
+        navigator.addProvider(guiceVaadin.getViewProvider());
 
-        return navigator;
-    }
-
-    void addNavigator(UI instance) {
-
-        Field defaultViewField = uiToDefaultViewField.get(instance.getClass());
-
-        if (defaultViewField != null) {
-
-            Object defaultView;
-
-            try {
-                defaultView = defaultViewField.get(instance);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-
-            checkNotNull(
-                    defaultView,
-                    "%s is annotated with @ViewContainer and therefore must not be null",
-                    defaultViewField.getName()
-            );
-
-            Navigator navigator = createNavigator(instance, defaultView);
-
-            instance.setNavigator(navigator);
-        }
+        instance.setNavigator(navigator);
     }
 }

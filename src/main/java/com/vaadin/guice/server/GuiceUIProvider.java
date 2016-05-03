@@ -23,7 +23,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.util.CurrentInstance;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.vaadin.guice.server.PathUtil.extractUIPathFromRequest;
@@ -41,15 +40,13 @@ class GuiceUIProvider extends UIProvider {
 
     private final Map<String, Class<? extends UI>> pathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
     private final Map<String, Class<? extends UI>> wildcardPathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
-    private final UIScoper uiScoper;
     private final GuiceVaadin guiceVaadin;
+    private final NavigatorManager navigatorManager;
 
-    NavigatorManager navigatorManager;
-
-    GuiceUIProvider(Set<Class<? extends UI>> uiClasses, UIScoper uiScoper, GuiceVaadin guiceVaadin) {
-        this.uiScoper = uiScoper;
+    GuiceUIProvider(GuiceVaadin guiceVaadin) {
         this.guiceVaadin = guiceVaadin;
-        detectUIs(uiClasses, pathToUIMap, wildcardPathToUIMap);
+        detectUIs(guiceVaadin.getUis(), pathToUIMap, wildcardPathToUIMap);
+        this.navigatorManager = new NavigatorManager(guiceVaadin);
     }
 
     @Override
@@ -78,17 +75,17 @@ class GuiceUIProvider extends UIProvider {
         CurrentInstance.set(key, identifier);
 
         try {
-            uiScoper.startInitialization();
+            guiceVaadin.getUiScoper().startInitialization();
 
             UI instance = guiceVaadin.assemble(event.getUIClass());
 
             navigatorManager.addNavigator(instance);
 
-            uiScoper.endInitialization(instance);
+            guiceVaadin.getUiScoper().endInitialization(instance);
 
             return instance;
         } catch (RuntimeException e) {
-            uiScoper.rollbackInitialization();
+            guiceVaadin.getUiScoper().rollbackInitialization();
             throw e;
         } finally {
             CurrentInstance.set(key, null);

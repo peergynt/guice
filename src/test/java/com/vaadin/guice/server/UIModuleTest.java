@@ -80,7 +80,7 @@ public class UIModuleTest {
     }
     
     private GuiceVaadin getGuiceVaadin(GuiceVaadinServlet servlet) throws NoSuchFieldException, IllegalAccessException {
-        final Field field = servlet.getClass().getField("guiceVaadin");
+        final Field field = servlet.getClass().getSuperclass().getDeclaredField("guiceVaadin");
         field.setAccessible(true);
         return (GuiceVaadin) field.get(servlet);
     }

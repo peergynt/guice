@@ -3,7 +3,6 @@ package com.vaadin.guice.server;
 import com.google.common.base.Optional;
 import com.google.inject.Module;
 
-import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.GuiceViewChangeListener;
@@ -35,11 +34,11 @@ final class ReflectionUtils {
     private ReflectionUtils() {
     }
 
-    static Module create(Class<? extends Module> type, Reflections reflections) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        checkArgument(type.getConstructors().length == 1, type + " has more than 1 constructors");
+    private static Module create(Class<? extends Module> type, Reflections reflections) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        checkArgument(type.getDeclaredConstructors().length == 1, type + " has more than 1 constructors");
 
         @SuppressWarnings("unchecked")
-        Constructor<Module> constructor = (Constructor<Module>) type.getConstructors()[0];
+        Constructor<Module> constructor = (Constructor<Module>) type.getDeclaredConstructors()[0];
 
         constructor.setAccessible(true);
 
@@ -224,6 +223,5 @@ final class ReflectionUtils {
             logger.log(Level.WARNING, "Found no Vaadin UIs in the application context");
         }
     }
-
 }
 
