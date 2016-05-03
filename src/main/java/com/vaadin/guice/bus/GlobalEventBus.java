@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -37,7 +38,7 @@ import static com.google.common.base.Preconditions.checkState;
 @SuppressWarnings("unused")
 public class GlobalEventBus extends EventBus {
 
-    private final Map<VaadinSession, Set<Object>> registeredObjectsBySession = new HashMap<VaadinSession, Set<Object>>();
+    private final Map<VaadinSession, Set<Object>> registeredObjectsBySession = new ConcurrentHashMap<VaadinSession, Set<Object>>();
 
     GlobalEventBus() {
         VaadinService.getCurrent().addSessionInitListener(new SessionInitListener() {
