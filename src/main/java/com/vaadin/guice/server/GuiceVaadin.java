@@ -82,8 +82,6 @@ class GuiceVaadin implements SessionInitListener {
             Reflections reflections,
             Class<? extends Module>[] modules
     ) {
-        Set<Class<? extends UI>> uis = getGuiceUIClasses(reflections);
-
         Set<Class<? extends View>> views = getGuiceViewClasses(reflections);
 
         this.viewChangeListeners = getViewChangeListenerClasses(reflections);
@@ -177,11 +175,11 @@ class GuiceVaadin implements SessionInitListener {
         return injector.getInstance(type);
     }
 
-    public Set<Class<? extends UI>> getUis() {
+    Set<Class<? extends UI>> getUis() {
         return uis;
     }
 
-    public Set<Class<? extends ViewChangeListener>> getViewChangeListeners() {
+    Set<Class<? extends ViewChangeListener>> getViewChangeListeners() {
         return viewChangeListeners;
     }
 }

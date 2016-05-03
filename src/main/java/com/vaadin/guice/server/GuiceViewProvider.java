@@ -130,19 +130,6 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
         return null;
     }
 
-    String getViewName(Class<? extends View> viewClass) {
-
-        checkNotNull(viewClass);
-
-        for (Map.Entry<String, Class<? extends View>> entry : viewNamesToViewClassesMap.entrySet()) {
-            if (viewClass.equals(entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-
-        throw new IllegalArgumentException(viewClass + " is not a registered view-class");
-    }
-
     @Override
     public View getView(String viewName) {
         checkArgument(viewNames.contains(viewName), "%s is not a registered view-name", viewName);
