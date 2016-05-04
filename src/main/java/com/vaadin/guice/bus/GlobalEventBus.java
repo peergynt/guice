@@ -36,7 +36,6 @@ import static com.google.common.base.Preconditions.checkState;
  * @author Bernd Hopp (bernd@vaadin.com)
  */
 @Singleton
-@SuppressWarnings("unused")
 public class GlobalEventBus extends EventBus {
 
     private final Map<VaadinSession, Set<Object>> registeredObjectsBySession = new ConcurrentHashMap<VaadinSession, Set<Object>>();

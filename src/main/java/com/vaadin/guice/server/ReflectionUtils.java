@@ -182,7 +182,6 @@ final class ReflectionUtils {
         return Optional.<Class<? extends View>>fromNullable(errorView);
     }
 
-    @SuppressWarnings("unchecked")
     static void detectUIs(Set<Class<? extends UI>> uiClasses, Map<String, Class<? extends UI>> pathToUIMap, Map<String, Class<? extends UI>> wildcardPathToUIMap) {
         Logger logger = Logger.getLogger(ReflectionUtils.class.getName());
 

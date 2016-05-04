@@ -18,7 +18,6 @@ import com.vaadin.guice.annotation.UIScope;
  * @author Bernd Hopp (bernd@vaadin.com)
  */
 @UIScope
-@SuppressWarnings("unused")
 public final class UIEventBus extends EventBus {
     UIEventBus() {
     }

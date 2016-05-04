@@ -38,10 +38,10 @@ import static com.google.common.base.Preconditions.checkState;
 
 class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
 
-    private final Map<VaadinSession, Map<UI, Map<Key, Object>>> sessionToScopedObjectsMap = new ConcurrentHashMap<VaadinSession, Map<UI, Map<Key, Object>>>();
+    private final Map<VaadinSession, Map<UI, Map<Key<?>, Object>>> sessionToScopedObjectsMap = new ConcurrentHashMap<VaadinSession, Map<UI, Map<Key<?>, Object>>>();
     private final VaadinSessionProvider vaadinSessionProvider;
     private final CurrentUIProvider currentUIProvider;
-    private Map<Key, Object> currentInitializationScopeSet = null;
+    private Map<Key<?>, Object> currentInitializationScopeSet = null;
 
     UIScoper(VaadinSessionProvider vaadinSessionProvider, CurrentUIProvider currentUIProvider) {
         this.vaadinSessionProvider = vaadinSessionProvider;
@@ -61,7 +61,7 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
 
     void endInitialization(UI ui) {
         checkState(currentInitializationScopeSet != null);
-        final Map<UI, Map<Key, Object>> uiScopes = sessionToScopedObjectsMap.get(vaadinSessionProvider.get());
+        final Map<UI, Map<Key<?>, Object>> uiScopes = sessionToScopedObjectsMap.get(vaadinSessionProvider.get());
         checkState(uiScopes != null);
         uiScopes.put(ui, currentInitializationScopeSet);
         currentInitializationScopeSet = null;
@@ -73,7 +73,7 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
             @Override
             @SuppressWarnings("unchecked")
             public T get() {
-                Map<Key, Object> scopedObjects = getCurrentScopeMap();
+                Map<Key<?>, Object> scopedObjects = getCurrentScopeMap();
 
                 T t = (T) scopedObjects.get(key);
 
@@ -87,13 +87,13 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
         };
     }
 
-    private Map<Key, Object> getCurrentScopeMap() {
-        Map<Key, Object> scopedObjects;
+    private Map<Key<?>, Object> getCurrentScopeMap() {
+        Map<Key<?>, Object> scopedObjects;
 
         if (currentInitializationScopeSet != null) {
             scopedObjects = currentInitializationScopeSet;
         } else {
-            final Map<UI, Map<Key, Object>> sessionToUIScopes = sessionToScopedObjectsMap.get(vaadinSessionProvider.get());
+            final Map<UI, Map<Key<?>, Object>> sessionToUIScopes = sessionToScopedObjectsMap.get(vaadinSessionProvider.get());
             checkState(sessionToUIScopes != null);
             scopedObjects = sessionToUIScopes.get(currentUIProvider.get());
             checkState(scopedObjects != null);
@@ -103,15 +103,15 @@ class UIScoper implements Scope, SessionDestroyListener, SessionInitListener {
 
     @Override
     public void sessionDestroy(SessionDestroyEvent event) {
-        final Map<UI, Map<Key, Object>> map = checkNotNull(sessionToScopedObjectsMap.remove(event.getSession()));
+        final Map<UI, Map<Key<?>, Object>> map = checkNotNull(sessionToScopedObjectsMap.remove(event.getSession()));
 
-        for (Map<Key, Object> keyObjectMap : map.values()) {
+        for (Map<Key<?>, Object> keyObjectMap : map.values()) {
             KeyObjectMapPool.returnKeyObjectMap(keyObjectMap);
         }
     }
 
     @Override
     public void sessionInit(SessionInitEvent event) throws ServiceException {
-        sessionToScopedObjectsMap.put(event.getSession(), new HashMap<UI, Map<Key, Object>>());
+        sessionToScopedObjectsMap.put(event.getSession(), new HashMap<UI, Map<Key<?>, Object>>());
     }
 }

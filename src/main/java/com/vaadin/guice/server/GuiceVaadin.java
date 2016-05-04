@@ -3,7 +3,6 @@ package com.vaadin.guice.server;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 
-import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.providers.CurrentUIProvider;
 import com.vaadin.guice.providers.VaadinServiceProvider;
 import com.vaadin.guice.providers.VaadinSessionProvider;
