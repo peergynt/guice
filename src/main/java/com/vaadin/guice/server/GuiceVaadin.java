@@ -181,4 +181,8 @@ class GuiceVaadin implements SessionInitListener {
     Set<Class<? extends ViewChangeListener>> getViewChangeListeners() {
         return viewChangeListeners;
     }
+
+    Injector getInjector() {
+        return injector;
+    }
 }

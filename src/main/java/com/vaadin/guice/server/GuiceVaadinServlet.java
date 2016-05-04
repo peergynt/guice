@@ -15,6 +15,7 @@
  */
 package com.vaadin.guice.server;
 
+import com.google.inject.Injector;
 import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.server.VaadinServlet;
 
@@ -55,4 +56,9 @@ public class GuiceVaadinServlet extends VaadinServlet {
     protected void servletInitialized() throws ServletException {
         guiceVaadin.vaadinInitialized();
     }
+
+    protected Injector getInjector() {
+        return guiceVaadin.getInjector();
+    }
+
 }
