@@ -10,7 +10,6 @@ import com.vaadin.guice.testClasses.AnotherInterface;
 import com.vaadin.guice.testClasses.AnotherInterfaceImplementation;
 import com.vaadin.guice.testClasses.StaticlyLoadedModule;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;

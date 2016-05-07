@@ -1,9 +1,6 @@
 package com.vaadin.guice.server;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Module;
-
 import com.vaadin.guice.providers.CurrentUIProvider;
 import com.vaadin.guice.providers.VaadinServiceProvider;
 import com.vaadin.guice.providers.VaadinSessionProvider;
@@ -13,15 +10,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.reflections.Reflections;
 
-import java.lang.reflect.Field;
-
-import static com.vaadin.guice.server.ReflectionUtils.getGuiceUIClasses;
-import static com.vaadin.guice.server.ReflectionUtils.getGuiceViewClasses;
-import static com.vaadin.guice.server.ReflectionUtils.getViewChangeListenerClasses;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockingDetails;
 
 public class ViewProviderTest {
 
