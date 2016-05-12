@@ -81,6 +81,13 @@ class GuiceVaadin implements SessionInitListener {
             Reflections reflections,
             Class<? extends Module>[] modules
     ) {
+        /**
+         * combine bindings from the static modules in {@link Configuration#modules()} with those bindings
+         * from dynamically loaded modules, see {@link com.vaadin.guice.annotation.UIModule}.
+         * This is done first so modules can install their own reflections.
+         */
+        Module dynamicAndStaticModules = override(getStaticModules(modules, reflections)).with(getDynamicModules(reflections));
+
         Set<Class<? extends View>> views = getGuiceViewClasses(reflections);
 
         this.viewChangeListeners = getViewChangeListenerClasses(reflections);
@@ -93,12 +100,6 @@ class GuiceVaadin implements SessionInitListener {
         this.uiScoper = new UIScoper(vaadinSessionProvider, currentUIProvider);
         this.viewProvider = new GuiceViewProvider(views, this);
         this.guiceUIProvider = new GuiceUIProvider(this);
-        
-        /**
-         * combine bindings from the static modules in {@link Configuration#modules()} with those bindings
-         * from dynamically loaded modules, see {@link com.vaadin.guice.annotation.UIModule}.
-         */
-        Module dynamicAndStaticModules = override(getStaticModules(modules, reflections)).with(getDynamicModules(reflections));
 
         //sets up the basic vaadin stuff like UIProvider
         VaadinModule vaadinModule = new VaadinModule(this);
