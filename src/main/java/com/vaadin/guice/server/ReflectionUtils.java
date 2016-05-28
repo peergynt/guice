@@ -136,18 +136,27 @@ final class ReflectionUtils {
         return viewChangeListeners;
     }
 
-    static Optional<Field> getDefaultViewField(Class<? extends UI> uiClass) {
+    @SuppressWarnings("unchecked")
+    static Optional<ViewFieldAndNavigator> getDefaultViewFieldAndNavigator(Class<? extends UI> uiClass) {
 
         Field defaultViewField = null;
+        Class<? extends GuiceNavigator> navigatorClass = null;
 
-        for (Field field : uiClass.getDeclaredFields()) {
-            if (field.getAnnotation(ViewContainer.class) == null) {
-                continue;
+        while ((uiClass != null) && (uiClass != UI.class)) {
+            for (Field field : uiClass.getDeclaredFields()) {
+
+                final ViewContainer viewContainer = field.getAnnotation(ViewContainer.class);
+
+                if (viewContainer == null) {
+                    continue;
+                }
+
+                checkArgument(defaultViewField == null, "more than one field annotated with @ViewContainer in class " + uiClass);
+
+                defaultViewField = field;
+                navigatorClass = viewContainer.navigator();
             }
-
-            checkArgument(defaultViewField == null, "more than one field annotated with @ViewContainer in class " + uiClass);
-
-            defaultViewField = field;
+            uiClass = (Class<? extends UI>) uiClass.getSuperclass();
         }
 
         if (defaultViewField == null) {
@@ -155,7 +164,7 @@ final class ReflectionUtils {
         }
 
         defaultViewField.setAccessible(true);
-        return Optional.of(defaultViewField);
+        return Optional.of(new ViewFieldAndNavigator(defaultViewField, navigatorClass));
     }
 
     static Optional<Class<? extends View>> findErrorView(Iterable<Class<? extends View>> viewClasses) {

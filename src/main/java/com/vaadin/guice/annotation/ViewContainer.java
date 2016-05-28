@@ -15,6 +15,9 @@
  */
 package com.vaadin.guice.annotation;
 
+import com.vaadin.guice.server.GuiceNavigator;
+import com.vaadin.navigator.Navigator;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -60,4 +63,8 @@ import java.lang.annotation.Target;
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Documented
 public @interface ViewContainer {
+    /**
+     * the {@link Navigator} that is to be used for this ViewContainer
+     */
+    Class<? extends GuiceNavigator> navigator() default GuiceNavigator.class;
 }
