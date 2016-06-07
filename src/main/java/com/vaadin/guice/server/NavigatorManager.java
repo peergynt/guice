@@ -2,7 +2,6 @@ package com.vaadin.guice.server;
 
 import com.google.common.base.Optional;
 
-import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
@@ -17,11 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.vaadin.guice.server.ReflectionUtils.findErrorView;
-import static com.vaadin.guice.server.ReflectionUtils.getDefaultViewField;
+import static com.vaadin.guice.server.ReflectionUtils.getDefaultViewFieldAndNavigator;
 
 final class NavigatorManager {
 
-    private final Map<Class<? extends UI>, Field> uiToDefaultViewField = new ConcurrentHashMap<Class<? extends UI>, Field>();
+    private final Map<Class<? extends UI>, ViewFieldAndNavigator> uiToDefaultViewFieldAndNavigator = new ConcurrentHashMap<Class<? extends UI>, ViewFieldAndNavigator>();
     private final Optional<Class<? extends View>> errorViewClassOptional;
     private final GuiceVaadin guiceVaadin;
 
@@ -31,26 +30,31 @@ final class NavigatorManager {
         this.guiceVaadin = guiceVaadin;
 
         for (Class<? extends UI> knownUI : guiceVaadin.getUis()) {
-            final Optional<Field> defaultViewFieldOptional = getDefaultViewField(knownUI);
+            final Optional<ViewFieldAndNavigator> defaultViewFieldOptional = getDefaultViewFieldAndNavigator(knownUI);
 
             if(defaultViewFieldOptional.isPresent()){
-                uiToDefaultViewField.put(knownUI, defaultViewFieldOptional.get());
+                uiToDefaultViewFieldAndNavigator.put(knownUI, defaultViewFieldOptional.get());
             }
         }
     }
 
-    void addNavigator(UI instance) {
+    void addNavigator(UI ui) {
 
-        Field defaultViewField = uiToDefaultViewField.get(instance.getClass());
+        final Class<? extends UI> uiClass = ui.getClass();
 
-        if (defaultViewField == null) {
+        ViewFieldAndNavigator viewFieldAndNavigator = uiToDefaultViewFieldAndNavigator.get(uiClass);
+
+        if (viewFieldAndNavigator == null) {
             return;
         }
+
+        Field defaultViewField = viewFieldAndNavigator.getViewField();
+        Class<? extends GuiceNavigator> navigatorClass = viewFieldAndNavigator.getNavigator();
 
         Object defaultView;
 
         try {
-            defaultView = defaultViewField.get(instance);
+            defaultView = defaultViewField.get(ui);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -61,14 +65,14 @@ final class NavigatorManager {
                 defaultViewField.getName()
         );
 
-        Navigator navigator;
+        GuiceNavigator navigator = guiceVaadin.assemble(navigatorClass);
 
-        if (defaultView instanceof ComponentContainer) {
-            navigator = new Navigator(instance, (ComponentContainer) defaultView);
+        if (defaultView instanceof ViewDisplay) {
+            navigator.init(ui, (ViewDisplay)defaultView);
+        } else if (defaultView instanceof ComponentContainer) {
+            navigator.init(ui, (ComponentContainer)defaultView);
         } else if (defaultView instanceof SingleComponentContainer) {
-            navigator = new Navigator(instance, (SingleComponentContainer) defaultView);
-        } else if (defaultView instanceof ViewDisplay) {
-            navigator = new Navigator(instance, (ViewDisplay) defaultView);
+            navigator.init(ui, (SingleComponentContainer)defaultView);
         } else {
             throw new IllegalArgumentException(
                     String.format(
@@ -107,6 +111,6 @@ final class NavigatorManager {
 
         navigator.addProvider(guiceVaadin.getViewProvider());
 
-        instance.setNavigator(navigator);
+        ui.setNavigator(navigator);
     }
 }
