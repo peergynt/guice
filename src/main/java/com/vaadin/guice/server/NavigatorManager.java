@@ -104,8 +104,8 @@ final class NavigatorManager {
         }
 
         for (Class<? extends ViewChangeListener> viewChangeListenerClass : guiceVaadin.getViewChangeListeners(uiClass)) {
-                ViewChangeListener viewChangeListener = guiceVaadin.assemble(viewChangeListenerClass);
-                navigator.addViewChangeListener(viewChangeListener);
+            ViewChangeListener viewChangeListener = guiceVaadin.assemble(viewChangeListenerClass);
+            navigator.addViewChangeListener(viewChangeListener);
         }
 
         navigator.addProvider(guiceVaadin.getViewProvider());
@@ -115,7 +115,7 @@ final class NavigatorManager {
 
     private boolean contains(Class<? extends UI>[] applicableUIs, Class<? extends UI> uiClass) {
         for (Class<? extends UI> applicableUiClass : applicableUIs) {
-            if(uiClass.equals(applicableUiClass)){
+            if (uiClass.equals(applicableUiClass)) {
                 return true;
             }
         }

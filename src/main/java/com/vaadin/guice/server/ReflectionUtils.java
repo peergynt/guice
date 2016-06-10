@@ -126,7 +126,7 @@ final class ReflectionUtils {
 
         Map<Class<? extends UI>, Set<Class<? extends ViewChangeListener>>> viewChangeListenersByUI = new HashMap<Class<? extends UI>, Set<Class<? extends ViewChangeListener>>>();
 
-        final Set<Class<? extends ViewChangeListener>> allViewChangeListenerClasses = (Set<Class<? extends ViewChangeListener>>)reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class, true);
+        final Set<Class<? extends ViewChangeListener>> allViewChangeListenerClasses = (Set<Class<? extends ViewChangeListener>>) reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class, true);
 
         for (Class<? extends UI> uiClass : uiClasses) {
             viewChangeListenersByUI.put(uiClass, new HashSet<Class<? extends ViewChangeListener>>());
@@ -141,7 +141,7 @@ final class ReflectionUtils {
 
             final GuiceViewChangeListener annotation = viewChangeListenerClass.getAnnotation(GuiceViewChangeListener.class);
 
-            if(annotation.applicableUIs().length == 0){
+            if (annotation.applicableUIs().length == 0) {
                 for (Set<Class<? extends ViewChangeListener>> viewChangeListenersForUI : viewChangeListenersByUI.values()) {
                     viewChangeListenersForUI.add(viewChangeListenerClass);
                 }
