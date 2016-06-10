@@ -20,7 +20,6 @@ import com.vaadin.server.UIClassSelectionEvent;
 import com.vaadin.server.UICreateEvent;
 import com.vaadin.server.UIProvider;
 import com.vaadin.ui.UI;
-import com.vaadin.util.CurrentInstance;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,10 +69,6 @@ class GuiceUIProvider extends UIProvider {
 
     @Override
     public UI createInstance(UICreateEvent event) {
-        final Class<UIID> key = UIID.class;
-        final UIID identifier = new UIID(event);
-        CurrentInstance.set(key, identifier);
-
         try {
             guiceVaadin.getUiScoper().startInitialization();
 
@@ -87,8 +82,6 @@ class GuiceUIProvider extends UIProvider {
         } catch (RuntimeException e) {
             guiceVaadin.getUiScoper().rollbackInitialization();
             throw e;
-        } finally {
-            CurrentInstance.set(key, null);
         }
     }
 }
