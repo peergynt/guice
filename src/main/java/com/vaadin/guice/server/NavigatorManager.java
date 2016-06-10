@@ -112,14 +112,4 @@ final class NavigatorManager {
 
         ui.setNavigator(navigator);
     }
-
-    private boolean contains(Class<? extends UI>[] applicableUIs, Class<? extends UI> uiClass) {
-        for (Class<? extends UI> applicableUiClass : applicableUIs) {
-            if (uiClass.equals(applicableUiClass)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }
