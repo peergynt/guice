@@ -47,7 +47,8 @@ class GuiceVaadin implements SessionInitListener {
     private final CurrentUIProvider currentUIProvider;
     private final VaadinServiceProvider vaadinServiceProvider;
     private final Injector injector;
-    
+    private VaadinSessionScoper vaadinSessionScoper;
+
     //used for non-testing
     GuiceVaadin(Reflections reflections, Class<? extends Module>[] modules){
         this(
@@ -98,6 +99,7 @@ class GuiceVaadin implements SessionInitListener {
         this.views = views;
         this.uis = getGuiceUIClasses(reflections);
         this.uiScoper = new UIScoper(vaadinSessionProvider, currentUIProvider);
+        this.vaadinSessionScoper = new VaadinSessionScoper(vaadinSessionProvider);
         this.viewProvider = new GuiceViewProvider(views, this);
         this.guiceUIProvider = new GuiceUIProvider(this);
 
@@ -141,6 +143,7 @@ class GuiceVaadin implements SessionInitListener {
         service.addSessionInitListener(uiScoper);
         service.addSessionDestroyListener(viewProvider);
         service.addSessionInitListener(viewProvider);
+        service.addSessionDestroyListener(vaadinSessionScoper);
     }
 
     GuiceViewProvider getViewProvider() {
@@ -185,5 +188,9 @@ class GuiceVaadin implements SessionInitListener {
 
     Injector getInjector() {
         return injector;
+    }
+
+    VaadinSessionScoper getVaadinSessionScoper() {
+        return vaadinSessionScoper;
     }
 }
