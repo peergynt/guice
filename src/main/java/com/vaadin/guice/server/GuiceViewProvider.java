@@ -17,7 +17,6 @@ package com.vaadin.guice.server;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
-import com.google.inject.Singleton;
 
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.navigator.View;
@@ -49,7 +48,6 @@ import static java.lang.Character.toLowerCase;
  * @author Bernd Hopp (bernd@vaadin.com)
  * @see GuiceView
  */
-@Singleton
 class GuiceViewProvider implements ViewProvider, SessionDestroyListener, SessionInitListener {
 
     private static final long serialVersionUID = 6113953554214462809L;
@@ -59,7 +57,7 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
     private final Map<VaadinSession, Map<String, View>> viewsBySessionMap;
     private final NavigableSet<String> viewNames;
 
-    public GuiceViewProvider(Set<Class<? extends View>> viewClasses, GuiceVaadin guiceVaadin) {
+    GuiceViewProvider(Set<Class<? extends View>> viewClasses, GuiceVaadin guiceVaadin) {
 
         viewNamesToViewClassesMap = scanForViews(viewClasses);
         this.guiceVaadin = guiceVaadin;
