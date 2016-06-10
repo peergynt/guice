@@ -17,9 +17,6 @@ package com.vaadin.guice.server;
 
 import com.google.inject.Module;
 
-import com.vaadin.guice.providers.CurrentUIProvider;
-import com.vaadin.guice.providers.VaadinServiceProvider;
-import com.vaadin.guice.providers.VaadinSessionProvider;
 import com.vaadin.guice.testClasses.Target;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;

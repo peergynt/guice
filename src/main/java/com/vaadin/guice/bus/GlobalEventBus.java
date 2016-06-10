@@ -2,9 +2,9 @@ package com.vaadin.guice.bus;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
-import com.vaadin.guice.providers.VaadinSessionProvider;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionDestroyEvent;
 import com.vaadin.server.SessionDestroyListener;
@@ -39,10 +39,10 @@ import static com.google.common.base.Preconditions.checkState;
 public class GlobalEventBus extends EventBus {
 
     private final Map<VaadinSession, Set<Object>> registeredObjectsBySession = new ConcurrentHashMap<VaadinSession, Set<Object>>();
-    private final VaadinSessionProvider vaadinSessionProvider;
+    private final Provider<VaadinSession> vaadinSessionProvider;
 
     @Inject
-    GlobalEventBus(VaadinService vaadinService, VaadinSessionProvider vaadinSessionProvider) {
+    GlobalEventBus(VaadinService vaadinService, Provider<VaadinSession> vaadinSessionProvider) {
         this.vaadinSessionProvider = vaadinSessionProvider;
         vaadinService.addSessionInitListener(new SessionInitListener() {
             @Override

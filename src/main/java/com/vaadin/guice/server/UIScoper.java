@@ -19,8 +19,6 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 
-import com.vaadin.guice.providers.CurrentUIProvider;
-import com.vaadin.guice.providers.VaadinSessionProvider;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionDestroyEvent;
 import com.vaadin.server.SessionDestroyListener;

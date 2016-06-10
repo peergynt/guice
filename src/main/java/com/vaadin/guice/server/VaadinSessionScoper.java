@@ -4,7 +4,6 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 
-import com.vaadin.guice.providers.VaadinSessionProvider;
 import com.vaadin.server.SessionDestroyEvent;
 import com.vaadin.server.SessionDestroyListener;
 import com.vaadin.server.VaadinSession;
@@ -28,6 +27,7 @@ class VaadinSessionScoper implements Scope, SessionDestroyListener {
 
         return new Provider<T>() {
             @Override
+            @SuppressWarnings("unchecked")
             public T get() {
                 T t = (T) scopedObjects.get(key);
 
