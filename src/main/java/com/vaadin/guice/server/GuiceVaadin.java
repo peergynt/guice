@@ -18,6 +18,7 @@ import org.reflections.Reflections;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.google.inject.Guice.createInjector;
@@ -40,7 +41,7 @@ class GuiceVaadin implements SessionInitListener {
     private final VaadinSessionProvider vaadinSessionProvider;
     private final Set<Class<? extends UI>> uis;
     private final Set<Class<? extends View>> views;
-    private final Set<Class<? extends ViewChangeListener>> viewChangeListeners;
+    private final Map<Class<? extends UI>, Set<Class<? extends ViewChangeListener>>> viewChangeListeners;
     private final CurrentUIProvider currentUIProvider;
     private final VaadinServiceProvider vaadinServiceProvider;
     private final Injector injector;
@@ -79,7 +80,7 @@ class GuiceVaadin implements SessionInitListener {
             Reflections reflections,
             Class<? extends Module>[] modules
     ) {
-        /**
+        /*
          * combine bindings from the static modules in {@link Configuration#modules()} with those bindings
          * from dynamically loaded modules, see {@link com.vaadin.guice.annotation.UIModule}.
          * This is done first so modules can install their own reflections.
@@ -88,13 +89,14 @@ class GuiceVaadin implements SessionInitListener {
 
         Set<Class<? extends View>> views = getGuiceViewClasses(reflections);
 
-        this.viewChangeListeners = getViewChangeListenerClasses(reflections);
+        this.uis = getGuiceUIClasses(reflections);
+        this.viewChangeListeners = getViewChangeListenerClasses(reflections, uis);
         this.vaadinSessionProvider = vaadinSessionProvider;
         this.currentUIProvider = currentUIProvider;
         this.vaadinServiceProvider = vaadinServiceProvider;
 
         this.views = views;
-        this.uis = getGuiceUIClasses(reflections);
+
         this.uiScoper = new UIScoper(vaadinSessionProvider, currentUIProvider);
         this.vaadinSessionScoper = new VaadinSessionScoper(vaadinSessionProvider);
         this.viewProvider = new GuiceViewProvider(views, this);
@@ -179,8 +181,8 @@ class GuiceVaadin implements SessionInitListener {
         return uis;
     }
 
-    Set<Class<? extends ViewChangeListener>> getViewChangeListeners() {
-        return viewChangeListeners;
+    Set<Class<? extends ViewChangeListener>> getViewChangeListeners(Class<? extends UI> uiClass) {
+        return viewChangeListeners.get(uiClass);
     }
 
     Injector getInjector() {

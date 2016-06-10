@@ -25,7 +25,6 @@ final class NavigatorManager {
     private final GuiceVaadin guiceVaadin;
 
     NavigatorManager(GuiceVaadin guiceVaadin) {
-
         this.errorViewClassOptional = findErrorView(guiceVaadin.getViews());
         this.guiceVaadin = guiceVaadin;
 
@@ -104,13 +103,23 @@ final class NavigatorManager {
             );
         }
 
-        for (Class<? extends ViewChangeListener> viewChangeListenerClass : guiceVaadin.getViewChangeListeners()) {
-            ViewChangeListener viewChangeListener = guiceVaadin.assemble(viewChangeListenerClass);
-            navigator.addViewChangeListener(viewChangeListener);
+        for (Class<? extends ViewChangeListener> viewChangeListenerClass : guiceVaadin.getViewChangeListeners(uiClass)) {
+                ViewChangeListener viewChangeListener = guiceVaadin.assemble(viewChangeListenerClass);
+                navigator.addViewChangeListener(viewChangeListener);
         }
 
         navigator.addProvider(guiceVaadin.getViewProvider());
 
         ui.setNavigator(navigator);
+    }
+
+    private boolean contains(Class<? extends UI>[] applicableUIs, Class<? extends UI> uiClass) {
+        for (Class<? extends UI> applicableUiClass : applicableUIs) {
+            if(uiClass.equals(applicableUiClass)){
+                return true;
+            }
+        }
+
+        return false;
     }
 }

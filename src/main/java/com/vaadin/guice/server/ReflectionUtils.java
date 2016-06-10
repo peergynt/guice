@@ -18,6 +18,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -121,19 +122,46 @@ final class ReflectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    static Set<Class<? extends ViewChangeListener>> getViewChangeListenerClasses(Reflections reflections) {
-        Set<Class<? extends ViewChangeListener>> viewChangeListeners = new HashSet<Class<? extends ViewChangeListener>>();
+    static Map<Class<? extends UI>, Set<Class<? extends ViewChangeListener>>> getViewChangeListenerClasses(Reflections reflections, Set<Class<? extends UI>> uiClasses) {
 
-        for (Class<?> viewChangeListenerClass : reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class, true)) {
+        Map<Class<? extends UI>, Set<Class<? extends ViewChangeListener>>> viewChangeListenersByUI = new HashMap<Class<? extends UI>, Set<Class<? extends ViewChangeListener>>>();
+
+        final Set<Class<? extends ViewChangeListener>> allViewChangeListenerClasses = (Set<Class<? extends ViewChangeListener>>)reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class, true);
+
+        for (Class<? extends UI> uiClass : uiClasses) {
+            viewChangeListenersByUI.put(uiClass, new HashSet<Class<? extends ViewChangeListener>>());
+        }
+
+        for (Class<? extends ViewChangeListener> viewChangeListenerClass : allViewChangeListenerClasses) {
             checkArgument(
                     ViewChangeListener.class.isAssignableFrom(viewChangeListenerClass),
                     "class %s is annotated with @GuiceViewChangeListener but does not implement com.vaadin.navigator.ViewChangeListener",
                     viewChangeListenerClass
             );
 
-            viewChangeListeners.add((Class<? extends ViewChangeListener>) viewChangeListenerClass);
+            final GuiceViewChangeListener annotation = viewChangeListenerClass.getAnnotation(GuiceViewChangeListener.class);
+
+            if(annotation.applicableUIs().length == 0){
+                for (Set<Class<? extends ViewChangeListener>> viewChangeListenersForUI : viewChangeListenersByUI.values()) {
+                    viewChangeListenersForUI.add(viewChangeListenerClass);
+                }
+            } else {
+                for (Class<? extends UI> applicableUiClass : annotation.applicableUIs()) {
+                    final Set<Class<? extends ViewChangeListener>> viewChangeListenersForUI = viewChangeListenersByUI.get(applicableUiClass);
+
+                    checkArgument(
+                            viewChangeListenersForUI != null,
+                            "%s is listed as applicableUi in the @GuiceViewChangeListener-annotation of %s, but is not annotated with @GuiceUI"
+                    );
+
+                    //TODO check if applicableUiClass has @ViewContainer
+
+                    viewChangeListenersForUI.add(viewChangeListenerClass);
+                }
+            }
         }
-        return viewChangeListeners;
+
+        return viewChangeListenersByUI;
     }
 
     @SuppressWarnings("unchecked")
