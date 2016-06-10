@@ -24,7 +24,7 @@ final class NavigatorManager {
     private final Optional<Class<? extends View>> errorViewClassOptional;
     private final GuiceVaadin guiceVaadin;
 
-    NavigatorManager(GuiceVaadin guiceVaadin){
+    NavigatorManager(GuiceVaadin guiceVaadin) {
 
         this.errorViewClassOptional = findErrorView(guiceVaadin.getViews());
         this.guiceVaadin = guiceVaadin;
@@ -32,7 +32,7 @@ final class NavigatorManager {
         for (Class<? extends UI> knownUI : guiceVaadin.getUis()) {
             final Optional<ViewFieldAndNavigator> defaultViewFieldOptional = getDefaultViewFieldAndNavigator(knownUI);
 
-            if(defaultViewFieldOptional.isPresent()){
+            if (defaultViewFieldOptional.isPresent()) {
                 uiToDefaultViewFieldAndNavigator.put(knownUI, defaultViewFieldOptional.get());
             }
         }
@@ -68,11 +68,11 @@ final class NavigatorManager {
         GuiceNavigator navigator = guiceVaadin.assemble(navigatorClass);
 
         if (defaultView instanceof ViewDisplay) {
-            navigator.init(ui, (ViewDisplay)defaultView);
+            navigator.init(ui, (ViewDisplay) defaultView);
         } else if (defaultView instanceof ComponentContainer) {
-            navigator.init(ui, (ComponentContainer)defaultView);
+            navigator.init(ui, (ComponentContainer) defaultView);
         } else if (defaultView instanceof SingleComponentContainer) {
-            navigator.init(ui, (SingleComponentContainer)defaultView);
+            navigator.init(ui, (SingleComponentContainer) defaultView);
         } else {
             throw new IllegalArgumentException(
                     String.format(
@@ -94,7 +94,7 @@ final class NavigatorManager {
 
                         @Override
                         public View getView(String viewName) {
-                            if(view == null){
+                            if (view == null) {
                                 view = guiceVaadin.assemble(errorViewClassOptional.get());
                             }
 

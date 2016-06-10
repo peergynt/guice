@@ -47,7 +47,7 @@ class GuiceVaadin implements SessionInitListener {
     private VaadinSessionScoper vaadinSessionScoper;
 
     //used for non-testing
-    GuiceVaadin(Reflections reflections, Class<? extends Module>[] modules){
+    GuiceVaadin(Reflections reflections, Class<? extends Module>[] modules) {
         this(
                 new VaadinSessionProvider() {
                     @Override
@@ -170,8 +170,8 @@ class GuiceVaadin implements SessionInitListener {
     VaadinServiceProvider getVaadinServiceProvider() {
         return vaadinServiceProvider;
     }
-    
-    <T> T assemble(Class<T> type){
+
+    <T> T assemble(Class<T> type) {
         return injector.getInstance(type);
     }
 

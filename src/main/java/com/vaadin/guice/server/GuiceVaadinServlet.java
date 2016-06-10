@@ -16,6 +16,7 @@
 package com.vaadin.guice.server;
 
 import com.google.inject.Injector;
+
 import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.server.VaadinServlet;
 
@@ -28,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * Subclass of the standard {@link com.vaadin.server.VaadinServlet Vaadin servlet} that adds a
  * {@link GuiceUIProvider} to every new Vaadin session
+ *
  * @author Bernd Hopp (bernd@vaadin.com)
  */
 public class GuiceVaadinServlet extends VaadinServlet {

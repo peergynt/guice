@@ -3,7 +3,7 @@ package com.vaadin.guice.server;
 import com.vaadin.server.VaadinRequest;
 
 final class PathUtil {
-    private PathUtil(){
+    private PathUtil() {
     }
 
     static String preparePath(String path) {

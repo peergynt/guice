@@ -34,10 +34,10 @@ import static org.mockito.Mockito.when;
 
 public abstract class ScopeTestBase {
 
+    protected GuiceVaadin guiceVaadin;
     private CurrentUIProvider currentUIProvider;
     private VaadinSessionProvider vaadinSessionProvider;
     private VaadinServiceProvider vaadinServiceProvider;
-    protected GuiceVaadin guiceVaadin;
 
     @Before
     public void setup() throws NoSuchFieldException, IllegalAccessException {

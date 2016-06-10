@@ -24,8 +24,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation will put elements in guice's 'VadinSession'-scope, so for every {@link com.vaadin.server.VaadinSession}
- * constructed by guice, there is exactly one instance of any given type in the VaadinSession-scope.
+ * This annotation will put elements in guice's 'VadinSession'-scope, so for every {@link
+ * com.vaadin.server.VaadinSession} constructed by guice, there is exactly one instance of any given
+ * type in the VaadinSession-scope.
  *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Josh Long (josh@joshlong.com)

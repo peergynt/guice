@@ -31,7 +31,7 @@ class VaadinSessionScoper implements Scope, SessionDestroyListener {
             public T get() {
                 T t = (T) scopedObjects.get(key);
 
-                if(t == null){
+                if (t == null) {
                     t = unscoped.get();
                     scopedObjects.put(key, t);
                 }
@@ -44,7 +44,7 @@ class VaadinSessionScoper implements Scope, SessionDestroyListener {
     private Map<Key<?>, Object> getOrCreateScopedObjectsMap() {
         Map<Key<?>, Object> scopedObjects = scopedObjectsBySession.get(vaadinSessionProvider.get());
 
-        if(scopedObjects == null){
+        if (scopedObjects == null) {
             scopedObjects = KeyObjectMapPool.getKeyObjectMap();
             scopedObjectsBySession.put(vaadinSessionProvider.get(), scopedObjects);
         }
@@ -55,7 +55,7 @@ class VaadinSessionScoper implements Scope, SessionDestroyListener {
     public void sessionDestroy(SessionDestroyEvent event) {
         final Map<Key<?>, Object> map = scopedObjectsBySession.remove(event.getSession());
 
-        if(map != null){
+        if (map != null) {
             KeyObjectMapPool.returnKeyObjectMap(map);
         }
     }

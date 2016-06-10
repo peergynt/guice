@@ -66,6 +66,12 @@ public class UIModuleTest {
         guiceVaadin.assemble(AnotherInterface.class);
     }
 
+    private GuiceVaadin getGuiceVaadin(GuiceVaadinServlet servlet) throws NoSuchFieldException, IllegalAccessException {
+        final Field field = servlet.getClass().getSuperclass().getDeclaredField("guiceVaadin");
+        field.setAccessible(true);
+        return (GuiceVaadin) field.get(servlet);
+    }
+
     @Configuration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.testClasses")
     private static class VaadinServletWithStaticAndDynamicLoadedModules extends GuiceVaadinServlet {
     }
@@ -76,11 +82,5 @@ public class UIModuleTest {
 
     @Configuration(modules = {}, basePackages = "com.vaadin.guice.testClasses")
     private static class VaadinServletWithDynamicLoadedModule extends GuiceVaadinServlet {
-    }
-    
-    private GuiceVaadin getGuiceVaadin(GuiceVaadinServlet servlet) throws NoSuchFieldException, IllegalAccessException {
-        final Field field = servlet.getClass().getSuperclass().getDeclaredField("guiceVaadin");
-        field.setAccessible(true);
-        return (GuiceVaadin) field.get(servlet);
     }
 }

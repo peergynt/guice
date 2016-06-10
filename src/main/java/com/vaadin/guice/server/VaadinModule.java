@@ -15,7 +15,7 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
-class VaadinModule extends AbstractModule{
+class VaadinModule extends AbstractModule {
 
     private final GuiceVaadin guiceVaadin;
 
