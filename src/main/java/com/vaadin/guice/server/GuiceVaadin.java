@@ -2,7 +2,9 @@ package com.vaadin.guice.server;
 
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Provider;
 
+import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.DefaultUIProvider;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.inject.Guice.createInjector;
 import static com.google.inject.util.Modules.combine;
 import static com.google.inject.util.Modules.override;
@@ -38,31 +41,42 @@ class GuiceVaadin implements SessionInitListener {
     private final GuiceViewProvider viewProvider;
     private final GuiceUIProvider guiceUIProvider;
     private final UIScoper uiScoper;
-    private final VaadinSessionProvider vaadinSessionProvider;
+    private final Provider<VaadinSession> vaadinSessionProvider;
     private final Set<Class<? extends UI>> uis;
     private final Set<Class<? extends View>> views;
     private final Map<Class<? extends UI>, Set<Class<? extends ViewChangeListener>>> viewChangeListeners;
-    private final CurrentUIProvider currentUIProvider;
-    private final VaadinServiceProvider vaadinServiceProvider;
+    private final Provider<UI> currentUIProvider;
+    private final Provider<VaadinService> vaadinServiceProvider;
     private final Injector injector;
-    private VaadinSessionScoper vaadinSessionScoper;
+    private final VaadinSessionScoper vaadinSessionScoper;
+    private final ViewScoper viewScoper;
 
     //used for non-testing
     GuiceVaadin(Reflections reflections, Class<? extends Module>[] modules) {
         this(
-                new VaadinSessionProvider() {
+                new Provider<VaadinSession>() {
                     @Override
                     public VaadinSession get() {
                         return VaadinSession.getCurrent();
                     }
                 },
-                new CurrentUIProvider() {
+                new Provider<UI>() {
                     @Override
                     public UI get() {
                         return UI.getCurrent();
                     }
                 },
-                new VaadinServiceProvider() {
+                new Provider<View>() {
+                    @Override
+                    public View get() {
+                        final Navigator navigator = UI.getCurrent().getNavigator();
+
+                        checkState(navigator != null);
+
+                        return navigator.getCurrentView();
+                    }
+                },
+                new Provider<VaadinService>() {
                     @Override
                     public VaadinService get() {
                         return VaadinService.getCurrent();
@@ -74,9 +88,10 @@ class GuiceVaadin implements SessionInitListener {
     }
 
     GuiceVaadin(
-            VaadinSessionProvider vaadinSessionProvider,
-            CurrentUIProvider currentUIProvider,
-            VaadinServiceProvider vaadinServiceProvider,
+            Provider<VaadinSession> vaadinSessionProvider,
+            Provider<UI> currentUIProvider,
+            Provider<View> currentViewProvider,
+            Provider<VaadinService> vaadinServiceProvider,
             Reflections reflections,
             Class<? extends Module>[] modules
     ) {
@@ -98,6 +113,7 @@ class GuiceVaadin implements SessionInitListener {
         this.views = views;
 
         this.uiScoper = new UIScoper(vaadinSessionProvider, currentUIProvider);
+        this.viewScoper = new ViewScoper(vaadinSessionProvider, currentViewProvider);
         this.vaadinSessionScoper = new VaadinSessionScoper(vaadinSessionProvider);
         this.viewProvider = new GuiceViewProvider(views, this);
         this.guiceUIProvider = new GuiceUIProvider(this);
@@ -140,6 +156,8 @@ class GuiceVaadin implements SessionInitListener {
 
         service.addSessionDestroyListener(uiScoper);
         service.addSessionInitListener(uiScoper);
+        service.addSessionDestroyListener(viewScoper);
+        service.addSessionInitListener(viewScoper);
         service.addSessionDestroyListener(viewProvider);
         service.addSessionInitListener(viewProvider);
         service.addSessionDestroyListener(vaadinSessionScoper);
@@ -157,7 +175,7 @@ class GuiceVaadin implements SessionInitListener {
         return uiScoper;
     }
 
-    VaadinSessionProvider getVaadinSessionProvider() {
+    Provider<VaadinSession> getVaadinSessionProvider() {
         return vaadinSessionProvider;
     }
 
@@ -165,11 +183,11 @@ class GuiceVaadin implements SessionInitListener {
         return views;
     }
 
-    CurrentUIProvider getCurrentUIProvider() {
+    Provider<UI> getCurrentUIProvider() {
         return currentUIProvider;
     }
 
-    VaadinServiceProvider getVaadinServiceProvider() {
+    Provider<VaadinService> getVaadinServiceProvider() {
         return vaadinServiceProvider;
     }
 
@@ -192,4 +210,9 @@ class GuiceVaadin implements SessionInitListener {
     VaadinSessionScoper getVaadinSessionScoper() {
         return vaadinSessionScoper;
     }
+
+    ViewScoper getViewScoper() {
+        return viewScoper;
+    }
+
 }

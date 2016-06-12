@@ -8,6 +8,7 @@ import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.guice.annotation.VaadinSessionScope;
+import com.vaadin.guice.annotation.ViewScope;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.UIProvider;
@@ -27,6 +28,7 @@ class VaadinModule extends AbstractModule {
     protected void configure() {
         bindScope(UIScope.class, guiceVaadin.getUiScoper());
         bindScope(GuiceUI.class, guiceVaadin.getUiScoper());
+        bindScope(ViewScope.class, guiceVaadin.getViewScoper());
         bindScope(GuiceView.class, guiceVaadin.getUiScoper());
         bindScope(VaadinSessionScope.class, guiceVaadin.getVaadinSessionScoper());
         bind(UIProvider.class).toInstance(guiceVaadin.getGuiceUIProvider());
@@ -35,10 +37,6 @@ class VaadinModule extends AbstractModule {
         bind(VaadinSession.class).toProvider(guiceVaadin.getVaadinSessionProvider());
         bind(UI.class).toProvider(guiceVaadin.getCurrentUIProvider());
         bind(VaadinService.class).toProvider(guiceVaadin.getVaadinServiceProvider());
-
-        bind(VaadinServiceProvider.class).toInstance(guiceVaadin.getVaadinServiceProvider());
-        bind(CurrentUIProvider.class).toInstance(guiceVaadin.getCurrentUIProvider());
-        bind(VaadinSessionProvider.class).toInstance(guiceVaadin.getVaadinSessionProvider());
 
         final Multibinder<View> viewMultibinder = Multibinder.newSetBinder(binder(), View.class, AllKnownGuiceViews.class);
 

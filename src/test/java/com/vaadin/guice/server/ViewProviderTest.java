@@ -1,6 +1,12 @@
 package com.vaadin.guice.server;
 
+import com.google.inject.Provider;
+
+import com.vaadin.navigator.View;
 import com.vaadin.server.ServiceException;
+import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,16 +21,20 @@ public class ViewProviderTest {
     private GuiceViewProvider viewProvider;
 
     @Before
+    @SuppressWarnings("unckecked")
     public void setup() throws NoSuchFieldException, IllegalAccessException {
-        VaadinSessionProvider vaadinSessionProvider = mock(VaadinSessionProvider.class);
-        CurrentUIProvider currentUIProvider = mock(CurrentUIProvider.class);
-        VaadinServiceProvider vaadinServiceProvider = mock(VaadinServiceProvider.class);
+
+        Provider<VaadinSession> vaadinSessionProvider = (Provider<VaadinSession>) mock(Provider.class);
+        Provider<UI> currentUIProvider = (Provider<UI>) mock(Provider.class);
+        Provider<View> currentViewProvider = (Provider<View>) mock(Provider.class);
+        Provider<VaadinService> vaadinServiceProvider = (Provider<VaadinService>) mock(Provider.class);
 
         Reflections reflections = new Reflections("com.vaadin.guice.testClasses");
 
         final GuiceVaadin guiceVaadin = new GuiceVaadin(
                 vaadinSessionProvider,
                 currentUIProvider,
+                currentViewProvider,
                 vaadinServiceProvider,
                 reflections, new Class[]{});
 

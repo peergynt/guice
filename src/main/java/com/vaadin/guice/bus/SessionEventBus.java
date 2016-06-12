@@ -6,10 +6,9 @@ import com.vaadin.guice.annotation.VaadinSessionScope;
 
 /**
  * This class serves as a means to allow VaadinSession-scope communication between objects.
- * UIEventBus is intended for events that are of 'VaadinSession-scope' interest, like updates to
- * data that is used by multiple {@link com.vaadin.ui.UI}'s of the same {@link
- * com.vaadin.server.VaadinSession}. It is VaadinSession-scoped and therefore not prone to memory
- * leaks.
+ * SessionEventBus is intended for events that are of 'VaadinSession-scope' interest, like updates
+ * to data that is used by multiple {@link com.vaadin.ui.UI}'s of the same {@link
+ * com.vaadin.server.VaadinSession}.
  *
  * <code> {@literal @}Inject private SessionEventBus sessionEventBus;
  *

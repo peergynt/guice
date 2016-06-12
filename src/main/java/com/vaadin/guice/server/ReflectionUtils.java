@@ -126,13 +126,13 @@ final class ReflectionUtils {
 
         Map<Class<? extends UI>, Set<Class<? extends ViewChangeListener>>> viewChangeListenersByUI = new HashMap<Class<? extends UI>, Set<Class<? extends ViewChangeListener>>>();
 
-        final Set<Class<? extends ViewChangeListener>> allViewChangeListenerClasses = (Set<Class<? extends ViewChangeListener>>) reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class, true);
+        final Set<Class<?>> allViewChangeListenerClasses = reflections.getTypesAnnotatedWith(GuiceViewChangeListener.class, true);
 
         for (Class<? extends UI> uiClass : uiClasses) {
             viewChangeListenersByUI.put(uiClass, new HashSet<Class<? extends ViewChangeListener>>());
         }
 
-        for (Class<? extends ViewChangeListener> viewChangeListenerClass : allViewChangeListenerClasses) {
+        for (Class<?> viewChangeListenerClass : allViewChangeListenerClasses) {
             checkArgument(
                     ViewChangeListener.class.isAssignableFrom(viewChangeListenerClass),
                     "class %s is annotated with @GuiceViewChangeListener but does not implement com.vaadin.navigator.ViewChangeListener",
@@ -143,7 +143,7 @@ final class ReflectionUtils {
 
             if (annotation.applicableUIs().length == 0) {
                 for (Set<Class<? extends ViewChangeListener>> viewChangeListenersForUI : viewChangeListenersByUI.values()) {
-                    viewChangeListenersForUI.add(viewChangeListenerClass);
+                    viewChangeListenersForUI.add((Class<? extends ViewChangeListener>) viewChangeListenerClass);
                 }
             } else {
                 for (Class<? extends UI> applicableUiClass : annotation.applicableUIs()) {
@@ -156,7 +156,7 @@ final class ReflectionUtils {
 
                     //TODO check if applicableUiClass has @ViewContainer
 
-                    viewChangeListenersForUI.add(viewChangeListenerClass);
+                    viewChangeListenersForUI.add((Class<? extends ViewChangeListener>) viewChangeListenerClass);
                 }
             }
         }

@@ -7,7 +7,7 @@ import com.vaadin.guice.annotation.UIScope;
 /**
  * This class serves as a means to allow UI-scope communication between objects. UIEventBus is
  * intended for events that are of 'UI-scope' interest, like updates to data that is used by only
- * the current UI. It is UI-scoped and therefore is not prone to memory leaks.
+ * the current UI.
  *
  * <code> {@literal @}Inject private UIEventBus uiIEventBus;
  *

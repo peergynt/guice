@@ -1,26 +1,15 @@
-/*
- * Copyright 2015 The original authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.vaadin.guice.server;
 
 import com.google.inject.Module;
+import com.google.inject.Provider;
 
 import com.vaadin.guice.testClasses.Target;
+import com.vaadin.navigator.View;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
+import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,16 +23,17 @@ import static org.mockito.Mockito.when;
 
 public abstract class ScopeTestBase {
 
-    protected GuiceVaadin guiceVaadin;
-    private CurrentUIProvider currentUIProvider;
-    private VaadinSessionProvider vaadinSessionProvider;
-    private VaadinServiceProvider vaadinServiceProvider;
+    GuiceVaadin guiceVaadin;
+    private Provider<VaadinSession> vaadinSessionProvider;
 
     @Before
+    @SuppressWarnings("unckecked")
     public void setup() throws NoSuchFieldException, IllegalAccessException {
-        vaadinSessionProvider = mock(VaadinSessionProvider.class);
-        currentUIProvider = mock(CurrentUIProvider.class);
-        vaadinServiceProvider = mock(VaadinServiceProvider.class);
+        vaadinSessionProvider = mock(Provider.class);
+        Provider<UI> currentUIProvider;
+        currentUIProvider = (Provider<UI>) mock(Provider.class);
+        Provider<View> currentViewProvider = (Provider<View>) mock(Provider.class);
+        Provider<VaadinService> vaadinServiceProvider = (Provider<VaadinService>) mock(Provider.class);
 
         Reflections reflections = new Reflections("com.vaadin.guice.server.testClasses");
 
@@ -52,6 +42,7 @@ public abstract class ScopeTestBase {
         guiceVaadin = new GuiceVaadin(
                 vaadinSessionProvider,
                 currentUIProvider,
+                currentViewProvider,
                 vaadinServiceProvider,
                 reflections,
                 modules
@@ -136,6 +127,7 @@ public abstract class ScopeTestBase {
         setVaadinSession(vaadinSession);
         when(sessionInitEvent.getSession()).thenReturn(vaadinSession);
 
+        guiceVaadin.getViewScoper().sessionInit(sessionInitEvent);
         guiceVaadin.getUiScoper().sessionInit(sessionInitEvent);
         guiceVaadin.sessionInit(sessionInitEvent);
 
