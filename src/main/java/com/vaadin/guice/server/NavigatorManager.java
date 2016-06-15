@@ -84,20 +84,14 @@ final class NavigatorManager {
         if (errorViewClassOptional.isPresent()) {
             navigator.setErrorProvider(
                     new ViewProvider() {
-                        View view;
-
                         @Override
                         public String getViewName(String viewAndParameters) {
-                            return viewAndParameters;
+                            throw new UnsupportedOperationException();
                         }
 
                         @Override
                         public View getView(String viewName) {
-                            if (view == null) {
-                                view = guiceVaadin.assemble(errorViewClassOptional.get());
-                            }
-
-                            return view;
+                            return guiceVaadin.assemble(errorViewClassOptional.get());
                         }
                     }
             );
