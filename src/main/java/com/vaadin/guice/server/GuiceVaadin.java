@@ -18,8 +18,7 @@ import com.vaadin.ui.UI;
 
 import org.reflections.Reflections;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -133,19 +132,23 @@ class GuiceVaadin implements SessionInitListener {
         // extraneous UIs if e.g. a servlet is declared as a nested
         // class in a UI class
         VaadinSession session = event.getSession();
-        List<UIProvider> uiProviders = new ArrayList<UIProvider>(
-                session.getUIProviders());
-        for (UIProvider provider : uiProviders) {
+
+        final Iterator<UIProvider> iterator = session.getUIProviders().iterator();
+
+        final String DefaultUiProviderCanonicalName = DefaultUIProvider.class.getCanonicalName();
+
+        while (iterator.hasNext()) {
+            final UIProvider uiProvider = iterator.next();
+
             // use canonical names as these may have been loaded with
             // different classloaders
-            if (DefaultUIProvider.class.getCanonicalName().equals(
-                    provider.getClass().getCanonicalName())) {
-                session.removeUIProvider(provider);
+            if (DefaultUiProviderCanonicalName.equals(uiProvider.getClass().getCanonicalName())) {
+                iterator.remove();
             }
         }
 
         //set the GuiceUIProvider
-        event.getSession().addUIProvider(this.guiceUIProvider);
+        session.addUIProvider(this.guiceUIProvider);
     }
 
     void vaadinInitialized() {
