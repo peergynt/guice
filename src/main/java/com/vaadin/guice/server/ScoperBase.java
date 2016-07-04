@@ -30,12 +30,12 @@ abstract class ScoperBase<SCOPE_BASE> implements Scope, SessionDestroyListener, 
 
     void startInitialization() {
         checkState(currentInitializationScopeSet == null);
-        currentInitializationScopeSet = KeyObjectMapPool.getKeyObjectMap();
+        currentInitializationScopeSet = KeyObjectMapPool.leaseMap();
     }
 
     void rollbackInitialization() {
         checkState(currentInitializationScopeSet != null);
-        KeyObjectMapPool.returnKeyObjectMap(currentInitializationScopeSet);
+        KeyObjectMapPool.returnMap(currentInitializationScopeSet);
         currentInitializationScopeSet = null;
     }
 
@@ -86,7 +86,7 @@ abstract class ScoperBase<SCOPE_BASE> implements Scope, SessionDestroyListener, 
         final Map<SCOPE_BASE, Map<Key<?>, Object>> map = sessionToScopedObjectsMap.remove(event.getSession());
 
         for (Map<Key<?>, Object> keyObjectMap : map.values()) {
-            KeyObjectMapPool.returnKeyObjectMap(keyObjectMap);
+            KeyObjectMapPool.returnMap(keyObjectMap);
         }
     }
 

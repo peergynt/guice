@@ -47,7 +47,7 @@ public class GlobalEventBus extends EventBus {
         vaadinService.addSessionInitListener(new SessionInitListener() {
             @Override
             public void sessionInit(SessionInitEvent sessionInitEvent) throws ServiceException {
-                registeredObjectsBySession.put(sessionInitEvent.getSession(), new HashSet<Object>());
+                registeredObjectsBySession.put(sessionInitEvent.getSession(), ObjectSetPool.leaseMap());
             }
         });
 
@@ -64,8 +64,12 @@ public class GlobalEventBus extends EventBus {
 
         checkState(registeredObjects != null);
 
-        for (Object registeredObject : registeredObjects) {
-            super.unregister(registeredObject);
+        try {
+            for (Object registeredObject : registeredObjects) {
+                super.unregister(registeredObject);
+            }
+        } finally {
+            ObjectSetPool.returnMap(registeredObjects);
         }
     }
 

@@ -14,7 +14,7 @@ final class KeyObjectMapPool {
     private KeyObjectMapPool() {
     }
 
-    static Map<Key<?>, Object> getKeyObjectMap() {
+    static Map<Key<?>, Object> leaseMap() {
         synchronized (pool) {
             return pool.isEmpty()
                     ? new HashMap<Key<?>, Object>()
@@ -22,7 +22,7 @@ final class KeyObjectMapPool {
         }
     }
 
-    static void returnKeyObjectMap(Map<Key<?>, Object> objectSet) {
+    static void returnMap(Map<Key<?>, Object> objectSet) {
         if (objectSet.size() <= KEY_OBJECT_MAP_REUSE_SIZE_MAX) {
             synchronized (pool) {
                 objectSet.clear();
