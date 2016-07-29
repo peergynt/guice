@@ -5,9 +5,10 @@ import com.vaadin.guice.testClasses.ViewA;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.lang.reflect.Field;
-
+/*
 public class ViewScopeTest extends ScopeTestBase {
 
     @Before
@@ -16,7 +17,7 @@ public class ViewScopeTest extends ScopeTestBase {
 
     @Test
     public void view_scopes_and_ui_scopes_should_not_overlap() throws NoSuchFieldException, IllegalAccessException {
-        GuiceVaadin guiceVaadin = getGuiceVaadin(new VaadinServletWithDynamicLoadedModule());
+
 
         final ViewA viewA = guiceVaadin.assemble(ViewA.class);
     }
@@ -30,4 +31,4 @@ public class ViewScopeTest extends ScopeTestBase {
     @Configuration(modules = {}, basePackages = "com.vaadin.guice.testClasses")
     private static class VaadinServletWithDynamicLoadedModule extends GuiceVaadinServlet {
     }
-}
+}*/
