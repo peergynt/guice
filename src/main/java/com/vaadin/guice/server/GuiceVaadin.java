@@ -18,7 +18,6 @@ import com.vaadin.ui.UI;
 
 import org.reflections.Reflections;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -133,17 +132,13 @@ class GuiceVaadin implements SessionInitListener {
         // class in a UI class
         VaadinSession session = event.getSession();
 
-        final Iterator<UIProvider> iterator = session.getUIProviders().iterator();
-
         final String DefaultUiProviderCanonicalName = DefaultUIProvider.class.getCanonicalName();
 
-        while (iterator.hasNext()) {
-            final UIProvider uiProvider = iterator.next();
-
+        for (UIProvider uiProvider : session.getUIProviders()) {
             // use canonical names as these may have been loaded with
             // different classloaders
             if (DefaultUiProviderCanonicalName.equals(uiProvider.getClass().getCanonicalName())) {
-                iterator.remove();
+                session.removeUIProvider(uiProvider);
             }
         }
 

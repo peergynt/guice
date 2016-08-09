@@ -17,9 +17,11 @@ import java.lang.annotation.Target;
  * @author Josh Long (josh@joshlong.com)
  * @author Bernd Hopp (bernd@vaadin.com)
  */
+/* TODO release when tested properly
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @ScopeAnnotation
 public @interface ViewScope {
 }
+*/

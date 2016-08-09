@@ -8,7 +8,7 @@ import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.guice.annotation.VaadinSessionScope;
-import com.vaadin.guice.annotation.ViewScope;
+//import com.vaadin.guice.annotation.ViewScope;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.UIProvider;
@@ -28,7 +28,7 @@ class VaadinModule extends AbstractModule {
     protected void configure() {
         bindScope(UIScope.class, guiceVaadin.getUiScoper());
         bindScope(GuiceUI.class, guiceVaadin.getUiScoper());
-        bindScope(ViewScope.class, guiceVaadin.getViewScoper());
+        //bindScope(ViewScope.class, guiceVaadin.getViewScoper());
         bindScope(GuiceView.class, guiceVaadin.getUiScoper());
         bindScope(VaadinSessionScope.class, guiceVaadin.getVaadinSessionScoper());
         bind(UIProvider.class).toInstance(guiceVaadin.getGuiceUIProvider());

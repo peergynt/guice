@@ -5,7 +5,7 @@
     <artifactId>guice-vaadin</artifactId>
     <packaging>jar</packaging>
     <groupId>com.vaadin</groupId>
-    <version>1.1.7-SNAPSHOT</version>
+    <version>1.1.9</version>
     <name>guice-vaadin</name>
     <description>
         Provides Google Guice integration for Vaadin applications.
@@ -17,7 +17,7 @@
         <project.build.source>1.7</project.build.source>
         <Vaadin-License-Title>Apache License 2.0</Vaadin-License-Title>
         <Implementation-Title>Guice Vaadin integration</Implementation-Title>
-        <guice.version>4.1.0</guice.version>
+        <guice.version>4.0</guice.version>
         <vaadin.version>[7.1.0,)</vaadin.version>
         <reflections.version>0.9.10</reflections.version>
         <javassist.version>3.20.0-GA</javassist.version>
@@ -63,6 +63,14 @@
             <artifactId>vaadin-server</artifactId>
             <version>${vaadin.version}</version>
             <scope>provided</scope>
+            <!--
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vaadin.external.google</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+            -->
         </dependency>
         <dependency>
             <groupId>junit</groupId>
