@@ -86,7 +86,7 @@ final class NavigatorManager {
                     new ViewProvider() {
                         @Override
                         public String getViewName(String viewAndParameters) {
-                            throw new UnsupportedOperationException();
+                            return viewAndParameters;
                         }
 
                         @Override

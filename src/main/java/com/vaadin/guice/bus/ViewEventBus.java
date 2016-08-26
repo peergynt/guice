@@ -2,7 +2,7 @@ package com.vaadin.guice.bus;
 
 import com.google.common.eventbus.EventBus;
 
-//import com.vaadin.guice.annotation.ViewScope;
+import com.vaadin.guice.annotation.ViewScope;
 
 /**
  * This class serves as a means to allow View-scope communication between objects.
@@ -18,10 +18,8 @@ import com.google.common.eventbus.EventBus;
  *
  * @author Bernd Hopp (bernd@vaadin.com)
  */
-/*TODO release when tested properly
 @ViewScope
 public final class ViewEventBus extends EventBus {
     ViewEventBus() {
     }
 }
-*/

@@ -85,6 +85,8 @@ abstract class ScoperBase<SCOPE_BASE> implements Scope, SessionDestroyListener, 
     public void sessionDestroy(SessionDestroyEvent event) {
         final Map<SCOPE_BASE, Map<Key<?>, Object>> map = sessionToScopedObjectsMap.remove(event.getSession());
 
+        checkState(map != null);
+
         for (Map<Key<?>, Object> keyObjectMap : map.values()) {
             KeyObjectMapPool.returnMap(keyObjectMap);
         }
