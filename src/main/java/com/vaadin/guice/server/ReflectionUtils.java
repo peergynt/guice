@@ -56,21 +56,17 @@ final class ReflectionUtils {
         throw new IllegalArgumentException("no suitable constructor found for " + type);
     }
 
-    static List<Module> getStaticModules(Class<? extends Module>[] modules, Reflections reflections) {
+    static List<Module> getStaticModules(Class<? extends Module>[] modules, Reflections reflections) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         List<Module> hardWiredModules = new ArrayList<Module>(modules.length);
 
         for (Class<? extends Module> moduleClass : modules) {
-            try {
-                hardWiredModules.add(create(moduleClass, reflections));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            hardWiredModules.add(create(moduleClass, reflections));
         }
         return hardWiredModules;
     }
 
     @SuppressWarnings("unchecked")
-    static Set<Module> getDynamicModules(Reflections reflections) {
+    static Set<Module> getDynamicModules(Reflections reflections) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Set<Module> dynamicallyLoadedModules = new HashSet<Module>();
 
         for (Class<?> dynamicallyLoadedModuleClass : reflections.getTypesAnnotatedWith(UIModule.class, true)) {
@@ -80,11 +76,7 @@ final class ReflectionUtils {
                     dynamicallyLoadedModuleClass
             );
 
-            try {
-                dynamicallyLoadedModules.add(create((Class<? extends Module>) dynamicallyLoadedModuleClass, reflections));
-            } catch (Exception e) {
-                throw new RuntimeException("unable to instantiate " + dynamicallyLoadedModuleClass, e);
-            }
+            dynamicallyLoadedModules.add(create((Class<? extends Module>) dynamicallyLoadedModuleClass, reflections));
         }
         return dynamicallyLoadedModules;
     }

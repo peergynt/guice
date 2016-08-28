@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.vaadin.guice.server.ReflectionUtils.findErrorView;
 import static com.vaadin.guice.server.ReflectionUtils.getDefaultViewFieldAndNavigator;
+import static java.lang.String.format;
 
 final class NavigatorManager {
 
@@ -55,7 +56,14 @@ final class NavigatorManager {
         try {
             defaultView = defaultViewField.get(ui);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                format(
+                    "unable to access viewContainer %s in %s",
+                    defaultViewField.getName(),
+                    uiClass
+                ),
+                e
+            );
         }
 
         checkNotNull(
@@ -74,7 +82,7 @@ final class NavigatorManager {
             navigator.init(ui, (SingleComponentContainer) defaultView);
         } else {
             throw new IllegalArgumentException(
-                    String.format(
+                    format(
                             "%s is annotated with @ViewContainer, must be either ComponentContainer, SingleComponentContainer or ViewDisplay",
                             defaultView
                     )

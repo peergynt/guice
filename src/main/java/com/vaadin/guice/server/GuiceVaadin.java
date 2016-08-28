@@ -18,6 +18,7 @@ import com.vaadin.ui.UI;
 
 import org.reflections.Reflections;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,7 +51,7 @@ class GuiceVaadin implements SessionInitListener {
     private final ViewScoper viewScoper;
 
     //used for non-testing
-    GuiceVaadin(Reflections reflections, Class<? extends Module>[] modules) {
+    GuiceVaadin(Reflections reflections, Class<? extends Module>[] modules) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         this(
                 new Provider<VaadinSession>() {
                     @Override
@@ -92,7 +93,7 @@ class GuiceVaadin implements SessionInitListener {
             Provider<VaadinService> vaadinServiceProvider,
             Reflections reflections,
             Class<? extends Module>[] modules
-    ) {
+    ) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         /*
          * combine bindings from the static modules in {@link Configuration#modules()} with those bindings
          * from dynamically loaded modules, see {@link com.vaadin.guice.annotation.UIModule}.

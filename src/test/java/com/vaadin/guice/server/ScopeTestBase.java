@@ -15,6 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.reflections.Reflections;
 
+import java.lang.reflect.InvocationTargetException;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -28,7 +30,7 @@ public abstract class ScopeTestBase {
 
     @Before
     @SuppressWarnings("unckecked")
-    public void setup() throws NoSuchFieldException, IllegalAccessException {
+    public void setup() throws NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
         vaadinSessionProvider = mock(Provider.class);
         Provider<UI> currentUIProvider;
         currentUIProvider = (Provider<UI>) mock(Provider.class);

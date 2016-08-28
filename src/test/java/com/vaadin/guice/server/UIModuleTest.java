@@ -13,6 +13,7 @@ import com.vaadin.guice.testClasses.StaticlyLoadedModule;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

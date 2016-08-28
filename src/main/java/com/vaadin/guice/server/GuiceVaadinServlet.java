@@ -7,6 +7,8 @@ import com.vaadin.server.VaadinServlet;
 
 import org.reflections.Reflections;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.servlet.ServletException;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -36,7 +38,11 @@ public class GuiceVaadinServlet extends VaadinServlet {
 
         Reflections reflections = new Reflections((Object[]) annotation.basePackages());
 
-        this.guiceVaadin = new GuiceVaadin(reflections, annotation.modules());
+        try {
+            this.guiceVaadin = new GuiceVaadin(reflections, annotation.modules());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
