@@ -5,7 +5,6 @@ import com.google.inject.ScopeAnnotation;
 import com.vaadin.guice.server.GuiceNavigator;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.ComponentContainer;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

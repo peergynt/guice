@@ -34,7 +34,7 @@ final class NavigatorManager {
 
         checkState(annotation != null);
 
-        if(annotation.viewContainer().equals(Component.class)){
+        if (annotation.viewContainer().equals(Component.class)) {
             return;
         }
 

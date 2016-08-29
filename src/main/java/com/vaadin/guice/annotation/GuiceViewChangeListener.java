@@ -31,8 +31,8 @@ import java.lang.annotation.Target;
 public @interface GuiceViewChangeListener {
 
     /**
-     * A list of {@link UI}'s that the ViewChangeListener will be attached to.
-     * If not set, the ViewChangeListener will be attached to all UI's
+     * A list of {@link UI}'s that the ViewChangeListener will be attached to. If not set, the
+     * ViewChangeListener will be attached to all UI's
      */
     Class<? extends UI>[] applicableUIs() default {};
 }

@@ -7,8 +7,6 @@ import com.vaadin.server.VaadinServlet;
 
 import org.reflections.Reflections;
 
-import java.lang.reflect.InvocationTargetException;
-
 import javax.servlet.ServletException;
 
 import static com.google.common.base.Preconditions.checkArgument;

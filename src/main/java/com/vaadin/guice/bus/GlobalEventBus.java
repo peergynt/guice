@@ -13,7 +13,6 @@ import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
