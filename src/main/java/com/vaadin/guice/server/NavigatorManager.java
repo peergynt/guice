@@ -2,75 +2,46 @@ package com.vaadin.guice.server;
 
 import com.google.common.base.Optional;
 
+import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.navigator.ViewProvider;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.SingleComponentContainer;
 import com.vaadin.ui.UI;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static com.vaadin.guice.server.ReflectionUtils.findErrorView;
-import static com.vaadin.guice.server.ReflectionUtils.getDefaultViewFieldAndNavigator;
 import static java.lang.String.format;
 
 final class NavigatorManager {
 
-    private final Map<Class<? extends UI>, ViewFieldAndNavigator> uiToDefaultViewFieldAndNavigator = new ConcurrentHashMap<Class<? extends UI>, ViewFieldAndNavigator>();
     private final Optional<Class<? extends View>> errorViewClassOptional;
     private final GuiceVaadin guiceVaadin;
 
     NavigatorManager(GuiceVaadin guiceVaadin) {
         this.errorViewClassOptional = findErrorView(guiceVaadin.getViews());
         this.guiceVaadin = guiceVaadin;
-
-        for (Class<? extends UI> knownUI : guiceVaadin.getUis()) {
-            final Optional<ViewFieldAndNavigator> defaultViewFieldOptional = getDefaultViewFieldAndNavigator(knownUI);
-
-            if (defaultViewFieldOptional.isPresent()) {
-                uiToDefaultViewFieldAndNavigator.put(knownUI, defaultViewFieldOptional.get());
-            }
-        }
     }
 
     void addNavigator(UI ui) {
 
         final Class<? extends UI> uiClass = ui.getClass();
 
-        ViewFieldAndNavigator viewFieldAndNavigator = uiToDefaultViewFieldAndNavigator.get(uiClass);
+        GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
 
-        if (viewFieldAndNavigator == null) {
+        checkState(annotation != null);
+
+        if(annotation.viewContainer().equals(Component.class)){
             return;
         }
 
-        Field defaultViewField = viewFieldAndNavigator.getViewField();
-        Class<? extends GuiceNavigator> navigatorClass = viewFieldAndNavigator.getNavigator();
+        Class<? extends Component> viewContainerClass = annotation.viewContainer();
+        Class<? extends GuiceNavigator> navigatorClass = annotation.navigator();
 
-        Object defaultView;
-
-        try {
-            defaultView = defaultViewField.get(ui);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(
-                format(
-                    "unable to access viewContainer %s in %s",
-                    defaultViewField.getName(),
-                    uiClass
-                ),
-                e
-            );
-        }
-
-        checkNotNull(
-                defaultView,
-                "%s is annotated with @ViewContainer and therefore must not be null",
-                defaultViewField.getName()
-        );
+        Component defaultView = guiceVaadin.assemble(viewContainerClass);
 
         GuiceNavigator navigator = guiceVaadin.assemble(navigatorClass);
 
@@ -83,8 +54,9 @@ final class NavigatorManager {
         } else {
             throw new IllegalArgumentException(
                     format(
-                            "%s is annotated with @ViewContainer, must be either ComponentContainer, SingleComponentContainer or ViewDisplay",
-                            defaultView
+                            "%s is set as viewContainer() in @GuiceUI of %s, must be either ComponentContainer, SingleComponentContainer or ViewDisplay",
+                            viewContainerClass,
+                            uiClass
                     )
             );
         }
@@ -99,6 +71,7 @@ final class NavigatorManager {
 
                         @Override
                         public View getView(String viewName) {
+                            //noinspection OptionalGetWithoutIsPresent
                             return guiceVaadin.assemble(errorViewClassOptional.get());
                         }
                     }

@@ -7,9 +7,9 @@ import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.GuiceViewChangeListener;
 import com.vaadin.guice.annotation.UIModule;
-import com.vaadin.guice.annotation.ViewContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 
 import org.reflections.Reflections;
@@ -146,7 +146,9 @@ final class ReflectionUtils {
                             "%s is listed as applicableUi in the @GuiceViewChangeListener-annotation of %s, but is not annotated with @GuiceUI"
                     );
 
-                    //TODO check if applicableUiClass has @ViewContainer
+                    final boolean viewContainerSet = !applicableUiClass.getAnnotation(GuiceUI.class).viewContainer().equals(Component.class);
+
+                    checkArgument(viewContainerSet, "%s is annotated as @GuiceViewChangeListener for %s, however viewContainer() is not set in @GuiceUI");
 
                     viewChangeListenersForUI.add((Class<? extends ViewChangeListener>) viewChangeListenerClass);
                 }
@@ -154,37 +156,6 @@ final class ReflectionUtils {
         }
 
         return viewChangeListenersByUI;
-    }
-
-    @SuppressWarnings("unchecked")
-    static Optional<ViewFieldAndNavigator> getDefaultViewFieldAndNavigator(Class<? extends UI> uiClass) {
-
-        Field defaultViewField = null;
-        Class<? extends GuiceNavigator> navigatorClass = null;
-
-        while ((uiClass != null) && (uiClass != UI.class)) {
-            for (Field field : uiClass.getDeclaredFields()) {
-
-                final ViewContainer viewContainer = field.getAnnotation(ViewContainer.class);
-
-                if (viewContainer == null) {
-                    continue;
-                }
-
-                checkArgument(defaultViewField == null, "more than one field annotated with @ViewContainer in class " + uiClass);
-
-                defaultViewField = field;
-                navigatorClass = viewContainer.navigator();
-            }
-            uiClass = (Class<? extends UI>) uiClass.getSuperclass();
-        }
-
-        if (defaultViewField == null) {
-            return Optional.absent();
-        }
-
-        defaultViewField.setAccessible(true);
-        return Optional.of(new ViewFieldAndNavigator(defaultViewField, navigatorClass));
     }
 
     static Optional<Class<? extends View>> findErrorView(Iterable<Class<? extends View>> viewClasses) {

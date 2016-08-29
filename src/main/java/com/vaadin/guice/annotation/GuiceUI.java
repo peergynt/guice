@@ -2,6 +2,11 @@ package com.vaadin.guice.annotation;
 
 import com.google.inject.ScopeAnnotation;
 
+import com.vaadin.guice.server.GuiceNavigator;
+import com.vaadin.navigator.Navigator;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.ComponentContainer;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -46,4 +51,23 @@ public @interface GuiceUI {
      * UI sub classes with the same path.
      */
     String path() default "";
+
+    /*
+    * the UI's default view container for navigation.
+    * ViewContainers are used by a UI's {@link com.vaadin.navigator.Navigator}. A view container must
+    * implement one of the following interface:
+    * <p>
+    *     <ul>
+    *         <li>{@link com.vaadin.ui.ComponentContainer}</li>
+    *         <li>{@link com.vaadin.ui.SingleComponentContainer}</li>
+    *         <li>{@link com.vaadin.navigator.ViewDisplay}</li>
+    *     </ul>
+    * <p>
+    */
+    Class<? extends Component> viewContainer() default Component.class;
+
+    /**
+     * the {@link Navigator} that is to be used for navigation
+     */
+    Class<? extends GuiceNavigator> navigator() default GuiceNavigator.class;
 }

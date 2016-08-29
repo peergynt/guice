@@ -9,6 +9,7 @@ import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.guice.annotation.VaadinSessionScope;
 import com.vaadin.guice.annotation.ViewScope;
+import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.UIProvider;
@@ -43,7 +44,5 @@ class VaadinModule extends AbstractModule {
         for (Class<? extends View> guiceViewClass : guiceVaadin.getViews()) {
             viewMultibinder.addBinding().to(guiceViewClass);
         }
-
-        bind(com.vaadin.navigator.Navigator.class).toProvider(NavigatorProvider.class);
     }
 }
