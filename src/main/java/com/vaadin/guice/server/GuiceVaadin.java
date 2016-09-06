@@ -99,7 +99,7 @@ class GuiceVaadin implements SessionInitListener {
          * from dynamically loaded modules, see {@link com.vaadin.guice.annotation.UIModule}.
          * This is done first so modules can install their own reflections.
          */
-        Module dynamicAndStaticModules = override(getStaticModules(modules, reflections)).with(getDynamicModules(reflections));
+        Module dynamicAndStaticModules = override(getStaticModules(modules, reflections, this)).with(getDynamicModules(reflections, this));
 
         Set<Class<? extends View>> views = getGuiceViewClasses(reflections);
 

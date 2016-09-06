@@ -1,7 +1,9 @@
 package com.vaadin.guice.server;
 
 import com.google.common.base.Optional;
+import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Provider;
 
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.GuiceView;
@@ -14,7 +16,6 @@ import com.vaadin.ui.UI;
 
 import org.reflections.Reflections;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,38 +35,38 @@ final class ReflectionUtils {
     private ReflectionUtils() {
     }
 
-    private static Module create(Class<? extends Module> type, Reflections reflections) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        checkArgument(type.getDeclaredConstructors().length == 1, type + " has more than 1 constructors");
+    private static Module create(Class<? extends Module> type, Reflections reflections, final GuiceVaadin guiceVaadin) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        final Module module = type.newInstance();
 
-        @SuppressWarnings("unchecked")
-        Constructor<Module> constructor = (Constructor<Module>) type.getDeclaredConstructors()[0];
-
-        constructor.setAccessible(true);
-
-        switch (constructor.getParameterTypes().length) {
-            case 0:
-                return constructor.newInstance();
-            case 1:
-                if (constructor.getParameterTypes()[0].equals(Reflections.class)) {
-                    return constructor.newInstance(reflections);
-                }
-                break;
+        if(module instanceof UsesReflections){
+            ((UsesReflections)module).setReflections(reflections);
         }
 
-        throw new IllegalArgumentException("no suitable constructor found for " + type);
+        if(module instanceof NeedsInjector){
+            ((NeedsInjector)module).setInjectorProvider(
+                    new Provider<Injector>() {
+                        @Override
+                        public Injector get() {
+                            return guiceVaadin.getInjector();
+                        }
+                    }
+            );
+        }
+
+        return module;
     }
 
-    static List<Module> getStaticModules(Class<? extends Module>[] modules, Reflections reflections) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    static List<Module> getStaticModules(Class<? extends Module>[] modules, Reflections reflections, GuiceVaadin guiceVaadin) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         List<Module> hardWiredModules = new ArrayList<Module>(modules.length);
 
         for (Class<? extends Module> moduleClass : modules) {
-            hardWiredModules.add(create(moduleClass, reflections));
+            hardWiredModules.add(create(moduleClass, reflections, guiceVaadin));
         }
         return hardWiredModules;
     }
 
     @SuppressWarnings("unchecked")
-    static Set<Module> getDynamicModules(Reflections reflections) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    static Set<Module> getDynamicModules(Reflections reflections, GuiceVaadin guiceVaadin) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Set<Module> dynamicallyLoadedModules = new HashSet<Module>();
 
         for (Class<?> dynamicallyLoadedModuleClass : reflections.getTypesAnnotatedWith(UIModule.class, true)) {
@@ -75,7 +76,7 @@ final class ReflectionUtils {
                     dynamicallyLoadedModuleClass
             );
 
-            dynamicallyLoadedModules.add(create((Class<? extends Module>) dynamicallyLoadedModuleClass, reflections));
+            dynamicallyLoadedModules.add(create((Class<? extends Module>) dynamicallyLoadedModuleClass, reflections, guiceVaadin));
         }
         return dynamicallyLoadedModules;
     }
