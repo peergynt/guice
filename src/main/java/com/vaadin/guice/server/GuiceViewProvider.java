@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static com.vaadin.guice.server.PathUtil.removeParametersFromViewName;
 import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
 
@@ -93,23 +94,9 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
     @Override
     public String getViewName(String viewAndParameters) {
 
-        if (viewAndParameters == null) {
-            return null;
-        }
-        // Since viewNames is sorted, floor() gives us the view name
-        // less than or equal to the view and parameters string.
-        // If the view name found is less than the view and parameters
-        // string, we will test that the string starts with 'viewName/'.
-        String viewName = viewNames.floor(viewAndParameters);
-        if (viewName == null) {
-            return null;
-        }
-        // 
-        if (viewAndParameters.equals(viewName)
-                || viewAndParameters.startsWith(viewName + "/")) {
-            return viewName;
-        }
-        return null;
+        final String viewName = removeParametersFromViewName(viewAndParameters);
+
+        return viewNames.contains(viewName) ? viewName : null;
     }
 
     @Override

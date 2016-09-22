@@ -2,7 +2,12 @@ package com.vaadin.guice.server;
 
 import com.vaadin.server.VaadinRequest;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 final class PathUtil {
+
+    private static final char DELIMITER = '/';
+
     private PathUtil() {
     }
 
@@ -15,6 +20,20 @@ final class PathUtil {
         }
 
         return path;
+    }
+
+    public static String removeParametersFromViewName(String viewNameAndParameters){
+        if(isNullOrEmpty(viewNameAndParameters)){
+            return "";
+        }
+
+        final int indexOfDelimiter = viewNameAndParameters.indexOf(DELIMITER);
+
+        if(indexOfDelimiter == -1){
+            return viewNameAndParameters;
+        }
+
+        return viewNameAndParameters.substring(0, indexOfDelimiter);
     }
 
     static String extractUIPathFromRequest(VaadinRequest request) {

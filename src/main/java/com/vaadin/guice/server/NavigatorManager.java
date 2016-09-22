@@ -1,6 +1,7 @@
 package com.vaadin.guice.server;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.navigator.View;
@@ -13,6 +14,7 @@ import com.vaadin.ui.SingleComponentContainer;
 import com.vaadin.ui.UI;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.vaadin.guice.server.PathUtil.removeParametersFromViewName;
 import static com.vaadin.guice.server.ReflectionUtils.findErrorView;
 import static java.lang.String.format;
 
@@ -66,7 +68,7 @@ final class NavigatorManager {
                     new ViewProvider() {
                         @Override
                         public String getViewName(String viewAndParameters) {
-                            return viewAndParameters;
+                            return removeParametersFromViewName(viewAndParameters);
                         }
 
                         @Override
