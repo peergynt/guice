@@ -1,13 +1,5 @@
 package com.vaadin.guice.server;
 
-import com.vaadin.guice.annotation.Configuration;
-import com.vaadin.guice.testClasses.ViewA;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.lang.reflect.Field;
 /*
 public class ViewScopeTest extends ScopeTestBase {
 

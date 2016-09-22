@@ -22,14 +22,14 @@ final class PathUtil {
         return path;
     }
 
-    public static String removeParametersFromViewName(String viewNameAndParameters){
-        if(isNullOrEmpty(viewNameAndParameters)){
+    public static String removeParametersFromViewName(String viewNameAndParameters) {
+        if (isNullOrEmpty(viewNameAndParameters)) {
             return "";
         }
 
         final int indexOfDelimiter = viewNameAndParameters.indexOf(DELIMITER);
 
-        if(indexOfDelimiter == -1){
+        if (indexOfDelimiter == -1) {
             return viewNameAndParameters;
         }
 

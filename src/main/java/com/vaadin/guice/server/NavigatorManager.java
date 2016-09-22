@@ -1,7 +1,6 @@
 package com.vaadin.guice.server;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.navigator.View;
