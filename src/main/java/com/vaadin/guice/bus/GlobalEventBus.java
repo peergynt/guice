@@ -43,12 +43,6 @@ public class GlobalEventBus extends EventBus {
     @Inject
     GlobalEventBus(VaadinService vaadinService, Provider<VaadinSession> vaadinSessionProvider) {
         this.vaadinSessionProvider = vaadinSessionProvider;
-        vaadinService.addSessionInitListener(new SessionInitListener() {
-            @Override
-            public void sessionInit(SessionInitEvent sessionInitEvent) throws ServiceException {
-                registeredObjectsBySession.put(sessionInitEvent.getSession(), ObjectSetPool.leaseMap());
-            }
-        });
 
         vaadinService.addSessionDestroyListener(new SessionDestroyListener() {
             @Override
@@ -61,7 +55,9 @@ public class GlobalEventBus extends EventBus {
     private void releaseAll(VaadinSession vaadinSession) {
         Set<Object> registeredObjects = registeredObjectsBySession.remove(vaadinSession);
 
-        checkState(registeredObjects != null);
+        if(registeredObjects == null){
+            return;
+        }
 
         try {
             for (Object registeredObject : registeredObjects) {
@@ -75,8 +71,22 @@ public class GlobalEventBus extends EventBus {
     @Override
     public void register(Object object) {
         checkNotNull(object);
-        registeredObjectsBySession.get(vaadinSessionProvider.get()).add(object);
+
+        final Set<Object> registeredObjects = getRegisteredObjects();
+
+        registeredObjects.add(object);
         super.register(object);
+    }
+
+    private Set<Object> getRegisteredObjects(){
+        Set<Object> registeredObjects = registeredObjectsBySession.get(vaadinSessionProvider.get());
+
+        if(registeredObjects == null){
+            registeredObjects = ObjectSetPool.leaseMap();
+            registeredObjectsBySession.put(vaadinSessionProvider.get(), registeredObjects);
+        }
+
+        return registeredObjects;
     }
 
     @Override
