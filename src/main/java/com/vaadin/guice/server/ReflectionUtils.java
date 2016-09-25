@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.vaadin.guice.server.PathUtil.preparePath;
 
@@ -47,7 +48,10 @@ final class ReflectionUtils {
                     new Provider<Injector>() {
                         @Override
                         public Injector get() {
-                            return guiceVaadin.getInjector();
+                            return checkNotNull(
+                                guiceVaadin.getInjector(),
+                                "guice injector is not set up yet"
+                            );
                         }
                     }
             );
