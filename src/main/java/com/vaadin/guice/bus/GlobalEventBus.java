@@ -5,11 +5,8 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
-import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionDestroyEvent;
 import com.vaadin.server.SessionDestroyListener;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 
@@ -18,7 +15,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * This class serves as a means to allow application-scope communication between objects.
@@ -55,7 +51,7 @@ public class GlobalEventBus extends EventBus {
     private void releaseAll(VaadinSession vaadinSession) {
         Set<Object> registeredObjects = registeredObjectsBySession.remove(vaadinSession);
 
-        if(registeredObjects == null){
+        if (registeredObjects == null) {
             return;
         }
 
@@ -78,10 +74,10 @@ public class GlobalEventBus extends EventBus {
         super.register(object);
     }
 
-    private Set<Object> getRegisteredObjects(){
+    private Set<Object> getRegisteredObjects() {
         Set<Object> registeredObjects = registeredObjectsBySession.get(vaadinSessionProvider.get());
 
-        if(registeredObjects == null){
+        if (registeredObjects == null) {
             registeredObjects = ObjectSetPool.leaseMap();
             registeredObjectsBySession.put(vaadinSessionProvider.get(), registeredObjects);
         }
