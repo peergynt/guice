@@ -189,11 +189,12 @@ final class ReflectionUtils {
 
         for (Class<? extends UI> uiClass : uiClasses) {
 
-            logger.log(Level.INFO, "Found Vaadin UI [{0}]", uiClass.getCanonicalName());
-
             GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
 
-            checkState(annotation != null);
+            if (annotation == null) {
+                logger.log(Level.INFO, "ignoring {0}, because it has no @GuiceUI annotation", new Object[]{uiClass});
+                continue;
+            }
 
             String path = annotation.path();
             path = preparePath(path);
