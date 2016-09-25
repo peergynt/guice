@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Bernd Hopp (bernd@vaadin.com)
  */
 @Singleton
-public class GlobalEventBus extends EventBus {
+public final class GlobalEventBus extends EventBus {
 
     private final Map<VaadinSession, Set<Object>> registeredObjectsBySession = new ConcurrentHashMap<VaadinSession, Set<Object>>();
     private final Provider<VaadinSession> vaadinSessionProvider;
