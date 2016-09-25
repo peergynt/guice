@@ -196,7 +196,7 @@ final class ReflectionUtils {
             GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
 
             if (annotation == null) {
-                logger.log(Level.INFO, "ignoring {0}, because it has no @GuiceUI annotation", new Object[]{uiClass});
+                logger.log(Level.WARNING, "ignoring {0}, because it has no @GuiceUI annotation", new Object[]{uiClass});
                 continue;
             }
 
