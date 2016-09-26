@@ -25,10 +25,9 @@ public @interface Configuration {
 
     /**
      * An array of classes for modules to be installed by guice. Each of these classes must have
-     * exactly one constructor, which can either have no arguments ( standard-constructor ) or a
-     * single argument that is of type {@link org.reflections.Reflections}
+     * a default ( no-args ) constructor
      */
-    Class<? extends Module>[] modules();
+    Class<? extends Module>[] modules() default {};
 
     /**
      * A list of packages that is to be scanned for the guice-context. Sub-packages are included as
