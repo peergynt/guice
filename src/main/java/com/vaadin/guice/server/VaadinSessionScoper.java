@@ -23,12 +23,12 @@ class VaadinSessionScoper implements Scope, SessionDestroyListener {
     @Override
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
 
-        final Map<Key<?>, Object> scopedObjects = getOrCreateScopedObjectsMap();
-
         return new Provider<T>() {
             @Override
             @SuppressWarnings("unchecked")
             public T get() {
+                Map<Key<?>, Object> scopedObjects = getOrCreateScopedObjectsMap();
+
                 T t = (T) scopedObjects.get(key);
 
                 if (t == null) {
