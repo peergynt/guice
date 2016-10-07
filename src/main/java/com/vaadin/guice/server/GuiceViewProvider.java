@@ -2,6 +2,7 @@ package com.vaadin.guice.server;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableSortedSet;
 
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.navigator.View;
@@ -49,7 +50,7 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
         this.guiceVaadin = guiceVaadin;
         // Set of view names sorted by their natural ordering (lexicographic).
         // This is useful for quickly looking up views by name
-        viewNames = ImmutableSortedMap.copyOf(viewNamesToViewClassesMap).keySet();
+        viewNames = ImmutableSortedSet.copyOf(viewNamesToViewClassesMap.keySet());
 
         viewsBySessionMap = new ConcurrentHashMap<VaadinSession, Map<String, View>>();
     }
