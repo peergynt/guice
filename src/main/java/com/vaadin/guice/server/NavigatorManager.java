@@ -3,6 +3,7 @@ package com.vaadin.guice.server;
 import com.google.common.base.Optional;
 
 import com.vaadin.guice.annotation.GuiceUI;
+import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
@@ -40,6 +41,14 @@ final class NavigatorManager {
         }
 
         Class<? extends Component> viewContainerClass = annotation.viewContainer();
+
+        checkState(
+                viewContainerClass.getAnnotation(UIScope.class) != null,
+                "%s is annotated with having %s as it's viewContainer, but this class does not have a @UIScope annotation. " +
+                "ViewContainers must be put in UIScope",
+                uiClass, viewContainerClass
+        );
+
         Class<? extends GuiceNavigator> navigatorClass = annotation.navigator();
 
         Component defaultView = guiceVaadin.assemble(viewContainerClass);
