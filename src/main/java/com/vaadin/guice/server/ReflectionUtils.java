@@ -39,21 +39,21 @@ final class ReflectionUtils {
     private static Module create(Class<? extends Module> type, Reflections reflections, final GuiceVaadin guiceVaadin) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         final Module module = type.newInstance();
 
-        if (module instanceof UsesReflections) {
-            ((UsesReflections) module).setReflections(reflections);
+        if (module instanceof NeedsReflections) {
+            ((NeedsReflections) module).setReflections(reflections);
         }
 
         if (module instanceof NeedsInjector) {
             ((NeedsInjector) module).setInjectorProvider(
-                    new Provider<Injector>() {
-                        @Override
-                        public Injector get() {
-                            return checkNotNull(
-                                guiceVaadin.getInjector(),
-                                "guice injector is not set up yet"
-                            );
-                        }
+                new Provider<Injector>() {
+                    @Override
+                    public Injector get() {
+                        return checkNotNull(
+                            guiceVaadin.getInjector(),
+                            "guice injector is not set up yet"
+                        );
                     }
+                }
             );
         }
 
