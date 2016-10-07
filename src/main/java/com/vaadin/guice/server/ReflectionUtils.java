@@ -185,47 +185,5 @@ final class ReflectionUtils {
 
         return Optional.<Class<? extends View>>fromNullable(errorView);
     }
-
-    static void detectUIs(Set<Class<? extends UI>> uiClasses, Map<String, Class<? extends UI>> pathToUIMap, Map<String, Class<? extends UI>> wildcardPathToUIMap) {
-        Logger logger = Logger.getLogger(ReflectionUtils.class.getName());
-
-        logger.info("Checking the application context for Vaadin UIs");
-
-        for (Class<? extends UI> uiClass : uiClasses) {
-
-            GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
-
-            if (annotation == null) {
-                logger.log(Level.WARNING, "ignoring {0}, because it has no @GuiceUI annotation", new Object[]{uiClass});
-                continue;
-            }
-
-            String path = annotation.path();
-            path = preparePath(path);
-
-            Class<? extends UI> existingUiForPath = pathToUIMap.get(path);
-
-            checkState(
-                    existingUiForPath == null,
-                    "[%s] is already mapped to the path [%s]",
-                    existingUiForPath,
-                    path
-            );
-
-            logger.log(Level.INFO, "Mapping Vaadin UI [{0}] to path [{1}]",
-                    new Object[]{uiClass.getCanonicalName(), path});
-
-            if (path.endsWith("/*")) {
-                wildcardPathToUIMap.put(path.substring(0, path.length() - 2),
-                        uiClass);
-            } else {
-                pathToUIMap.put(path, uiClass);
-            }
-        }
-
-        if (pathToUIMap.isEmpty()) {
-            logger.log(Level.WARNING, "Found no Vaadin UIs in the application context");
-        }
-    }
 }
 

@@ -1,16 +1,21 @@
 package com.vaadin.guice.server;
 
+import com.google.common.collect.ImmutableMap;
+
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.server.UIClassSelectionEvent;
 import com.vaadin.server.UICreateEvent;
 import com.vaadin.server.UIProvider;
 import com.vaadin.ui.UI;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.vaadin.guice.server.PathUtil.extractUIPathFromRequest;
-import static com.vaadin.guice.server.ReflectionUtils.detectUIs;
+import static com.vaadin.guice.server.PathUtil.preparePath;
 
 /**
  * Vaadin {@link com.vaadin.server.UIProvider} that looks up UI classes from the Guice application
@@ -22,15 +27,60 @@ import static com.vaadin.guice.server.ReflectionUtils.detectUIs;
  */
 class GuiceUIProvider extends UIProvider {
 
-    private final Map<String, Class<? extends UI>> pathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
-    private final Map<String, Class<? extends UI>> wildcardPathToUIMap = new ConcurrentHashMap<String, Class<? extends UI>>();
+    private final Map<String, Class<? extends UI>> pathToUIMap;
+    private final Map<String, Class<? extends UI>> wildcardPathToUIMap;
     private final GuiceVaadin guiceVaadin;
     private final NavigatorManager navigatorManager;
 
     GuiceUIProvider(GuiceVaadin guiceVaadin) {
         this.guiceVaadin = guiceVaadin;
-        detectUIs(guiceVaadin.getUis(), pathToUIMap, wildcardPathToUIMap);
+        Logger logger = Logger.getLogger(getClass().getName());
+
+        logger.info("Checking the application context for Vaadin UIs");
+
+        final HashMap<String, Class<? extends UI>> pathToUIMap = new HashMap<String, Class<? extends UI>>();
+        final Map<String, Class<? extends UI>> wildcardPathToUIMap = new HashMap<String, Class<? extends UI>>();
+
+        for (Class<? extends UI> uiClass : guiceVaadin.getUis()) {
+
+            GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
+
+            if (annotation == null) {
+                logger.log(Level.WARNING, "ignoring {0}, because it has no @GuiceUI annotation", new Object[]{uiClass});
+                continue;
+            }
+
+            String path = annotation.path();
+            path = preparePath(path);
+
+            Class<? extends UI> existingUiForPath = pathToUIMap.get(path);
+
+            checkState(
+                existingUiForPath == null,
+                "[%s] is already mapped to the path [%s]",
+                existingUiForPath,
+                path
+            );
+
+            logger.log(Level.INFO, "Mapping Vaadin UI [{0}] to path [{1}]",
+                    new Object[]{uiClass.getCanonicalName(), path});
+
+            if (path.endsWith("/*")) {
+                wildcardPathToUIMap.put(path.substring(0, path.length() - 2),
+                        uiClass);
+            } else {
+                pathToUIMap.put(path, uiClass);
+            }
+        }
+
+        if (pathToUIMap.isEmpty()) {
+            logger.log(Level.WARNING, "Found no Vaadin UIs in the application context");
+        }
+
         this.navigatorManager = new NavigatorManager(guiceVaadin);
+
+        this.pathToUIMap = ImmutableMap.copyOf(pathToUIMap);
+        this.wildcardPathToUIMap = ImmutableMap.copyOf(wildcardPathToUIMap);
     }
 
     @Override
