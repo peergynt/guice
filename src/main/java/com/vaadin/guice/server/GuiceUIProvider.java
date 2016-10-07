@@ -56,10 +56,10 @@ class GuiceUIProvider extends UIProvider {
             Class<? extends UI> existingUiForPath = pathToUIMapCollector.get(path);
 
             checkState(
-                existingUiForPath == null,
-                "[%s] is already mapped to the path [%s]",
-                existingUiForPath,
-                path
+                    existingUiForPath == null,
+                    "[%s] is already mapped to the path [%s]",
+                    existingUiForPath,
+                    path
             );
 
             logger.log(Level.INFO, "Mapping Vaadin UI [{0}] to path [{1}]",

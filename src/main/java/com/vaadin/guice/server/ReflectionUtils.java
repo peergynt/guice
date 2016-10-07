@@ -23,13 +23,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.vaadin.guice.server.PathUtil.preparePath;
 
 final class ReflectionUtils {
 
@@ -45,15 +42,15 @@ final class ReflectionUtils {
 
         if (module instanceof NeedsInjector) {
             ((NeedsInjector) module).setInjectorProvider(
-                new Provider<Injector>() {
-                    @Override
-                    public Injector get() {
-                        return checkNotNull(
-                            guiceVaadin.getInjector(),
-                            "guice injector is not set up yet"
-                        );
+                    new Provider<Injector>() {
+                        @Override
+                        public Injector get() {
+                            return checkNotNull(
+                                    guiceVaadin.getInjector(),
+                                    "guice injector is not set up yet"
+                            );
+                        }
                     }
-                }
             );
         }
 

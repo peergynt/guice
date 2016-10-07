@@ -1,7 +1,6 @@
 package com.vaadin.guice.server;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 
 import com.vaadin.guice.annotation.GuiceView;

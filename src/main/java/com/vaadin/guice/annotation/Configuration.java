@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
 public @interface Configuration {
 
     /**
-     * An array of classes for modules to be installed by guice. Each of these classes must have
-     * a default ( no-args ) constructor
+     * An array of classes for modules to be installed by guice. Each of these classes must have a
+     * default ( no-args ) constructor
      */
     Class<? extends Module>[] modules() default {};
 

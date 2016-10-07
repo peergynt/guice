@@ -45,7 +45,7 @@ final class NavigatorManager {
         checkState(
                 viewContainerClass.getAnnotation(UIScope.class) != null,
                 "%s is annotated with having %s as it's viewContainer, but this class does not have a @UIScope annotation. " +
-                "ViewContainers must be put in UIScope",
+                        "ViewContainers must be put in UIScope",
                 uiClass, viewContainerClass
         );
 
@@ -72,6 +72,10 @@ final class NavigatorManager {
         }
 
         if (errorViewClassOptional.isPresent()) {
+
+            final Class<? extends View> errorViewClass = errorViewClassOptional.get();
+
+
             navigator.setErrorProvider(
                     new ViewProvider() {
                         @Override
@@ -82,7 +86,7 @@ final class NavigatorManager {
                         @Override
                         public View getView(String viewName) {
                             //noinspection OptionalGetWithoutIsPresent
-                            return guiceVaadin.assemble(errorViewClassOptional.get());
+                            return guiceVaadin.assemble(errorViewClass);
                         }
                     }
             );
