@@ -18,7 +18,7 @@
         <Vaadin-License-Title>Apache License 2.0</Vaadin-License-Title>
         <Implementation-Title>Guice Vaadin integration</Implementation-Title>
         <guice.version>4.1.0</guice.version>
-        <vaadin.version>[7.1.0,)</vaadin.version>
+        <vaadin.version>[7.6.0,)</vaadin.version>
         <reflections.version>0.9.10</reflections.version>
         <javassist.version>3.20.0-GA</javassist.version>
         <mockito-core.version>1.9.5</mockito-core.version>
