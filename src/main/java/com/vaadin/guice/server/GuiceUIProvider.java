@@ -38,8 +38,8 @@ class GuiceUIProvider extends UIProvider {
 
         logger.info("Checking the application context for Vaadin UIs");
 
-        final HashMap<String, Class<? extends UI>> pathToUIMap = new HashMap<String, Class<? extends UI>>();
-        final Map<String, Class<? extends UI>> wildcardPathToUIMap = new HashMap<String, Class<? extends UI>>();
+        final HashMap<String, Class<? extends UI>> pathToUIMapCollector = new HashMap<String, Class<? extends UI>>();
+        final Map<String, Class<? extends UI>> wildcardPathToUIMapCollector = new HashMap<String, Class<? extends UI>>();
 
         for (Class<? extends UI> uiClass : guiceVaadin.getUis()) {
 
@@ -53,7 +53,7 @@ class GuiceUIProvider extends UIProvider {
             String path = annotation.path();
             path = preparePath(path);
 
-            Class<? extends UI> existingUiForPath = pathToUIMap.get(path);
+            Class<? extends UI> existingUiForPath = pathToUIMapCollector.get(path);
 
             checkState(
                 existingUiForPath == null,
@@ -66,21 +66,21 @@ class GuiceUIProvider extends UIProvider {
                     new Object[]{uiClass.getCanonicalName(), path});
 
             if (path.endsWith("/*")) {
-                wildcardPathToUIMap.put(path.substring(0, path.length() - 2),
+                wildcardPathToUIMapCollector.put(path.substring(0, path.length() - 2),
                         uiClass);
             } else {
-                pathToUIMap.put(path, uiClass);
+                pathToUIMapCollector.put(path, uiClass);
             }
         }
 
-        if (pathToUIMap.isEmpty()) {
+        if (pathToUIMapCollector.isEmpty()) {
             logger.log(Level.WARNING, "Found no Vaadin UIs in the application context");
         }
 
         this.navigatorManager = new NavigatorManager(guiceVaadin);
 
-        this.pathToUIMap = ImmutableMap.copyOf(pathToUIMap);
-        this.wildcardPathToUIMap = ImmutableMap.copyOf(wildcardPathToUIMap);
+        this.pathToUIMap = ImmutableMap.copyOf(pathToUIMapCollector);
+        this.wildcardPathToUIMap = ImmutableMap.copyOf(wildcardPathToUIMapCollector);
     }
 
     @Override
