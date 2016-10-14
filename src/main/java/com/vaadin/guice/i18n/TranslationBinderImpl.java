@@ -1,11 +1,8 @@
 package com.vaadin.guice.i18n;
 
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.Multimaps;
 import com.google.inject.Inject;
 
+import com.vaadin.guice.annotation.Caption;
 import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.ui.Component;
 

@@ -1,5 +1,7 @@
 package com.vaadin.guice.i18n;
 
+import com.vaadin.guice.annotation.Caption;
+
 /**
  * A TranslationBinder should be injected on every part of your application where you want your
  * translations to be bound to the {@link com.vaadin.ui.Component}s annotated with {@link Caption}

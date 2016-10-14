@@ -3,6 +3,7 @@ package com.vaadin.guice.i18n;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 
+import com.vaadin.guice.annotation.Caption;
 import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.server.NeedsReflections;
 import com.vaadin.ui.Component;

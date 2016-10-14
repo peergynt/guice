@@ -1,4 +1,8 @@
-package com.vaadin.guice.i18n;
+package com.vaadin.guice.annotation;
+
+import com.vaadin.guice.i18n.TranslationBinder;
+import com.vaadin.guice.i18n.TranslationModule;
+import com.vaadin.guice.i18n.Translator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

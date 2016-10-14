@@ -1,5 +1,7 @@
 package com.vaadin.guice.i18n;
 
+import com.vaadin.guice.annotation.Caption;
+
 /**
  * Translator is a provider of translations for any input String, which may or may not be dependent
  * on the current context. The Translator itself is responsible of choosing the correct current
