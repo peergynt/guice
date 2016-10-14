@@ -9,7 +9,6 @@ import com.vaadin.navigator.View;
 import org.reflections.Reflections;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.inject.name.Names.named;
 
 public abstract class SecurityModule extends AbstractModule implements NeedsReflections {
@@ -19,17 +18,23 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
 
     protected SecurityModule(Class<? extends PermissionEvaluator> permissionEvaluatorClass, Class<? extends View> permissionDeniedView) {
         this.permissionDeniedView = permissionDeniedView;
-        this.permissionEvaluatorClass = checkNotNull(permissionEvaluatorClass);
+        this.permissionEvaluatorClass = permissionEvaluatorClass;
     }
 
     protected SecurityModule(Class<? extends PermissionEvaluator> permissionEvaluatorClass) {
         this(permissionEvaluatorClass, null);
     }
 
+    protected SecurityModule() {
+        this(null, null);
+    }
+
     protected void configure() {
 
-        bind(PermissionEvaluator.class).to(permissionEvaluatorClass);
-        bind(PermissionEnforcer.class).to(PermissionEnforcerImpl.class);
+        if (permissionEvaluatorClass != null) {
+            bind(PermissionEvaluator.class).to(permissionEvaluatorClass);
+            bind(PermissionEnforcer.class).to(PermissionEnforcerImpl.class);
+        }
 
         if (permissionDeniedView != null) {
             final GuiceView guiceView = permissionDeniedView.getAnnotation(GuiceView.class);
