@@ -35,7 +35,7 @@ public abstract class TranslationModule extends AbstractModule implements NeedsR
     private final Class<? extends Translator> translatorClass;
     private Reflections reflections;
 
-    protected TranslationModule(Class<? extends Translator> translatorClass) {
+    public TranslationModule(Class<? extends Translator> translatorClass) {
         this.translatorClass = checkNotNull(translatorClass);
     }
 

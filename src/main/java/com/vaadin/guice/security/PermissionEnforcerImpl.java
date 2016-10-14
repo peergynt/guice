@@ -22,11 +22,16 @@ class PermissionEnforcerImpl implements PermissionEnforcer {
 
     @Override
     public void enforce() {
-        final Navigator navigator = UI.getCurrent().getNavigator();
 
-        if (navigator != null && navigator.getCurrentView() != null && navigator.getCurrentView() instanceof SecureView) {
-            //reload secure view to check if there is still access granted
-            navigator.navigateTo(navigator.getState());
+        UI ui = UI.getCurrent();
+
+        if (ui != null) {
+            final Navigator navigator = UI.getCurrent().getNavigator();
+
+            if (navigator != null && navigator.getCurrentView() != null && navigator.getCurrentView() instanceof SecureView) {
+                //reload secure view to check if there is still access granted
+                navigator.navigateTo(navigator.getState());
+            }
         }
 
         for (Component restrictedComponent : restrictedComponents) {

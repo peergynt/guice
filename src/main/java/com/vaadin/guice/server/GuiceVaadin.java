@@ -1,6 +1,7 @@
 package com.vaadin.guice.server;
 
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 
@@ -192,6 +193,10 @@ class GuiceVaadin implements SessionInitListener {
 
     <T> T assemble(Class<T> type) {
         return injector.getInstance(type);
+    }
+
+    boolean isBound(Class<?> clazz) {
+        return injector.getExistingBinding(Key.get(clazz)) != null;
     }
 
     Set<Class<? extends UI>> getUis() {
