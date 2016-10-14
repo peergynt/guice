@@ -5,7 +5,7 @@
     <artifactId>guice-vaadin</artifactId>
     <packaging>jar</packaging>
     <groupId>com.vaadin</groupId>
-    <version>1.2.0</version>
+    <version>1.3.0-SNAPSHOT</version>
     <name>guice-vaadin</name>
     <description>
         Provides Google Guice integration for Vaadin applications.
@@ -20,8 +20,8 @@
         <guice.version>4.1.0</guice.version>
         <vaadin.version>[7.6.0,)</vaadin.version>
         <reflections.version>0.9.10</reflections.version>
-        <javassist.version>3.20.0-GA</javassist.version>
-        <mockito-core.version>1.9.5</mockito-core.version>
+        <javassist.version>3.21.0-GA</javassist.version>
+        <mockito-core.version>2.2.1</mockito-core.version>
         <maven-surefire-plugin.version>2.10</maven-surefire-plugin.version>
         <maven-jar-plugin.version>2.3.1</maven-jar-plugin.version>
         <javax.servlet-api.version>[3.0.0,)</javax.servlet-api.version>
