@@ -23,10 +23,13 @@ public @interface Caption {
     /**
      * this shoule be the name of the template or message that the {@link Translator} being used
      * understands. It may or may not contain parameters, that the Translator has to resolve, like
-     * in <code>
-     *
+     * in
+     * <pre>
+     *  <code>
      * @Caption("{{user.firstname}} {{user.lastname}}" public class FirstNameLastNameLabel extends
-     * Label { } </code>
+     * Label { }
+     *  </code>
+     * </pre>
      */
     String value();
 }
