@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 
 import com.vaadin.guice.annotation.GuiceView;
+import com.vaadin.guice.i18n.TranslationBinder;
+import com.vaadin.guice.security.PermissionEnforcer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.ServiceException;
@@ -119,6 +121,14 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
 
                 view = guiceVaadin.assemble(viewClass);
                 views.put(viewName, view);
+
+                if (guiceVaadin.isBound(PermissionEnforcer.class)) {
+                    guiceVaadin.assemble(PermissionEnforcer.class).enforce();
+                }
+
+                if (guiceVaadin.isBound(TranslationBinder.class)) {
+                    guiceVaadin.assemble(TranslationBinder.class).bind();
+                }
 
                 guiceVaadin.getViewScoper().endInitialization(view);
             } catch (RuntimeException e) {
