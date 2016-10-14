@@ -16,11 +16,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * this Module cannot be used directly but needs to be subclassed and being provided
- * with a {@link Translator} class in order to set up properly. Also, make sure that
- * the subclass is in a package that is being included in {@link Configuration#basePackages()}
- * if you use the {@link com.vaadin.guice.annotation.UIModule} annotation instead of
- * {@link Configuration#modules()}, as in the code below.
+ * this Module cannot be used directly but needs to be subclassed and being provided with a {@link
+ * Translator} class in order to set up properly. Also, make sure that the subclass is in a package
+ * that is being included in {@link Configuration#basePackages()} if you use the {@link
+ * com.vaadin.guice.annotation.UIModule} annotation instead of {@link Configuration#modules()}, as
+ * in the code below.
  *
  * <pre>
  * @UIModule
@@ -35,7 +35,7 @@ public abstract class TranslationModule extends AbstractModule implements NeedsR
     private final Class<? extends Translator> translatorClass;
     private Reflections reflections;
 
-    protected TranslationModule(Class<? extends Translator> translatorClass){
+    protected TranslationModule(Class<? extends Translator> translatorClass) {
         this.translatorClass = checkNotNull(translatorClass);
     }
 

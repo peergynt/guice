@@ -8,8 +8,8 @@ import com.vaadin.ui.SingleComponentContainer;
 import com.vaadin.ui.UI;
 
 /**
- * subclass GuiceNavigator if you need a custom navigator. To use,
- * set your GuiceNavigator's class in {@link GuiceUI#navigator()}
+ * subclass GuiceNavigator if you need a custom navigator. To use, set your GuiceNavigator's class
+ * in {@link GuiceUI#navigator()}
  */
 public class GuiceNavigator extends Navigator {
 

@@ -11,6 +11,7 @@ import com.vaadin.guice.server.NeedsReflections;
 import com.vaadin.navigator.View;
 
 import org.reflections.Reflections;
+
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -22,7 +23,7 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
     private final Class<? extends PermissionEvaluator> permissionEvaluatorClass;
     private Reflections reflections;
 
-    protected SecurityModule(Class<? extends PermissionEvaluator> permissionEvaluatorClass){
+    protected SecurityModule(Class<? extends PermissionEvaluator> permissionEvaluatorClass) {
         this.permissionEvaluatorClass = checkNotNull(permissionEvaluatorClass);
     }
 
