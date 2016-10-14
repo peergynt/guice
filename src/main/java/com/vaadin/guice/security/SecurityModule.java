@@ -52,13 +52,17 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
             bind(PermissionEvaluator.class).to(permissionEvaluatorClass);
             bind(PermissionEnforcer.class).to(PermissionEnforcerImpl.class);
 
-            final Set<Class<?>> needsPermissions = reflections.getTypesAnnotatedWith(NeedsPermission.class);
+            final Set<Class<?>> restrictedComponentClasses = reflections.getTypesAnnotatedWith(NeedsPermission.class);
 
             Multibinder<Component> restrictedComponents = Multibinder.newSetBinder(binder(), Component.class, AllRestrictedComponents.class);
 
-            for (Class<?> needsPermission : needsPermissions) {
-                checkState(Component.class.isAssignableFrom(needsPermission));
-                restrictedComponents.addBinding().to((Class<? extends Component>) needsPermission);
+            for (Class<?> restrictedComponentClass : restrictedComponentClasses) {
+                checkState(
+                        Component.class.isAssignableFrom(restrictedComponentClass),
+                        "%s has @NeedsPermission annotation but is not itself a com.vaadin.ui.Component",
+                        restrictedComponentClass
+                );
+                restrictedComponents.addBinding().to((Class<? extends Component>) restrictedComponentClass);
             }
         }
 
