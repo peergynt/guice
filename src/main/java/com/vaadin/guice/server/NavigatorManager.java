@@ -1,7 +1,5 @@
 package com.vaadin.guice.server;
 
-import com.google.common.base.Optional;
-
 import com.vaadin.guice.annotation.GuiceUI;
 import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.navigator.View;
@@ -15,16 +13,13 @@ import com.vaadin.ui.UI;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.vaadin.guice.server.PathUtil.removeParametersFromViewName;
-import static com.vaadin.guice.server.ReflectionUtils.findErrorView;
 import static java.lang.String.format;
 
 final class NavigatorManager {
 
-    private final Optional<Class<? extends View>> errorViewClassOptional;
     private final GuiceVaadin guiceVaadin;
 
     NavigatorManager(GuiceVaadin guiceVaadin) {
-        this.errorViewClassOptional = findErrorView(guiceVaadin.getViews());
         this.guiceVaadin = guiceVaadin;
     }
 
@@ -32,7 +27,7 @@ final class NavigatorManager {
 
         final Class<? extends UI> uiClass = ui.getClass();
 
-        GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
+        final GuiceUI annotation = uiClass.getAnnotation(GuiceUI.class);
 
         checkState(annotation != null);
 
@@ -71,10 +66,7 @@ final class NavigatorManager {
             );
         }
 
-        if (errorViewClassOptional.isPresent()) {
-
-            final Class<? extends View> errorViewClass = errorViewClassOptional.get();
-
+        if (!View.class.equals(annotation.errorView())) {
 
             navigator.setErrorProvider(
                     new ViewProvider() {
@@ -86,7 +78,7 @@ final class NavigatorManager {
                         @Override
                         public View getView(String viewName) {
                             //noinspection OptionalGetWithoutIsPresent
-                            return guiceVaadin.assemble(errorViewClass);
+                            return guiceVaadin.assemble(annotation.errorView());
                         }
                     }
             );

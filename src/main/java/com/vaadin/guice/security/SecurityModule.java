@@ -77,7 +77,7 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
 
             bind(String.class)
                     .annotatedWith(named("guice_security_permission_denied_view"))
-                    .toInstance(guiceView.name());
+                    .toInstance(guiceView.value());
         } else {
             bind(String.class)
                     .annotatedWith(named("guice_security_permission_denied_view"))

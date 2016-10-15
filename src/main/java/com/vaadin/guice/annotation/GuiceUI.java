@@ -4,6 +4,7 @@ import com.google.inject.ScopeAnnotation;
 
 import com.vaadin.guice.server.GuiceNavigator;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.View;
 import com.vaadin.ui.Component;
 
 import java.lang.annotation.Documented;
@@ -69,4 +70,10 @@ public @interface GuiceUI {
      * the {@link Navigator} that is to be used for navigation
      */
     Class<? extends GuiceNavigator> navigator() default GuiceNavigator.class;
+
+    /**
+     * the {@link View} that should be displayed in case of an error, see {@link
+     * Navigator#setErrorView(Class)}
+     */
+    Class<? extends View> errorView() default View.class;
 }

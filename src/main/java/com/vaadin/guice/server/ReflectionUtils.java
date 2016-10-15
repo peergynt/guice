@@ -1,6 +1,5 @@
 package com.vaadin.guice.server;
 
-import com.google.common.base.Optional;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provider;
@@ -26,7 +25,6 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 final class ReflectionUtils {
 
@@ -157,30 +155,6 @@ final class ReflectionUtils {
         }
 
         return viewChangeListenersByUI;
-    }
-
-    static Optional<Class<? extends View>> findErrorView(Iterable<Class<? extends View>> viewClasses) {
-
-        Class<? extends View> errorView = null;
-
-        for (Class<? extends View> viewClass : viewClasses) {
-            GuiceView annotation = viewClass.getAnnotation(GuiceView.class);
-
-            checkState(annotation != null);
-
-            if (annotation.isErrorView()) {
-                checkState(
-                        errorView == null,
-                        "%s and %s have an @GuiceView-annotation with isErrorView set to true",
-                        errorView,
-                        viewClass
-                );
-
-                errorView = viewClass;
-            }
-        }
-
-        return Optional.<Class<? extends View>>fromNullable(errorView);
     }
 }
 

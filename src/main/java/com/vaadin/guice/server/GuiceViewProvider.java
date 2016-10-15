@@ -23,8 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.vaadin.guice.server.PathUtil.removeParametersFromViewName;
-import static java.lang.Character.isUpperCase;
-import static java.lang.Character.toLowerCase;
 
 /**
  * A Vaadin {@link ViewProvider} that fetches the views from the guice application context. The
@@ -65,29 +63,7 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
 
             checkState(annotation != null);
 
-            if (GuiceView.USE_CONVENTIONS.equals(annotation.name())) {
-
-                String className = viewClass.getSimpleName();
-
-                StringBuilder viewNameBuilder = new StringBuilder();
-
-                for (int i = 0; i < className.length(); i++) {
-                    char c = className.charAt(i);
-
-                    if (isUpperCase(c)) {
-                        if (i != 0) {
-                            viewNameBuilder.append('-');
-                        }
-                        viewNameBuilder.append(toLowerCase(c));
-                    } else {
-                        viewNameBuilder.append(c);
-                    }
-                }
-
-                viewMapBuilder.put(viewNameBuilder.toString(), viewClass);
-            } else {
-                viewMapBuilder.put(annotation.name(), viewClass);
-            }
+            viewMapBuilder.put(annotation.value(), viewClass);
         }
 
         return viewMapBuilder.build();
