@@ -12,7 +12,6 @@ import com.google.inject.spi.TypeListener;
 
 import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.NeedsPermission;
-import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.guice.server.NeedsInjector;
 import com.vaadin.guice.server.NeedsReflections;
 import com.vaadin.navigator.View;
@@ -36,14 +35,6 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
     public SecurityModule(Class<? extends PermissionEvaluator> permissionEvaluatorClass, Class<? extends View> permissionDeniedView) {
         this.permissionDeniedView = permissionDeniedView;
         this.permissionEvaluatorClass = permissionEvaluatorClass;
-
-        if (permissionEvaluatorClass != null) {
-            checkArgument(
-                    permissionEvaluatorClass.getAnnotation(UIScope.class) != null,
-                    "%s needs to be put in UIScope, please add @UIScope annotation to it",
-                    permissionEvaluatorClass
-            );
-        }
     }
 
     public SecurityModule(Class<? extends PermissionEvaluator> permissionEvaluatorClass) {
