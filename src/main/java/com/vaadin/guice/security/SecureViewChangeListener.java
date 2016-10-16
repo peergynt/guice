@@ -14,9 +14,14 @@ import com.vaadin.ui.UI;
 @UIScope
 class SecureViewChangeListener implements ViewChangeListener {
 
+    private final String permissionDeniedTarget;
+
     @Inject
-    @Named("guice_security_permission_denied_view")
-    private Class<? extends View> permissionDeniedView;
+    SecureViewChangeListener(@Named("guice_security_permission_denied_view") Class<? extends View> permissionDeniedView) {
+        permissionDeniedTarget = View.class.equals(permissionDeniedView)
+                ? ""
+                : permissionDeniedView.getAnnotation(GuiceView.class).value();
+    }
 
     @Override
     public boolean beforeViewChange(ViewChangeEvent event) {
@@ -28,11 +33,7 @@ class SecureViewChangeListener implements ViewChangeListener {
         boolean canAccess = ((SecureView) event.getNewView()).canAccess(event.getParameters());
 
         if (!canAccess) {
-            String target = View.class.equals(permissionDeniedView)
-                    ? ""
-                    : permissionDeniedView.getAnnotation(GuiceView.class).value();
-
-            UI.getCurrent().getNavigator().navigateTo(target);
+            UI.getCurrent().getNavigator().navigateTo(permissionDeniedTarget);
         }
 
         return canAccess;
