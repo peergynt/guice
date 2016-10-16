@@ -3,8 +3,10 @@ package com.vaadin.guice.security;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import com.vaadin.guice.annotation.GuiceView;
 import com.vaadin.guice.annotation.GuiceViewChangeListener;
 import com.vaadin.guice.annotation.UIScope;
+import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.UI;
 
@@ -14,7 +16,7 @@ class SecureViewChangeListener implements ViewChangeListener {
 
     @Inject
     @Named("guice_security_permission_denied_view")
-    private String permissionDeniedView;
+    private Class<? extends View> permissionDeniedView;
 
     @Override
     public boolean beforeViewChange(ViewChangeEvent event) {
@@ -26,7 +28,11 @@ class SecureViewChangeListener implements ViewChangeListener {
         boolean canAccess = ((SecureView) event.getNewView()).canAccess(event.getParameters());
 
         if (!canAccess) {
-            UI.getCurrent().getNavigator().navigateTo(permissionDeniedView);
+            String target = View.class.equals(permissionDeniedView)
+                    ? ""
+                    : permissionDeniedView.getAnnotation(GuiceView.class).value();
+
+            UI.getCurrent().getNavigator().navigateTo(target);
         }
 
         return canAccess;

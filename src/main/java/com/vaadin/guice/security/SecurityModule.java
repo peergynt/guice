@@ -105,13 +105,15 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
                     permissionDeniedView
             );
 
-            bind(String.class)
+            bind(new TypeLiteral<Class<? extends View>>() {
+            })
                     .annotatedWith(named("guice_security_permission_denied_view"))
-                    .toInstance(guiceView.value());
+                    .toInstance(permissionDeniedView);
         } else {
-            bind(String.class)
+            bind(new TypeLiteral<Class<? extends View>>() {
+            })
                     .annotatedWith(named("guice_security_permission_denied_view"))
-                    .toInstance("");
+                    .toInstance(View.class);
         }
 
     }

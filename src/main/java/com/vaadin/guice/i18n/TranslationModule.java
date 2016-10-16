@@ -12,7 +12,6 @@ import com.google.inject.spi.TypeListener;
 
 import com.vaadin.guice.annotation.Caption;
 import com.vaadin.guice.annotation.Configuration;
-import com.vaadin.guice.annotation.UIScope;
 import com.vaadin.guice.server.NeedsInjector;
 import com.vaadin.guice.server.NeedsReflections;
 import com.vaadin.ui.Component;
@@ -21,7 +20,6 @@ import org.reflections.Reflections;
 
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -47,14 +45,7 @@ public abstract class TranslationModule extends AbstractModule implements NeedsR
     private Provider<Injector> injectorProvider;
 
     public TranslationModule(Class<? extends Translator> translatorClass) {
-
         this.translatorClass = checkNotNull(translatorClass);
-
-        checkArgument(
-                translatorClass.getAnnotation(UIScope.class) != null,
-                "%s needs to be put in UIScope, please add @UIScope annotation to it",
-                translatorClass
-        );
     }
 
     @Override
