@@ -16,20 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * This class serves as a means to allow application-scope communication between objects.
- * GlobalEventBusImpl is intended for events that are of 'global' interest, like updates to data
- * that is used by multiple UIs simultaneously. It is singleton-scoped and will release any
- * subscribers once their {@link VaadinSession} is ended in order to prevent memory leaks.
- *
- * <code> {@literal @}Inject private GlobalEventBusImpl globalEventBus;
- *
- * ... globalEventBus.post(new DataSetOfGlobalInterestChangedEvent()); ...
- *
- * </code> </pre>
- *
- * @author Bernd Hopp (bernd@vaadin.com)
- */
 @Singleton
 final class GlobalEventBusImpl extends EventBus implements GlobalEventBus {
 
