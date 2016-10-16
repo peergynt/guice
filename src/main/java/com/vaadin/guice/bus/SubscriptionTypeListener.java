@@ -42,7 +42,7 @@ class SubscriptionTypeListener implements TypeListener {
                 int scopes = getScopes(injectee.getClass());
 
                 if ((scopes & GLOBAL) == GLOBAL) {
-                    injectorProvider.get().getInstance(GlobalEventBus.class).register(injectee);
+                    injectorProvider.get().getInstance(GlobalEventBusImpl.class).register(injectee);
                 }
 
                 if ((scopes & SESSION) == SESSION) {
