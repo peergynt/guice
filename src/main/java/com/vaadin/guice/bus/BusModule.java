@@ -12,7 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The busses in com.vaadin.guice.bus can perfectly be used without this module, except of
  * the {@link GlobalEventBus}, which is an interface that needs to be bound by calling either
  * {@link BusModule#BusModule()} for the default non-distributed EventBus or by calling {@link BusModule#BusModule(Class)}
- * with your own implementation that may be distributed. Bus-registration will be wired up for you by guice.
+ * with an own implementation that may be distributed. Bus-registration will be wired up for you by guice.
  * If a BusModule is applied, Guice will register every instance with a @Subscribe annotation to the
  * corresponding bus via the marker interfaces in com.vaadin.guice.bus.events.
  * For example in the following code, Guice will register every new instance of Foo to the UIEventBus after creation.
@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *     </code>
  * </pre>
  */
-public final class BusModule extends AbstractModule implements NeedsInjector {
+public class BusModule extends AbstractModule implements NeedsInjector {
     private final Class<? extends GlobalEventBus> globalEventBusClass;
     private Provider<Injector> injectorProvider;
 
