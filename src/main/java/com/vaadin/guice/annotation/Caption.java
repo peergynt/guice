@@ -26,8 +26,9 @@ public @interface Caption {
      * in
      * <pre>
      *  <code>
-     * @Caption("{{user.firstname}} {{user.lastname}}" public class FirstNameLastNameLabel extends
-     * Label { }
+     * {@literal @}Caption("{{user.firstname}} {{user.lastname}}" public class FirstNameLastNameLabel extends
+     * Label {
+     * }
      *  </code>
      * </pre>
      */

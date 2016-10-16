@@ -1,11 +1,19 @@
 package com.vaadin.guice.i18n;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
+import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.spi.InjectionListener;
+import com.google.inject.spi.TypeEncounter;
+import com.google.inject.spi.TypeListener;
 
 import com.vaadin.guice.annotation.Caption;
 import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.annotation.UIScope;
+import com.vaadin.guice.server.NeedsInjector;
 import com.vaadin.guice.server.NeedsReflections;
 import com.vaadin.ui.Component;
 
@@ -33,9 +41,10 @@ import static com.google.common.base.Preconditions.checkState;
  * }
  * </pre>
  */
-public abstract class TranslationModule extends AbstractModule implements NeedsReflections {
+public abstract class TranslationModule extends AbstractModule implements NeedsReflections, NeedsInjector {
     private final Class<? extends Translator> translatorClass;
     private Reflections reflections;
+    private Provider<Injector> injectorProvider;
 
     public TranslationModule(Class<? extends Translator> translatorClass) {
 
@@ -68,10 +77,34 @@ public abstract class TranslationModule extends AbstractModule implements NeedsR
 
         bind(Translator.class).to(translatorClass);
         bind(TranslationBinder.class).to(TranslationBinderImpl.class);
+
+        bindListener(new AbstractMatcher<TypeLiteral<?>>() {
+            @Override
+            public boolean matches(TypeLiteral<?> typeLiteral) {
+                return typeLiteral.getRawType().getAnnotation(Caption.class) != null;
+            }
+        }, new TypeListener() {
+            @Override
+            public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
+                encounter.register(new InjectionListener<I>() {
+                    @Override
+                    public void afterInjection(I injectee) {
+                        final Caption caption = injectee.getClass().getAnnotation(Caption.class);
+
+                        Translator translator = injectorProvider.get().getInstance(Translator.class);
+
+                        ((Component) injectee).setCaption(translator.translate(caption.value()));
+                    }
+                });
+            }
+        });
     }
 
-    @Override
     public void setReflections(Reflections reflections) {
         this.reflections = reflections;
+    }
+
+    public void setInjectorProvider(Provider<Injector> injectorProvider) {
+        this.injectorProvider = injectorProvider;
     }
 }

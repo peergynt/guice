@@ -3,8 +3,6 @@ package com.vaadin.guice.server;
 import com.google.common.collect.ImmutableMap;
 
 import com.vaadin.guice.annotation.GuiceUI;
-import com.vaadin.guice.i18n.TranslationBinder;
-import com.vaadin.guice.security.PermissionEnforcer;
 import com.vaadin.server.UIClassSelectionEvent;
 import com.vaadin.server.UICreateEvent;
 import com.vaadin.server.UIProvider;
@@ -112,14 +110,6 @@ class GuiceUIProvider extends UIProvider {
             UI instance = guiceVaadin.assemble(event.getUIClass());
 
             navigatorManager.addNavigator(instance);
-
-            if (guiceVaadin.isBound(PermissionEnforcer.class)) {
-                guiceVaadin.assemble(PermissionEnforcer.class).enforce();
-            }
-
-            if (guiceVaadin.isBound(TranslationBinder.class)) {
-                guiceVaadin.assemble(TranslationBinder.class).bind();
-            }
 
             guiceVaadin.getUiScoper().endInitialization(instance);
 

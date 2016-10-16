@@ -26,7 +26,7 @@ class PermissionEnforcerImpl implements PermissionEnforcer {
         UI ui = UI.getCurrent();
 
         if (ui != null) {
-            final Navigator navigator = UI.getCurrent().getNavigator();
+            final Navigator navigator = ui.getNavigator();
 
             if (navigator != null && navigator.getCurrentView() != null && navigator.getCurrentView() instanceof SecureView) {
                 //reload secure view to check if there is still access granted
