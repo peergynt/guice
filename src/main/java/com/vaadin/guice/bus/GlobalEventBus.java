@@ -5,6 +5,7 @@ package com.vaadin.guice.bus;
  * GlobalEventBusImpl is intended for events that are of 'global' interest, like updates to data
  * that is used by multiple UIs simultaneously. It is singleton-scoped and will release any
  * subscribers once their {@link com.vaadin.server.VaadinSession} is ended in order to prevent memory leaks.
+ * In order to use GlobalEventBus, a {@link BusModule} needs to be installed.
  *
  * <code> {@literal @}Inject private GlobalEventBusImpl globalEventBus;
  *
