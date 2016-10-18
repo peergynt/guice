@@ -2,7 +2,6 @@ package com.vaadin.guice.server;
 
 import com.google.inject.ConfigurationException;
 
-import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.testClasses.ASecondImplementation;
 import com.vaadin.guice.testClasses.AnImplementation;
 import com.vaadin.guice.testClasses.AnInterface;

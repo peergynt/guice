@@ -11,7 +11,6 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
 import com.vaadin.guice.annotation.Caption;
-import com.vaadin.guice.annotation.Configuration;
 import com.vaadin.guice.server.NeedsInjector;
 import com.vaadin.guice.server.NeedsReflections;
 import com.vaadin.ui.Component;

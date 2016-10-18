@@ -26,7 +26,6 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.inject.Guice.createInjector;
 import static com.google.inject.util.Modules.combine;
-import static com.google.inject.util.Modules.override;
 import static com.vaadin.guice.server.ReflectionUtils.getDynamicModules;
 import static com.vaadin.guice.server.ReflectionUtils.getGuiceUIClasses;
 import static com.vaadin.guice.server.ReflectionUtils.getGuiceViewClasses;
@@ -96,7 +95,7 @@ class GuiceVaadin implements SessionInitListener {
             Class<? extends Module>[] modules
     ) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         /*
-         * combine bindings from the static modules in {@link Configuration#modules()} with those bindings
+         * combine bindings from the static modules in {@link VaadinGuiceConfiguration#modules()} with those bindings
          * from dynamically loaded modules, see {@link com.vaadin.guice.annotation.UIModule}.
          * This is done first so modules can install their own reflections.
          */
