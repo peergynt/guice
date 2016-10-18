@@ -11,6 +11,7 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
 import com.vaadin.guice.annotation.Caption;
+import com.vaadin.guice.annotation.GuiceVaadinConfiguration;
 import com.vaadin.guice.server.NeedsInjector;
 import com.vaadin.guice.server.NeedsReflections;
 import com.vaadin.ui.Component;
@@ -25,8 +26,8 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * this Module cannot be used directly but needs to be subclassed and being provided with a {@link
  * Translator} class in order to set up properly. Also, make sure that the subclass is in a package
- * that is being included in {@link Configuration#basePackages()} if you use the {@link
- * com.vaadin.guice.annotation.UIModule} annotation instead of {@link Configuration#modules()}, as
+ * that is being included in {@link GuiceVaadinConfiguration#basePackages()} if you use the {@link
+ * com.vaadin.guice.annotation.UIModule} annotation instead of {@link GuiceVaadinConfiguration#modules()}, as
  * in the code below.
  *
  * <pre>
