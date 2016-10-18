@@ -28,10 +28,12 @@ class SubscriptionTypeListener implements TypeListener {
     private static final int VIEW = 8;
 
     private final Provider<Injector> injectorProvider;
+    private final Class<? extends GlobalEventBus> globalEventBusClass;
     private final Map<Class<?>, Integer> classToScopesMap = new ConcurrentHashMap<Class<?>, Integer>();
 
-    SubscriptionTypeListener(Provider<Injector> injectorProvider) {
+    SubscriptionTypeListener(Provider<Injector> injectorProvider, Class<? extends GlobalEventBus> globalEventBusClass) {
         this.injectorProvider = injectorProvider;
+        this.globalEventBusClass = globalEventBusClass;
     }
 
     @Override
@@ -42,7 +44,7 @@ class SubscriptionTypeListener implements TypeListener {
                 int scopes = getScopes(injectee.getClass());
 
                 if ((scopes & GLOBAL) == GLOBAL) {
-                    injectorProvider.get().getInstance(GlobalEventBusImpl.class).register(injectee);
+                    injectorProvider.get().getInstance(globalEventBusClass).register(injectee);
                 }
 
                 if ((scopes & SESSION) == SESSION) {

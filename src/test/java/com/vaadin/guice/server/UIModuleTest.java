@@ -2,6 +2,7 @@ package com.vaadin.guice.server;
 
 import com.google.inject.ConfigurationException;
 
+import com.vaadin.guice.annotation.GuiceVaadinConfiguration;
 import com.vaadin.guice.testClasses.ASecondImplementation;
 import com.vaadin.guice.testClasses.AnImplementation;
 import com.vaadin.guice.testClasses.AnInterface;
@@ -71,15 +72,15 @@ public class UIModuleTest {
         return (GuiceVaadin) field.get(servlet);
     }
 
-    @Configuration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.testClasses")
+    @GuiceVaadinConfiguration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.testClasses")
     private static class VaadinServletWithStaticAndDynamicLoadedModules extends GuiceVaadinServlet {
     }
 
-    @Configuration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.server")
+    @GuiceVaadinConfiguration(modules = {StaticlyLoadedModule.class}, basePackages = "com.vaadin.guice.server")
     private static class VaadinServletWithStaticLoadedModule extends GuiceVaadinServlet {
     }
 
-    @Configuration(modules = {}, basePackages = "com.vaadin.guice.testClasses")
+    @GuiceVaadinConfiguration(modules = {}, basePackages = "com.vaadin.guice.testClasses")
     private static class VaadinServletWithDynamicLoadedModule extends GuiceVaadinServlet {
     }
 }

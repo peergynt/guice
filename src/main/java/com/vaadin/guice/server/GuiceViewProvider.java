@@ -13,6 +13,7 @@ import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.VaadinSession;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
@@ -113,6 +114,6 @@ class GuiceViewProvider implements ViewProvider, SessionDestroyListener, Session
 
     @Override
     public void sessionInit(SessionInitEvent event) throws ServiceException {
-        viewsBySessionMap.put(event.getSession(), new ConcurrentHashMap<String, View>(viewNamesToViewClassesMap.size()));
+        viewsBySessionMap.put(event.getSession(), new HashMap<String, View>(viewNamesToViewClassesMap.size()));
     }
 }

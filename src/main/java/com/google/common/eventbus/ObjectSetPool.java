@@ -1,4 +1,4 @@
-package com.vaadin.guice.bus;
+package com.google.common.eventbus;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

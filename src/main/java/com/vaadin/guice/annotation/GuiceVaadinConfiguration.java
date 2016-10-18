@@ -8,11 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * VaadinGuiceConfiguration for {@link GuiceVaadinServlet}, attach directly to your GuiceVaadinServlet's
+ * GuiceVaadinConfiguration for {@link GuiceVaadinServlet}, attach directly to your GuiceVaadinServlet's
  * declaration like
  * <pre>
  *      <code>
- * {@literal @}VaadinGuiceConfiguration(modules={MyModule.class}, basePackages="com.myproject")
+ * {@literal @}GuiceVaadinConfiguration(modules={MyModule.class}, basePackages="com.myproject")
  * {@literal @}WebServlet(urlPatterns = "/*", name = "MyServlet", asyncSupported = true)
  * public static class MyServlet extends GuiceVaadinServlet {
  * }
@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
  */
 @Target({java.lang.annotation.ElementType.TYPE})
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
-public @interface VaadinGuiceConfiguration {
+public @interface GuiceVaadinConfiguration {
 
     /**
      * An array of classes for modules to be installed by guice. Each of these classes must have a

@@ -2,6 +2,7 @@ package com.vaadin.guice.server;
 
 import com.google.inject.Injector;
 
+import com.vaadin.guice.annotation.GuiceVaadinConfiguration;
 import com.vaadin.server.VaadinServlet;
 
 import org.reflections.Reflections;
@@ -21,16 +22,16 @@ public class GuiceVaadinServlet extends VaadinServlet {
     private final GuiceVaadin guiceVaadin;
 
     public GuiceVaadinServlet() {
-        Configuration annotation = getClass().getAnnotation(Configuration.class);
+        GuiceVaadinConfiguration annotation = getClass().getAnnotation(GuiceVaadinConfiguration.class);
 
         checkArgument(
                 annotation != null,
-                "GuiceVaadinServlet cannot be used without 'VaadinGuiceConfiguration' annotation"
+                "GuiceVaadinServlet cannot be used without 'GuiceVaadinConfiguration' annotation"
         );
 
         checkArgument(
                 annotation.basePackages().length > 0,
-                "at least on 'basePackages'-parameter expected in VaadinGuiceConfiguration of " + getClass()
+                "at least on 'basePackages'-parameter expected in GuiceVaadinConfiguration of " + getClass()
         );
 
         Reflections reflections = new Reflections((Object[]) annotation.basePackages());

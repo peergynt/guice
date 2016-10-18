@@ -3,10 +3,16 @@ package com.vaadin.guice.bus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 
 import com.vaadin.guice.server.NeedsInjector;
+import com.vaadin.ui.UI;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.inject.name.Names.named;
 
 /**
  * The busses in com.vaadin.guice.bus can perfectly be used without this module, except of
@@ -36,18 +42,31 @@ public class BusModule extends AbstractModule implements NeedsInjector {
     private Provider<Injector> injectorProvider;
 
     public BusModule() {
-        this(GlobalEventBusImpl.class);
+        this(getDefaultImplementationClass());
     }
 
     public BusModule(Class<? extends GlobalEventBus> globalEventBusClass) {
         this.globalEventBusClass = checkNotNull(globalEventBusClass);
     }
 
+    @SuppressWarnings("unchecked")
+    private static Class<? extends GlobalEventBus> getDefaultImplementationClass() {
+        try {
+            return (Class<? extends GlobalEventBus>) Class.forName("com.google.common.eventbus.GlobalEventBusImpl");
+        } catch (ClassNotFoundException e) {
+            //will not happen
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     protected void configure() {
+        bind(new TypeLiteral<Map<Object, UI>>() {
+        }).annotatedWith(named("_registeredObjectsToUI")).toInstance(new ConcurrentHashMap<Object, UI>());
+
         bindListener(
                 new SubscriberMethodsMatcher(),
-                new SubscriptionTypeListener(injectorProvider)
+                new SubscriptionTypeListener(injectorProvider, globalEventBusClass)
         );
 
         bind(GlobalEventBus.class).to(globalEventBusClass);

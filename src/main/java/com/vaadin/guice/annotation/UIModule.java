@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * Annotation to be placed on {@link com.google.inject.Module}-classes that should be loaded
  * dynamically by the {@link com.vaadin.guice.server.GuiceVaadinServlet}. Bindings from dynamically
  * loaded modules will override bindings from "statically loaded" modules that are listed in {@link
- * VaadinGuiceConfiguration#modules()}.
+ * GuiceVaadinConfiguration#modules()}.
  *
  * <pre>
  * &#064;UIModule
