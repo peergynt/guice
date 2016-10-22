@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
+import com.vaadin.guice.bus.GlobalEventBus;
 import com.vaadin.server.SessionDestroyEvent;
 import com.vaadin.server.SessionDestroyListener;
 import com.vaadin.server.VaadinService;
@@ -22,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 @SuppressWarnings("unused")
-class GlobalEventBusImpl extends EventBus {
+class GlobalEventBusImpl extends EventBus implements GlobalEventBus {
 
     private static final Dispatcher DISPATCHER = new Dispatcher() {
         @Override
