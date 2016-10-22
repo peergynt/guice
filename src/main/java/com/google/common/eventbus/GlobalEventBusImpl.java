@@ -10,6 +10,7 @@ import com.vaadin.server.SessionDestroyListener;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.UI;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -30,12 +31,19 @@ class GlobalEventBusImpl extends EventBus {
                 final Subscriber subscriber = subscribers.next();
 
                 if (subscriber.target instanceof Component) {
-                    ((Component) subscriber.target).getUI().access(new Runnable() {
-                        @Override
-                        public void run() {
-                            subscriber.dispatchEvent(event);
-                        }
-                    });
+                    final UI ui = ((Component) subscriber.target).getUI();
+
+                    if (ui != null) {
+                        ui.access(new Runnable() {
+                            @Override
+                            public void run() {
+                                subscriber.dispatchEvent(event);
+                            }
+                        });
+                    } else {
+                        //component is not attached to a UI yet
+                        subscriber.dispatchEvent(event);
+                    }
                 } else {
                     //use current thread
                     subscriber.dispatchEvent(event);
