@@ -29,6 +29,8 @@
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
         <java-source.version>1.6</java-source.version>
         <java-target.version>1.6</java-target.version>
+        <security.version>1.0</security.version>
+        <i18n.version>1.0</i18n.version>
     </properties>
     <dependencies>
         <dependency>
@@ -67,6 +69,16 @@
             <artifactId>vaadin-server</artifactId>
             <version>${vaadin.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.vaadin</groupId>
+            <artifactId>security</artifactId>
+            <version>${security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.vaadin</groupId>
+            <artifactId>i18n</artifactId>
+            <version>${i18n.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

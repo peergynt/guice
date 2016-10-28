@@ -11,13 +11,15 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
 import com.vaadin.guice.annotation.GuiceView;
-import com.vaadin.guice.annotation.NeedsPermission;
 import com.vaadin.guice.server.NeedsInjector;
 import com.vaadin.guice.server.NeedsReflections;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.Component;
 
 import org.reflections.Reflections;
+import org.vaadin.security.annotation.Restricted;
+import org.vaadin.security.api.PermissionEnforcer;
+import org.vaadin.security.api.PermissionEvaluator;
 
 import java.util.Set;
 
@@ -50,9 +52,9 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
 
         if (permissionEvaluatorClass != null) {
             bind(PermissionEvaluator.class).to(permissionEvaluatorClass);
-            bind(PermissionEnforcer.class).to(PermissionEnforcerImpl.class);
+            bind(PermissionEnforcer.class).to(GuicePermissionEnforcer.class);
 
-            final Set<Class<?>> restrictedComponentClasses = reflections.getTypesAnnotatedWith(NeedsPermission.class);
+            final Set<Class<?>> restrictedComponentClasses = reflections.getTypesAnnotatedWith(Restricted.class);
 
             Multibinder<Component> restrictedComponents = Multibinder.newSetBinder(binder(), Component.class, AllRestrictedComponents.class);
 
@@ -68,7 +70,7 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
             bindListener(new AbstractMatcher<TypeLiteral<?>>() {
                 @Override
                 public boolean matches(TypeLiteral<?> typeLiteral) {
-                    return typeLiteral.getRawType().getAnnotation(NeedsPermission.class) != null;
+                    return typeLiteral.getRawType().getAnnotation(Restricted.class) != null;
                 }
             }, new TypeListener() {
                 @Override
@@ -76,11 +78,11 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
                     encounter.register(new InjectionListener<I>() {
                         @Override
                         public void afterInjection(I injectee) {
-                            final NeedsPermission needsPermission = injectee.getClass().getAnnotation(NeedsPermission.class);
+                            final Restricted annotation = injectee.getClass().getAnnotation(Restricted.class);
 
                             PermissionEvaluator permissionEvaluator = injectorProvider.get().getInstance(PermissionEvaluator.class);
 
-                            ((Component) injectee).setVisible(permissionEvaluator.hasPermission(needsPermission.value()));
+                            ((Component) injectee).setVisible(permissionEvaluator.hasPermission(annotation.value()));
                         }
                     });
                 }
@@ -96,17 +98,14 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
                     permissionDeniedView
             );
 
-            bind(new TypeLiteral<Class<? extends View>>() {
-            })
+            bind(String.class)
                     .annotatedWith(named("guice_security_permission_denied_view"))
-                    .toInstance(permissionDeniedView);
+                    .toInstance(permissionDeniedView.getAnnotation(GuiceView.class).value());
         } else {
-            bind(new TypeLiteral<Class<? extends View>>() {
-            })
+            bind(String.class)
                     .annotatedWith(named("guice_security_permission_denied_view"))
-                    .toInstance(View.class);
+                    .toInstance("");
         }
-
     }
 
     public void setInjectorProvider(Provider<Injector> injectorProvider) {

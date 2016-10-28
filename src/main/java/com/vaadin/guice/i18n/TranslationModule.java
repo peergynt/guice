@@ -10,13 +10,15 @@ import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
-import com.vaadin.guice.annotation.Caption;
 import com.vaadin.guice.annotation.GuiceVaadinConfiguration;
 import com.vaadin.guice.server.NeedsInjector;
 import com.vaadin.guice.server.NeedsReflections;
 import com.vaadin.ui.Component;
 
 import org.reflections.Reflections;
+import org.vaadin.i18n.annotation.Caption;
+import org.vaadin.i18n.api.TranslationBinder;
+import org.vaadin.i18n.api.Translator;
 
 import java.util.Set;
 
@@ -67,7 +69,7 @@ public abstract class TranslationModule extends AbstractModule implements NeedsR
         }
 
         bind(Translator.class).to(translatorClass);
-        bind(TranslationBinder.class).to(TranslationBinderImpl.class);
+        bind(TranslationBinder.class).to(GuiceTranslationBinder.class);
 
         bindListener(new AbstractMatcher<TypeLiteral<?>>() {
             @Override
