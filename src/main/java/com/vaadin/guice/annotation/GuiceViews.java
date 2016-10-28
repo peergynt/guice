@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  * &#064;GuiceView(name = &quot;myView&quot;, ui = MyUI.class) public class MyView extends
  * CustomComponent implements View { // ... } </pre>
  *
- * {@literal @}Inject {@literal @}AllKnownGuiceViews private Set&lt;View&gt; guiceViews;
+ * {@literal @}Inject {@literal @}GuiceViews private Set&lt;View&gt; guiceViews;
  *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Henri Sara (hesara@vaadin.com)
@@ -24,5 +24,5 @@ import java.lang.annotation.Target;
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Documented
 @BindingAnnotation
-public @interface AllKnownGuiceViews {
+public @interface GuiceViews {
 }
