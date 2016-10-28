@@ -1,5 +1,7 @@
 package com.vaadin.guice.security;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 
 import com.vaadin.guice.annotation.UIScope;
@@ -12,7 +14,7 @@ import org.vaadin.security.api.PermissionEnforcer;
 import org.vaadin.security.api.PermissionEvaluator;
 import org.vaadin.security.api.SecureView;
 
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,17 +25,20 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @UIScope
 class GuicePermissionEnforcer implements PermissionEnforcer {
 
-    private final Map<String, Component> restrictedComponentsByPermission;
+    private final Multimap<String, Component> restrictedComponentsByPermission;
+
     @Inject
     private PermissionEvaluator permissionEvaluator;
 
     @Inject
     GuicePermissionEnforcer(@AllRestrictedComponents Set<Component> restrictedComponents) {
-        restrictedComponentsByPermission = new HashMap<String, Component>(restrictedComponents.size());
+        restrictedComponentsByPermission = HashMultimap.create(restrictedComponents.size(), 4);
 
         for (Component component : restrictedComponents) {
+            final String restriction = component.getClass().getAnnotation(Restricted.class).value();
+
             restrictedComponentsByPermission.put(
-                    component.getClass().getAnnotation(Restricted.class).value(),
+                    restriction,
                     component
             );
         }
@@ -53,10 +58,15 @@ class GuicePermissionEnforcer implements PermissionEnforcer {
             }
         }
 
-        for (Map.Entry<String, Component> entry : restrictedComponentsByPermission.entrySet()) {
-            boolean hasPermission = permissionEvaluator.hasPermission(entry.getKey());
+        for (Map.Entry<String, Collection<Component>> entry : restrictedComponentsByPermission.asMap().entrySet()) {
+            String permission = entry.getKey();
+            Collection<Component> components = entry.getValue();
 
-            entry.getValue().setVisible(hasPermission);
+            boolean hasPermission = permissionEvaluator.hasPermission(permission);
+
+            for (Component component : components) {
+                component.setVisible(hasPermission);
+            }
         }
     }
 
