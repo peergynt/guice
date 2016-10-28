@@ -84,7 +84,8 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
 
                             ((Component) injectee).setVisible(permissionEvaluator.hasPermission(annotation.value()));
                         }
-                    });
+                        }
+                    );
                 }
             });
         }
