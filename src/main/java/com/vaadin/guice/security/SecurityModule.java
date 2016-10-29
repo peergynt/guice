@@ -64,30 +64,39 @@ public abstract class SecurityModule extends AbstractModule implements NeedsRefl
                         "%s has @NeedsPermission annotation but is not itself a com.vaadin.ui.Component",
                         restrictedComponentClass
                 );
+
+                final Restricted annotation = restrictedComponentClass.getAnnotation(Restricted.class);
+
+                checkState(!annotation.value().isEmpty(), "%s has @Restricted annotation with empty value");
+
                 restrictedComponents.addBinding().to((Class<? extends Component>) restrictedComponentClass);
             }
 
-            bindListener(new AbstractMatcher<TypeLiteral<?>>() {
-                @Override
-                public boolean matches(TypeLiteral<?> typeLiteral) {
-                    return typeLiteral.getRawType().getAnnotation(Restricted.class) != null;
-                }
-            }, new TypeListener() {
-                @Override
-                public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
-                    encounter.register(new InjectionListener<I>() {
+            bindListener(
+                    new AbstractMatcher<TypeLiteral<?>>() {
                         @Override
-                        public void afterInjection(I injectee) {
-                            final Restricted annotation = injectee.getClass().getAnnotation(Restricted.class);
-
-                            PermissionEvaluator permissionEvaluator = injectorProvider.get().getInstance(PermissionEvaluator.class);
-
-                            ((Component) injectee).setVisible(permissionEvaluator.hasPermission(annotation.value()));
+                        public boolean matches(TypeLiteral<?> typeLiteral) {
+                            return typeLiteral.getRawType().getAnnotation(Restricted.class) != null;
                         }
+                    },
+                    new TypeListener() {
+                        @Override
+                        public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
+                            encounter.register(
+                                    new InjectionListener<I>() {
+                                        @Override
+                                        public void afterInjection(I injectee) {
+                                            final Restricted annotation = injectee.getClass().getAnnotation(Restricted.class);
+
+                                            PermissionEvaluator permissionEvaluator = injectorProvider.get().getInstance(PermissionEvaluator.class);
+
+                                            ((Component) injectee).setVisible(permissionEvaluator.hasPermission(annotation.value()));
+                                        }
+                                    }
+                            );
                         }
-                    );
                 }
-            });
+            );
         }
 
         if (permissionDeniedView != null) {

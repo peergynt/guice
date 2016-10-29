@@ -70,7 +70,6 @@ class GuicePermissionEnforcer implements PermissionEnforcer {
         }
     }
 
-
     @Override
     public void register(Component component, String permission) {
         checkNotNull(component);

@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * @author Josh Long (josh@joshlong.com)
  * @author Bernd Hopp (bernd@vaadin.com)
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @ScopeAnnotation
